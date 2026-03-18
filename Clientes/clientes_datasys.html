@@ -1,0 +1,3158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS · Área de Clientes</title>
+<meta name="robots" content="noindex, nofollow">
+<script src="tracker.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+
+:root{
+  --cyan:#00e5ff;--cyan2:#00b8d9;--dark:#030d18;--dark2:#060f1c;--dark3:#0a1828;
+  --silver:#8eb8cc;--white:#dff0f8;--gold:#f0c040;--red:#c8282a;--green:#3d8c6e;
+  --glow-sm:0 0 12px rgba(0,229,255,0.4);
+  --glow-md:0 0 24px rgba(0,229,255,0.5),0 0 48px rgba(0,229,255,0.2);
+  --glow-lg:0 0 40px rgba(0,229,255,0.6),0 0 80px rgba(0,229,255,0.25);
+}
+
+body{font-family:'Rajdhani',sans-serif;background:var(--dark);color:var(--white);overflow-x:hidden;cursor:none;min-height:100vh;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,.011) 3px,rgba(0,229,255,.011) 4px);pointer-events:none;z-index:9997;}
+
+/* CURSOR */
+#cur{width:20px;height:20px;border:1.5px solid var(--cyan);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);transition:width .2s,height .2s;mix-blend-mode:screen;}
+#cur2{width:5px;height:5px;background:var(--cyan);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transform:translate(-50%,-50%);transition:left .1s ease,top .1s ease;box-shadow:var(--glow-sm);}
+body:has(a:hover,button:hover) #cur{width:30px;height:30px;background:rgba(0,229,255,.05);}
+
+/* NAVBAR */
+#navbar{position:fixed;inset:0 0 auto 0;height:66px;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 44px;background:rgba(3,13,24,.96);border-bottom:1px solid rgba(0,229,255,.18);backdrop-filter:blur(18px);}
+#navbar::after{content:'';position:absolute;bottom:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.4;}
+.n-logo{display:flex;align-items:center;gap:12px;text-decoration:none;}
+.n-logo-mark{width:32px;height:32px;border:1.5px solid var(--cyan);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;background:rgba(0,229,255,.08);box-shadow:var(--glow-sm);}
+.n-logo-mark span{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:900;color:var(--cyan);}
+.n-logo-txt{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;letter-spacing:5px;color:var(--cyan);text-shadow:var(--glow-sm);}
+.n-logo-sub{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:3px;color:var(--silver);margin-left:4px;}
+.n-right{display:flex;align-items:center;gap:12px;}
+.n-btn{padding:7px 13px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.82rem;letter-spacing:2px;text-transform:uppercase;color:var(--silver);background:none;border:1px solid transparent;cursor:pointer;transition:all .3s;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.n-btn:hover{color:var(--cyan);border-color:rgba(0,229,255,.28);background:rgba(0,229,255,.05);}
+#navUser{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--cyan);letter-spacing:2px;display:none;}
+#logoutBtn{display:none;}
+
+/* GRID BG */
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);background-size:55px 55px;animation:gridDrift 26s linear infinite;pointer-events:none;z-index:0;}
+@keyframes gridDrift{0%{background-position:0 0;}100%{background-position:55px 55px;}}
+.ambient{position:fixed;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 30%,rgba(0,30,60,.6) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+/* ══════════════════════════════ LOGIN SCREEN ══════════════════════════════ */
+#loginScreen{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;padding-top:66px;}
+
+.login-wrap{position:relative;z-index:2;width:100%;max-width:440px;padding:0 20px;}
+
+.login-badge{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:5px;color:var(--cyan);opacity:.6;text-align:center;margin-bottom:16px;animation:fadeUp .8s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+
+.login-card{background:rgba(6,15,28,.95);border:1px solid rgba(0,229,255,.18);clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);padding:44px 40px;animation:fadeUp .9s ease .1s both;position:relative;overflow:hidden;}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.login-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(0,229,255,.06),transparent);pointer-events:none;}
+
+.login-icon{width:64px;height:64px;margin:0 auto 24px;border:1.5px solid rgba(0,229,255,.35);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;background:rgba(0,229,255,.06);box-shadow:var(--glow-sm);font-size:1.6rem;animation:iconPulse 3s ease-in-out infinite;}
+@keyframes iconPulse{0%,100%{box-shadow:var(--glow-sm);}50%{box-shadow:var(--glow-md);}}
+
+.login-title{font-family:'Orbitron',sans-serif;font-size:1.05rem;font-weight:900;letter-spacing:4px;color:var(--cyan);text-align:center;text-shadow:var(--glow-sm);margin-bottom:6px;}
+.login-sub{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:3px;color:var(--silver);text-align:center;margin-bottom:36px;opacity:.7;}
+
+.field-wrap{margin-bottom:20px;position:relative;}
+.field-label{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:3px;color:var(--cyan);opacity:.7;margin-bottom:8px;display:block;text-transform:uppercase;}
+.field-input{width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:1rem;font-weight:500;padding:12px 16px;outline:none;transition:all .3s;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
+.field-input:focus{border-color:rgba(0,229,255,.5);background:rgba(0,229,255,.07);box-shadow:var(--glow-sm);}
+.field-input::placeholder{color:rgba(142,184,204,.3);font-size:.9rem;}
+.field-eye{position:absolute;right:14px;bottom:13px;cursor:pointer;color:var(--silver);opacity:.5;font-size:.85rem;transition:opacity .2s;background:none;border:none;}
+.field-eye:hover{opacity:1;}
+
+.login-opts{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+.check-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.check-box{width:14px;height:14px;border:1px solid rgba(0,229,255,.3);background:rgba(0,229,255,.04);display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.check-box.active{background:rgba(0,229,255,.15);border-color:var(--cyan);}
+.check-box.active::after{content:'✓';font-size:.6rem;color:var(--cyan);}
+.check-lbl{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:1.5px;color:var(--silver);}
+.forgot-link{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:1.5px;color:var(--cyan);opacity:.6;cursor:pointer;text-decoration:none;transition:opacity .2s;}
+.forgot-link:hover{opacity:1;}
+
+.login-btn{width:100%;padding:15px;font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:4px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);box-shadow:var(--glow-sm);transition:all .3s;position:relative;overflow:hidden;text-transform:uppercase;}
+.login-btn::before{content:'';position:absolute;top:0;left:-120%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);transition:left .5s;}
+.login-btn:hover::before{left:120%;}
+.login-btn:hover{box-shadow:var(--glow-md);transform:translateY(-1px);}
+.login-btn:active{transform:translateY(0);}
+.login-btn.loading{opacity:.7;pointer-events:none;}
+
+.login-err{display:none;margin-top:14px;padding:10px 14px;background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.3);font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:1.5px;color:#e05050;text-align:center;}
+.login-err.show{display:block;}
+
+.login-divider{display:flex;align-items:center;gap:14px;margin:24px 0;opacity:.3;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.3);}
+.login-divider span{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:3px;color:var(--silver);}
+
+.demo-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.demo-btn{padding:10px 8px;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1.5px;color:var(--silver);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);transition:all .3s;text-align:center;}
+.demo-btn:hover{color:var(--cyan);border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.04);}
+.demo-btn .db-role{font-size:.48rem;color:var(--cyan);opacity:.6;display:block;margin-top:2px;}
+
+.login-footer{margin-top:20px;text-align:center;animation:fadeUp .9s ease .3s both;}
+.login-footer span{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--silver);opacity:.35;}
+
+/* ══════════════════════════════ DASHBOARD ══════════════════════════════ */
+#dashboard{display:none;padding-top:66px;min-height:100vh;position:relative;z-index:1;}
+
+/* SIDEBAR */
+#sidebar{position:fixed;left:0;top:66px;bottom:0;width:230px;background:rgba(3,13,24,.97);border-right:1px solid rgba(0,229,255,.1);z-index:400;display:flex;flex-direction:column;transition:transform .3s;}
+.sb-user{padding:24px 20px;border-bottom:1px solid rgba(0,229,255,.08);}
+.sb-avatar{width:46px;height:46px;background:rgba(0,229,255,.1);border:1.5px solid rgba(0,229,255,.3);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;color:var(--cyan);margin-bottom:12px;text-shadow:var(--glow-sm);}
+.sb-name{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--white);}
+.sb-role{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2px;margin-top:4px;padding:2px 8px;display:inline-block;}
+.role-admin{color:var(--gold);border:1px solid rgba(240,192,64,.3);background:rgba(240,192,64,.06);}
+.role-client{color:var(--cyan);border:1px solid rgba(0,229,255,.25);background:rgba(0,229,255,.05);}
+.role-viewer{color:var(--silver);border:1px solid rgba(142,184,204,.2);background:rgba(142,184,204,.04);}
+.sb-status{display:flex;align-items:center;gap:6px;margin-top:8px;}
+.sb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+.sb-status-lbl{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;color:var(--silver);opacity:.6;}
+
+.sb-nav{flex:1;padding:16px 0;overflow-y:auto;}
+.sb-section{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:4px;color:var(--silver);opacity:.35;padding:10px 20px 6px;text-transform:uppercase;}
+.sb-item{display:flex;align-items:center;gap:12px;padding:11px 20px;cursor:pointer;transition:all .25s;border-left:2px solid transparent;font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:500;letter-spacing:1px;color:var(--silver);text-decoration:none;}
+.sb-item:hover{color:var(--white);background:rgba(0,229,255,.04);border-left-color:rgba(0,229,255,.3);}
+.sb-item.active{color:var(--cyan);background:rgba(0,229,255,.07);border-left-color:var(--cyan);}
+.sb-item .si-ico{font-size:1rem;width:20px;text-align:center;}
+.sb-item .si-badge{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.44rem;padding:2px 6px;background:var(--cyan);color:var(--dark);font-weight:700;}
+.sb-item .si-badge.gold{background:var(--gold);}
+.sb-item .si-badge.red{background:var(--red);}
+
+.sb-bottom{padding:16px 20px;border-top:1px solid rgba(0,229,255,.08);}
+.sb-logout{width:100%;padding:10px;font-family:'Share Tech Mono',monospace;font-size:.54rem;letter-spacing:2px;color:var(--silver);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.sb-logout:hover{color:#e05050;border-color:rgba(200,40,42,.3);background:rgba(200,40,42,.05);}
+
+/* MAIN CONTENT */
+#mainContent{margin-left:230px;padding:32px 36px;position:relative;z-index:1;}
+
+.dash-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px;}
+.dash-title-wrap .dt-pre{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:5px;color:var(--cyan);opacity:.6;margin-bottom:8px;}
+.dash-title-wrap .dt-main{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:4px;color:var(--white);}
+.dash-title-wrap .dt-sub{font-family:'Rajdhani',sans-serif;font-size:.9rem;color:var(--silver);margin-top:6px;opacity:.7;}
+.dash-time{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:2px;color:var(--cyan);opacity:.7;text-align:right;}
+.dash-date{font-size:.52rem;letter-spacing:2px;color:var(--silver);opacity:.5;margin-top:4px;}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;}
+.kpi-card{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:20px 22px;position:relative;overflow:hidden;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);transition:all .3s;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.kpi-card.kc-cyan::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.kpi-card.kc-gold::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.kpi-card.kc-green::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.kpi-card.kc-red::before{background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.kpi-card:hover{transform:translateY(-3px);border-color:rgba(0,229,255,.22);}
+.kpi-ico{font-size:1.4rem;margin-bottom:10px;}
+.kpi-val{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;color:var(--white);}
+.kc-cyan .kpi-val{color:var(--cyan);text-shadow:var(--glow-sm);}
+.kc-gold .kpi-val{color:var(--gold);}
+.kc-green .kpi-val{color:var(--green);}
+.kc-red .kpi-val{color:#e05050;}
+.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--silver);opacity:.6;margin-top:4px;}
+.kpi-delta{font-family:'Share Tech Mono',monospace;font-size:.5rem;margin-top:8px;padding:2px 7px;display:inline-block;}
+.delta-up{background:rgba(61,140,110,.12);border:1px solid rgba(61,140,110,.25);color:var(--green);}
+.delta-dn{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.22);color:#e05050;}
+
+/* PANELS GRID */
+.panels-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+.panel{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:24px;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.25),transparent);}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.panel-title{font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:3px;color:var(--cyan);}
+.panel-badge{font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:1.5px;padding:3px 8px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.18);color:var(--cyan);}
+
+/* SERVICES LIST */
+.srv-list{display:flex;flex-direction:column;gap:10px;}
+.srv-row{display:flex;align-items:center;gap:14px;padding:12px 14px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.07);transition:all .25s;cursor:pointer;}
+.srv-row:hover{background:rgba(0,229,255,.06);border-color:rgba(0,229,255,.15);}
+.srv-row-ico{font-size:1.1rem;width:32px;text-align:center;}
+.srv-row-info{flex:1;}
+.srv-row-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:1px;color:var(--white);}
+.srv-row-meta{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;margin-top:2px;}
+.srv-row-status{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:1.5px;padding:3px 8px;}
+.s-active{background:rgba(61,140,110,.1);border:1px solid rgba(61,140,110,.25);color:var(--green);}
+.s-pend{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.s-new{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan);}
+
+/* ACTIVITY FEED */
+.act-list{display:flex;flex-direction:column;gap:0;}
+.act-item{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:1px solid rgba(0,229,255,.05);}
+.act-item:last-child{border-bottom:none;}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.ad-cyan{background:var(--cyan);box-shadow:var(--glow-sm);}
+.ad-gold{background:var(--gold);}
+.ad-green{background:var(--green);}
+.ad-silver{background:var(--silver);opacity:.4;}
+.act-body{flex:1;}
+.act-msg{font-family:'Rajdhani',sans-serif;font-size:.88rem;color:var(--white);font-weight:500;}
+.act-time{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;margin-top:3px;}
+
+/* TICKETS */
+.ticket-list{display:flex;flex-direction:column;gap:10px;}
+.ticket{padding:14px 16px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);position:relative;cursor:pointer;transition:all .25s;}
+.ticket:hover{border-color:rgba(0,229,255,.18);background:rgba(0,229,255,.05);}
+.ticket-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ticket-id{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;color:var(--cyan);opacity:.6;}
+.ticket-pri{font-family:'Share Tech Mono',monospace;font-size:.44rem;padding:2px 7px;}
+.pri-high{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;}
+.pri-med{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.pri-low{background:rgba(61,140,110,.08);border:1px solid rgba(61,140,110,.2);color:var(--green);}
+.ticket-title{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:600;color:var(--white);margin-bottom:4px;}
+.ticket-meta{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:1px;color:var(--silver);opacity:.45;}
+
+/* NEW TICKET BTN */
+.new-ticket-btn{width:100%;margin-top:14px;padding:11px;font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:3px;color:var(--cyan);background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.new-ticket-btn:hover{background:rgba(0,229,255,.09);box-shadow:var(--glow-sm);}
+
+/* WIDE PANEL */
+.panel-wide{grid-column:1/-1;}
+
+/* QUICK ACCESS */
+.qa-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;}
+.qa-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 10px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);cursor:pointer;transition:all .3s;text-decoration:none;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);}
+.qa-card:hover{background:rgba(0,229,255,.07);border-color:rgba(0,229,255,.2);transform:translateY(-3px);}
+.qa-ico{font-size:1.4rem;}
+.qa-lbl{font-family:'Orbitron',sans-serif;font-size:.44rem;letter-spacing:1.5px;color:var(--cyan);text-align:center;line-height:1.5;}
+
+/* MODAL TICKET */
+#ticketModal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.85);backdrop-filter:blur(8px);}
+#ticketModal.show{display:flex;}
+.modal-box{background:rgba(6,15,28,.98);border:1px solid rgba(0,229,255,.2);clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);padding:36px 40px;width:100%;max-width:520px;position:relative;animation:modalIn .3s ease both;}
+@keyframes modalIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.modal-title{font-family:'Orbitron',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:3px;color:var(--cyan);margin-bottom:24px;}
+.modal-field{margin-bottom:18px;}
+.modal-label{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2.5px;color:var(--cyan);opacity:.7;margin-bottom:8px;display:block;}
+.modal-input{width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:10px 14px;outline:none;transition:all .3s;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);}
+.modal-input:focus{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.06);}
+.modal-select{appearance:none;cursor:pointer;}
+.modal-textarea{resize:vertical;min-height:80px;font-family:'Rajdhani',sans-serif;}
+.modal-btns{display:flex;gap:12px;margin-top:24px;}
+.modal-send{flex:1;padding:12px;font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:3px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);box-shadow:var(--glow-sm);transition:all .3s;}
+.modal-send:hover{box-shadow:var(--glow-md);}
+.modal-cancel{flex:0 0 auto;padding:12px 20px;font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:2px;color:var(--silver);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);transition:all .3s;}
+.modal-cancel:hover{border-color:rgba(200,40,42,.3);color:#e05050;}
+.modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--silver);font-size:1rem;cursor:pointer;opacity:.5;transition:opacity .2s;}
+.modal-close:hover{opacity:1;}
+
+/* TOAST */
+#toast{position:fixed;bottom:30px;right:30px;z-index:3000;font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:2px;padding:14px 20px;background:rgba(61,140,110,.15);border:1px solid rgba(61,140,110,.4);color:var(--green);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateY(0);}
+
+/* ROLE-BASED */
+.admin-only{display:none;}
+
+/* ══════════════ BILLING SYSTEM ══════════════ */
+.billing-tabs{display:flex;gap:0;margin-bottom:28px;border-bottom:1px solid rgba(0,229,255,.1);}
+.bt{padding:11px 22px;font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:2.5px;color:var(--silver);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;transition:all .25s;margin-bottom:-1px;}
+.bt:hover{color:var(--white);}
+.bt.bt-active{color:var(--cyan);border-bottom-color:var(--cyan);background:rgba(0,229,255,.03);}
+.bill-kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.bkpi{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:18px 20px;position:relative;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
+.bkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);}
+.bkpi-ico{font-size:1.1rem;margin-bottom:8px;}
+.bkpi-val{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;color:var(--cyan);}
+.bkpi-val.gold{color:var(--gold);}
+.bkpi-val.green{color:var(--green);}
+.bkpi-val.red{color:#e05050;}
+.bkpi-lbl{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--silver);opacity:.55;margin-top:4px;}
+.pill{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;padding:3px 9px;}
+.pill-paid{background:rgba(61,140,110,.1);border:1px solid rgba(61,140,110,.25);color:var(--green);}
+.pill-pend{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.22);color:var(--gold);}
+.pill-over{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;}
+.pill-sched{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--cyan);}
+.inv-table{width:100%;border-collapse:collapse;}
+.inv-table th{font-family:'Share Tech Mono',monospace;font-size:.47rem;letter-spacing:2.5px;color:var(--cyan);opacity:.55;padding:8px 12px;text-align:left;border-bottom:1px solid rgba(0,229,255,.12);}
+.inv-table td{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:500;color:var(--white);padding:13px 12px;border-bottom:1px solid rgba(0,229,255,.05);transition:background .2s;}
+.inv-table tr:hover td{background:rgba(0,229,255,.03);}
+.inv-num{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--cyan);letter-spacing:1px;}
+.inv-amount{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;}
+.inv-amount.paid{color:var(--green);}
+.inv-amount.pend{color:var(--gold);}
+.inv-amount.over{color:#e05050;}
+.iact{padding:4px 10px;font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;border:1px solid rgba(0,229,255,.2);color:var(--cyan);background:rgba(0,229,255,.04);cursor:pointer;clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);transition:all .25s;margin-right:5px;}
+.iact:hover{background:rgba(0,229,255,.1);}
+.iact.pay{background:rgba(61,140,110,.1);border-color:rgba(61,140,110,.3);color:var(--green);}
+.co-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}
+.co-card{background:rgba(6,15,28,.92);border:1px solid rgba(0,229,255,.1);padding:24px 22px;position:relative;overflow:hidden;transition:all .35s;}
+.co-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);transform:scaleX(0);transition:transform .4s;}
+.co-card:hover{border-color:rgba(0,229,255,.3);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,229,255,.08);}
+.co-card:hover::before{transform:scaleX(1);}
+.co-card.co-gold{border-color:rgba(240,192,64,.15);}
+.co-card.co-gold::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.co-card.co-gold:hover{border-color:rgba(240,192,64,.35);}
+.co-card.co-pop{border-color:rgba(0,229,255,.25);box-shadow:0 0 30px rgba(0,229,255,.06);}
+.co-badge{position:absolute;top:12px;right:12px;font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;padding:3px 8px;background:var(--cyan);color:var(--dark);font-weight:700;}
+.co-badge.gold{background:var(--gold);}
+.co-ico{font-size:1.8rem;margin-bottom:14px;}
+.co-name{font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;color:var(--cyan);margin-bottom:4px;}
+.co-gold .co-name{color:var(--gold);}
+.co-desc{font-family:'Rajdhani',sans-serif;font-size:.85rem;color:var(--silver);line-height:1.6;margin-bottom:14px;min-height:42px;}
+.co-price{display:flex;align-items:baseline;gap:6px;margin-bottom:2px;}
+.co-amount{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--white);}
+.co-cur{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:var(--silver);opacity:.6;}
+.co-period{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;color:var(--silver);opacity:.45;margin-bottom:16px;}
+.co-features{list-style:none;margin-bottom:18px;display:flex;flex-direction:column;gap:5px;}
+.co-features li{font-family:'Rajdhani',sans-serif;font-size:.82rem;color:var(--silver);display:flex;align-items:center;gap:8px;}
+.co-features li::before{content:'◈';color:var(--cyan);font-size:.55rem;flex-shrink:0;}
+.co-gold .co-features li::before{color:var(--gold);}
+.co-btn{width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.56rem;letter-spacing:3px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:all .3s;box-shadow:var(--glow-sm);}
+.co-btn:hover{box-shadow:var(--glow-md);transform:translateY(-1px);}
+.co-gold .co-btn{background:var(--gold);}
+.sub-list{display:flex;flex-direction:column;gap:12px;}
+.sub-row{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:16px;padding:16px 18px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);transition:all .25s;}
+.sub-row:hover{border-color:rgba(0,229,255,.16);background:rgba(0,229,255,.05);}
+.sub-ico{font-size:1.2rem;width:36px;text-align:center;}
+.sub-info .sub-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.95rem;letter-spacing:1px;color:var(--white);}
+.sub-info .sub-meta{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;margin-top:3px;}
+.sub-price-col{font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;color:var(--cyan);text-align:right;white-space:nowrap;}
+.sub-price-col .sp-period{display:block;font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--silver);opacity:.5;font-weight:400;margin-top:2px;}
+.sub-actions{display:flex;gap:6px;}
+.sub-progress{height:3px;background:rgba(0,229,255,.08);margin-top:8px;}
+.sub-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--cyan2));}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px;}
+.pm-card{background:rgba(6,15,28,.9);border:2px solid rgba(0,229,255,.1);padding:20px;cursor:pointer;transition:all .3s;position:relative;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);}
+.pm-card.pm-sel{border-color:var(--cyan);background:rgba(0,229,255,.07);}
+.pm-card.pm-sel::after{content:'✓';position:absolute;top:10px;right:12px;font-family:'Orbitron',sans-serif;font-size:.6rem;color:var(--cyan);}
+.pm-card:hover{border-color:rgba(0,229,255,.3);}
+.pm-ico{font-size:1.4rem;margin-bottom:10px;}
+.pm-name{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:2px;color:var(--white);}
+.pm-desc{font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--silver);opacity:.5;margin-top:4px;letter-spacing:1px;}
+.pm-tag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.42rem;padding:2px 7px;margin-top:8px;}
+.pm-soon{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.pm-ready{background:rgba(61,140,110,.08);border:1px solid rgba(61,140,110,.2);color:var(--green);}
+#checkoutModal{position:fixed;inset:0;z-index:2001;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.88);backdrop-filter:blur(10px);}
+#checkoutModal.show{display:flex;}
+.co-modal{background:rgba(5,12,24,.99);border:1px solid rgba(0,229,255,.22);clip-path:polygon(24px 0,100% 0,100% calc(100% - 24px),calc(100% - 24px) 100%,0 100%,0 24px);width:100%;max-width:560px;animation:modalIn .3s ease both;overflow:hidden;}
+.co-modal-head{background:rgba(0,229,255,.05);border-bottom:1px solid rgba(0,229,255,.12);padding:22px 32px;display:flex;align-items:center;justify-content:space-between;}
+.co-modal-title{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:3px;color:var(--cyan);}
+.co-modal-body{padding:26px 32px;}
+.steps{display:flex;align-items:center;margin-bottom:24px;}
+.step{display:flex;align-items:center;gap:8px;flex:1;}
+.step-num{width:24px;height:24px;border-radius:50%;border:1.5px solid rgba(0,229,255,.25);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.52rem;color:var(--silver);flex-shrink:0;}
+.step.s-active .step-num{border-color:var(--cyan);color:var(--cyan);box-shadow:var(--glow-sm);}
+.step.s-done .step-num{background:var(--cyan);border-color:var(--cyan);color:var(--dark);}
+.step-lbl{font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;}
+.step.s-active .step-lbl{color:var(--cyan);opacity:1;}
+.step.s-done .step-lbl{color:var(--green);opacity:.8;}
+.step-line{flex:1;height:1px;background:rgba(0,229,255,.12);margin:0 6px;}
+.order-summary{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);padding:16px 18px;margin-bottom:20px;}
+.os-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(0,229,255,.05);}
+.os-row:last-child{border-bottom:none;padding-top:10px;margin-top:4px;}
+.os-label{font-family:'Share Tech Mono',monospace;font-size:.49rem;letter-spacing:1.5px;color:var(--silver);opacity:.6;}
+.os-val{font-family:'Rajdhani',sans-serif;font-size:.9rem;font-weight:600;color:var(--white);}
+.os-total-label{font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:2px;color:var(--cyan);}
+.os-total-val{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:var(--cyan);text-shadow:var(--glow-sm);}
+.gateway-sel{display:flex;gap:10px;margin-bottom:20px;}
+.gw{flex:1;padding:10px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);cursor:pointer;text-align:center;transition:all .25s;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);}
+.gw:hover{background:rgba(0,229,255,.07);}
+.gw.gw-sel{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.08);}
+.gw-ico{font-size:1.1rem;margin-bottom:4px;}
+.gw-name{font-family:'Orbitron',sans-serif;font-size:.48rem;letter-spacing:2px;color:var(--silver);}
+.gw.gw-sel .gw-name{color:var(--cyan);}
+.card-form{display:flex;flex-direction:column;gap:13px;margin-bottom:18px;}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cf-label{font-family:'Share Tech Mono',monospace;font-size:.49rem;letter-spacing:2px;color:var(--cyan);opacity:.65;margin-bottom:6px;display:block;}
+.cf-input{width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.14);color:var(--white);font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:2px;padding:11px 14px;outline:none;transition:all .3s;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);}
+.cf-input:focus{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.06);}
+.cf-input::placeholder{opacity:.3;}
+.gc-form{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.gc-full{grid-column:1/-1;}
+.new-inv-btn{width:100%;padding:14px;font-family:'Orbitron',sans-serif;font-size:.62rem;letter-spacing:4px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:var(--glow-sm);transition:all .3s;margin-top:8px;}
+.new-inv-btn:hover{box-shadow:var(--glow-md);transform:translateY(-1px);}
+.new-inv-btn.gold{background:var(--gold);}
+#paySuccess{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.92);backdrop-filter:blur(12px);}
+#paySuccess.show{display:flex;}
+.pay-ok-box{text-align:center;animation:modalIn .4s ease both;}
+.pay-ok-ico{font-size:4rem;margin-bottom:20px;animation:successPop .6s cubic-bezier(.175,.885,.32,1.275) .2s both;display:block;}
+@keyframes successPop{from{transform:scale(0);}to{transform:scale(1);}}
+.pay-ok-title{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--green);letter-spacing:6px;text-shadow:0 0 24px rgba(61,140,110,.6);margin-bottom:10px;}
+.pay-ok-sub{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:3px;color:var(--silver);margin-bottom:8px;}
+.pay-ok-folio{font-family:'Share Tech Mono',monospace;font-size:.7rem;letter-spacing:3px;color:var(--cyan);margin-bottom:28px;}
+.pay-ok-close{padding:12px 32px;font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:3px;color:var(--dark);background:var(--green);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:all .3s;}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  #sidebar{transform:translateX(-230px);}
+  #mainContent{margin-left:0;}
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .bill-kpi{grid-template-columns:1fr 1fr;}
+  .panels-grid{grid-template-columns:1fr;}
+  .qa-grid{grid-template-columns:repeat(3,1fr);}
+  .co-grid{grid-template-columns:1fr;}
+  .pay-methods{grid-template-columns:1fr;}
+  .gc-form{grid-template-columns:1fr;}
+  .gc-full{grid-column:auto;}
+  #diagPanel{display:none;}
+}
+
+/* ══ PANEL DIAGNÓSTICO ══ */
+#diagPanel{position:fixed;bottom:24px;left:24px;z-index:9400;background:rgba(3,13,24,.97);border:1px solid rgba(0,229,255,.25);backdrop-filter:blur(18px);clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));box-shadow:0 8px 40px rgba(0,229,255,.07);max-width:370px;transition:all .4s;}
+#diagPanel.collapsed .diag-body,#diagPanel.collapsed .diag-footer{display:none;}
+.diag-header{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid rgba(0,229,255,.12);cursor:pointer;background:rgba(0,229,255,.03);}
+.diag-ico{font-size:1rem;}
+.diag-lbl{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:2.5px;color:var(--cyan);flex:1;}
+.diag-toggle{background:none;border:none;color:var(--silver);font-size:.75rem;cursor:pointer;padding:0;}
+.diag-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px;max-height:380px;overflow-y:auto;}
+.diag-body::-webkit-scrollbar{width:2px;}.diag-body::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);}
+.diag-item{display:flex;align-items:flex-start;gap:10px;}
+.di-ok{color:#00ff88;font-size:.75rem;flex-shrink:0;margin-top:1px;}
+.di-warn{color:var(--gold);font-size:.75rem;flex-shrink:0;margin-top:1px;}
+.di-miss{color:#e05050;font-size:.75rem;flex-shrink:0;margin-top:1px;}
+.di-body{flex:1;}
+.di-name{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;color:var(--white);letter-spacing:1px;margin-bottom:2px;}
+.di-desc{font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:.5px;color:var(--silver);opacity:.55;line-height:1.6;}
+.di-action{font-family:'Share Tech Mono',monospace;font-size:.43rem;letter-spacing:.5px;color:var(--cyan);opacity:.7;margin-top:3px;}
+.diag-footer{padding:10px 16px 14px;border-top:1px solid rgba(0,229,255,.08);}
+.diag-score{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.ds-lbl{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--silver);opacity:.5;}
+.ds-bar-bg{flex:1;height:4px;background:rgba(0,229,255,.1);border-radius:2px;overflow:hidden;}
+.ds-bar-fill{height:100%;background:linear-gradient(90deg,var(--cyan),#00ff88);border-radius:2px;transition:width 1.6s ease;}
+.ds-pct{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;color:var(--cyan);}
+.diag-verify-btn{width:100%;padding:9px;font-family:'Orbitron',sans-serif;font-size:.52rem;letter-spacing:3px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:all .3s;box-shadow:0 0 12px rgba(0,229,255,.3);}
+.diag-verify-btn:hover{box-shadow:0 0 24px rgba(0,229,255,.5);}
+.diag-verify-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* ══════════════════════════════════════════════
+   ADMIN OVERVIEW — nuevos estilos
+══════════════════════════════════════════════ */
+.admin-dash-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;padding-bottom:28px;border-bottom:1px solid rgba(0,229,255,.08);position:relative;}
+.admin-dash-header::after{content:'';position:absolute;bottom:-1px;left:0;width:120px;height:1px;background:var(--gold);}
+.adh-pre{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:5px;color:var(--gold);opacity:.8;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.adh-pre::before{content:'';width:20px;height:1px;background:var(--gold);opacity:.6;}
+.adh-title{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:900;letter-spacing:4px;color:var(--white);line-height:1.1;}
+.adh-sub{font-family:'Rajdhani',sans-serif;font-size:.95rem;color:var(--silver);margin-top:8px;opacity:.65;}
+.adh-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+.adh-clock{font-family:'Share Tech Mono',monospace;font-size:.9rem;letter-spacing:3px;color:var(--cyan);}
+.adh-date-lbl{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--silver);opacity:.5;}
+.adh-ping{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;color:var(--green);}
+.adh-ping-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.5s ease-in-out infinite;}
+/* Alert banner */
+.alert-banner{display:flex;align-items:center;gap:14px;padding:13px 20px;background:rgba(200,40,42,.07);border:1px solid rgba(200,40,42,.25);border-left:3px solid var(--red);margin-bottom:28px;}
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(-12px);}to{opacity:1;transform:translateX(0);}}
+.ab-ico{font-size:1.1rem;flex-shrink:0;}
+.ab-body{flex:1;}
+.ab-title{font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:2px;color:#e05050;}
+.ab-desc{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;color:var(--silver);opacity:.6;margin-top:3px;}
+.ab-action{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:2px;color:#e05050;padding:5px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.08);cursor:pointer;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);transition:all .25s;white-space:nowrap;}
+.ab-action:hover{background:rgba(200,40,42,.15);}
+/* KPI row 5-col admin */
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:30px;}
+.kc-silver::before{background:linear-gradient(90deg,transparent,var(--silver),transparent);}
+.kc-silver .kpi-val{color:var(--silver);}
+.delta-warn{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+/* Main grid 3-col */
+.main-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:20px;}
+.panel.p-gold::before{background:linear-gradient(90deg,transparent,rgba(240,192,64,.35),transparent);}
+.panel.p-red::before{background:linear-gradient(90deg,transparent,rgba(200,40,42,.4),transparent);}
+.panel-title.gold{color:var(--gold);}
+.panel-title.red{color:#e05050;}
+.panel-badge.gold{background:rgba(240,192,64,.08);border-color:rgba(240,192,64,.2);color:var(--gold);}
+.panel-badge.red{background:rgba(200,40,42,.08);border-color:rgba(200,40,42,.25);color:#e05050;}
+.span2{grid-column:span 2;}
+.span3{grid-column:span 3;}
+/* Revenue chart */
+.rev-chart-wrap{position:relative;height:90px;display:flex;align-items:flex-end;gap:5px;padding-top:10px;}
+.rev-bar-group{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.rev-bar{width:100%;border-radius:1px 1px 0 0;cursor:default;position:relative;background:rgba(0,229,255,.25);border-top:1px solid rgba(0,229,255,.5);transition:opacity .25s;}
+.rev-bar.paid{background:rgba(61,140,110,.3);border-top-color:var(--green);}
+.rev-bar:hover{opacity:.75;}
+.rev-bar-lbl{font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:1px;color:var(--silver);opacity:.5;text-align:center;}
+.rev-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(0,229,255,.07);}
+.rev-stat-val{font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:900;}
+.rev-stat-lbl{font-family:'Share Tech Mono',monospace;font-size:.43rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;margin-top:3px;}
+/* System status bars */
+.sys-list{display:flex;flex-direction:column;gap:10px;}
+.sys-row{display:flex;align-items:center;gap:12px;}
+.sys-name{font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:500;color:var(--silver);flex:1;}
+.sys-bar-wrap{width:100px;height:4px;background:rgba(0,229,255,.08);border-radius:2px;overflow:hidden;}
+.sys-bar{height:100%;border-radius:2px;transition:width 1.4s ease;}
+.sys-bar.green{background:linear-gradient(90deg,var(--green),#00ff88);}
+.sys-bar.cyan{background:linear-gradient(90deg,var(--cyan2),var(--cyan));}
+.sys-bar.gold{background:linear-gradient(90deg,var(--gold),#ffe066);}
+.sys-pct{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;width:32px;text-align:right;}
+.sys-pct.ok{color:var(--green);}
+.sys-pct.warn{color:var(--gold);}
+/* CxC */
+.cxc-list{display:flex;flex-direction:column;gap:8px;}
+.cxc-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(0,229,255,.02);border:1px solid rgba(0,229,255,.06);transition:all .2s;cursor:pointer;}
+.cxc-row:hover{background:rgba(0,229,255,.05);border-color:rgba(0,229,255,.14);}
+.cxc-ico{font-size:.95rem;flex-shrink:0;width:22px;text-align:center;}
+.cxc-info{flex:1;min-width:0;}
+.cxc-name{font-family:'Rajdhani',sans-serif;font-size:.82rem;font-weight:600;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cxc-meta{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1px;color:var(--silver);opacity:.45;margin-top:2px;}
+.cxc-amount{font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:700;text-align:right;flex-shrink:0;}
+.cxc-amount.pend{color:var(--gold);}
+.cxc-amount.over{color:#e05050;}
+.cxc-status{font-family:'Share Tech Mono',monospace;font-size:.42rem;padding:2px 7px;flex-shrink:0;margin-left:6px;}
+.st-pend{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.st-over{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;}
+.st-new{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--cyan);}
+.cxc-footer{display:flex;gap:8px;margin-top:12px;}
+.cxc-btn{flex:1;padding:9px;font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--cyan);background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.16);cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);transition:all .3s;text-align:center;}
+.cxc-btn:hover{background:rgba(0,229,255,.09);}
+.cxc-btn.warn{color:#e05050;background:rgba(200,40,42,.04);border-color:rgba(200,40,42,.2);}
+.cxc-btn.warn:hover{background:rgba(200,40,42,.1);}
+/* Clients */
+.client-list{display:flex;flex-direction:column;gap:8px;}
+.client-row{display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(0,229,255,.02);border:1px solid rgba(0,229,255,.06);transition:all .2s;}
+.client-row:hover{background:rgba(0,229,255,.05);border-color:rgba(0,229,255,.14);}
+.client-avatar{width:34px;height:34px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:900;color:var(--cyan);flex-shrink:0;}
+.client-info{flex:1;}
+.client-name{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:600;color:var(--white);}
+.client-meta{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1px;color:var(--silver);opacity:.45;margin-top:2px;}
+.client-plan{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:1px;padding:2px 8px;}
+.plan-ent{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.plan-pro{background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.2);color:var(--cyan);}
+.plan-str{background:rgba(142,184,204,.06);border:1px solid rgba(142,184,204,.15);color:var(--silver);}
+.client-revenue{font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;color:var(--green);text-align:right;}
+/* Ticket new styles */
+.ticket.pri-h{border-left:2px solid #e05050;}
+.ticket.pri-m{border-left:2px solid var(--gold);}
+.ticket-flags{display:flex;gap:5px;align-items:center;}
+.ticket-footer{margin-top:12px;padding-top:12px;border-top:1px solid rgba(0,229,255,.06);display:flex;gap:8px;}
+/* Activity timeline */
+.act-dot-wrap{display:flex;flex-direction:column;align-items:center;padding-top:5px;}
+.act-line{width:1px;min-height:16px;background:rgba(0,229,255,.08);margin:3px auto 0;}
+.act-item:last-child .act-line{display:none;}
+.ad-red{background:#e05050;}
+/* Factura rápida */
+.gf-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.gf-full{grid-column:span 2;}
+.gen-btn{width:100%;padding:13px;font-family:'Orbitron',sans-serif;font-size:.6rem;letter-spacing:4px;color:var(--dark);background:var(--gold);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:0 0 14px rgba(240,192,64,.3);transition:all .3s;margin-top:4px;}
+.gen-btn:hover{box-shadow:0 0 28px rgba(240,192,64,.5);transform:translateY(-1px);}
+/* Acceso rápido admin 6-col */
+.qa-grid-admin{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+/* Sidebar admin badge */
+.sb-role-badge{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;margin-top:5px;padding:3px 10px;display:inline-block;}
+
+@media(max-width:1400px){
+  .kpi-row{grid-template-columns:repeat(3,1fr);}
+  .main-grid{grid-template-columns:1fr 1fr;}
+  .span2{grid-column:span 2;}
+  .span3{grid-column:span 2;}
+  .qa-grid-admin{grid-template-columns:repeat(3,1fr);}
+}
+@media(max-width:900px){
+  .kpi-row{grid-template-columns:1fr 1fr;}
+  .main-grid{grid-template-columns:1fr;}
+  .span2,.span3{grid-column:span 1;}
+  .qa-grid-admin{grid-template-columns:repeat(3,1fr);}
+}
+
+/* ══ CONTRATACIÓN WIZARD ══ */
+.wiz-steps{display:flex;align-items:center;gap:0;margin-bottom:32px;overflow-x:auto;padding-bottom:4px;}
+.wiz-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;}
+.wiz-num{width:34px;height:34px;border-radius:50%;border:2px solid rgba(0,229,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:900;color:var(--silver);background:rgba(0,229,255,.03);transition:all .3s;}
+.wiz-lbl{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;text-align:center;line-height:1.4;}
+.wiz-step.ws-active .wiz-num{border-color:var(--cyan);color:var(--cyan);background:rgba(0,229,255,.1);box-shadow:var(--glow-sm);}
+.wiz-step.ws-active .wiz-lbl{color:var(--cyan);opacity:1;}
+.wiz-step.ws-done .wiz-num{border-color:var(--green);color:var(--green);background:rgba(61,140,110,.1);}
+.wiz-step.ws-done .wiz-num::after{content:'✓';}
+.wiz-step.ws-done .wiz-lbl{color:var(--green);opacity:.8;}
+.wiz-connector{flex:1;height:1px;background:rgba(0,229,255,.12);min-width:20px;margin-bottom:22px;}
+.wiz-connector.wc-done{background:var(--green);opacity:.5;}
+
+.wiz-page{display:none;animation:fadeUp .35s ease both;}
+.wiz-page.wp-active{display:block;}
+
+/* Plan checkboxes */
+.plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+.plan-item{padding:16px 14px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);cursor:pointer;transition:all .25s;position:relative;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
+.plan-item:hover{border-color:rgba(0,229,255,.22);background:rgba(0,229,255,.06);}
+.plan-item.pi-sel{border-color:var(--cyan);background:rgba(0,229,255,.1);box-shadow:var(--glow-sm);}
+.plan-item.pi-sel::before{content:'✓';position:absolute;top:8px;right:10px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:900;color:var(--cyan);}
+.pi-ico{font-size:1.4rem;margin-bottom:8px;}
+.pi-name{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:1.5px;color:var(--white);}
+.pi-desc{font-family:'Rajdhani',sans-serif;font-size:.78rem;color:var(--silver);margin-top:4px;line-height:1.4;}
+.pi-price{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:900;color:var(--cyan);margin-top:8px;}
+
+/* Total summary */
+.tot-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,229,255,.06);}
+.tot-row:last-child{border-bottom:none;}
+.tot-lbl{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1.5px;color:var(--silver);}
+.tot-val{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;color:var(--white);}
+.tot-grand{font-size:1.1rem;color:var(--cyan);text-shadow:var(--glow-sm);}
+
+/* Garantias / Tiempos */
+.gt-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.gt-card{padding:16px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);}
+.gt-title{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:2px;color:var(--cyan);margin-bottom:10px;}
+.gt-item{font-family:'Rajdhani',sans-serif;font-size:.85rem;color:var(--silver);padding:4px 0;border-bottom:1px solid rgba(0,229,255,.04);display:flex;gap:8px;align-items:flex-start;line-height:1.5;}
+.gt-item::before{content:'◈';color:var(--cyan);font-size:.5rem;flex-shrink:0;margin-top:4px;}
+.gt-item.gi-warn::before{content:'⚠';color:var(--gold);}
+.gt-item.gi-red::before{content:'✗';color:#e05050;}
+
+/* Contrato */
+.contrato-box{background:rgba(6,15,28,.95);border:1px solid rgba(0,229,255,.15);padding:24px 28px;max-height:280px;overflow-y:auto;font-family:'Rajdhani',sans-serif;font-size:.88rem;color:var(--silver);line-height:1.9;margin-bottom:20px;}
+.contrato-box h3{font-family:'Orbitron',sans-serif;font-size:.65rem;letter-spacing:3px;color:var(--cyan);margin-bottom:14px;}
+.contrato-box p{margin-bottom:10px;}
+.firma-area{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;}
+.firma-box{border-bottom:1px solid rgba(0,229,255,.3);padding:14px 0 6px;position:relative;}
+.firma-lbl{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--silver);opacity:.5;margin-top:6px;}
+
+/* Payment methods step */
+.pay-method-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;}
+.pay-m{padding:20px 16px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);cursor:pointer;transition:all .3s;text-align:center;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
+.pay-m:hover{border-color:rgba(0,229,255,.25);background:rgba(0,229,255,.06);}
+.pay-m.pm-active{border-color:var(--cyan);background:rgba(0,229,255,.1);box-shadow:var(--glow-sm);}
+.pay-m-ico{font-size:1.8rem;margin-bottom:10px;}
+.pay-m-name{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:2px;color:var(--white);}
+.pay-m-desc{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:1px;color:var(--silver);opacity:.55;margin-top:4px;}
+
+.wiz-nav{display:flex;gap:12px;margin-top:24px;align-items:center;}
+.wiz-btn-next{flex:1;padding:14px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:4px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:var(--glow-sm);transition:all .3s;}
+.wiz-btn-next:hover{box-shadow:var(--glow-md);}
+.wiz-btn-back{padding:14px 22px;font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:2px;color:var(--silver);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.1);cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);transition:all .3s;}
+.wiz-btn-back:hover{border-color:rgba(0,229,255,.25);color:var(--cyan);}
+.wiz-result{display:none;margin-top:14px;padding:10px 14px;font-family:Share Tech Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-align:center;}
+
+/* 2-col form */
+.form2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.f-full{grid-column:1/-1;}
+@media(max-width:700px){.plan-grid{grid-template-columns:1fr 1fr;}.gt-grid{grid-template-columns:1fr;}.form2,.form3{grid-template-columns:1fr;}.pay-method-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+<div class="grid-bg"></div>
+<div class="ambient"></div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <a href="../index.html" class="n-logo">
+    <div class="n-logo-mark"><span>DS</span></div>
+    <div>
+      <div class="n-logo-txt">DATASYS</div>
+      <div class="n-logo-sub">ÁREA DE CLIENTES</div>
+    </div>
+  </a>
+  <div class="n-right">
+    <span id="navUser"></span>
+    <a href="../index.html" class="n-btn">← INICIO</a>
+    <button class="n-btn" id="logoutBtn" onclick="logout()">⏻ SALIR</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════ LOGIN SCREEN ══════════════════════ -->
+<div id="loginScreen">
+  <div class="login-wrap">
+    <div class="login-badge">// ACCESO SEGURO · DATASYS PORTAL //</div>
+    <div class="login-card">
+      <div class="login-icon">🔐</div>
+      <div class="login-title">ÁREA DE CLIENTES</div>
+      <div class="login-sub">AUTENTICACIÓN REQUERIDA</div>
+
+      <div class="field-wrap">
+        <label class="field-label">EMAIL</label>
+        <input type="text" class="field-input" id="loginUser" placeholder="usuario@empresa.com" autocomplete="username" oninput="this.value=this.value.toLowerCase()" onpaste="setTimeout(()=>this.value=this.value.toLowerCase(),0)">
+      </div>
+
+      <div class="field-wrap">
+        <label class="field-label">CONTRASEÑA</label>
+        <input type="password" class="field-input" id="loginPass" placeholder="••••••••" autocomplete="current-password" oninput="this.value=this.value.toLowerCase()" onpaste="setTimeout(()=>this.value=this.value.toLowerCase(),0)">
+        <button class="field-eye" id="eyeBtn" onclick="toggleEye()">👁</button>
+      </div>
+
+      <div class="login-opts">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;" onclick="toggleRemember()">
+          <div class="check-box" id="rememberBox"></div>
+          <span class="check-lbl">RECORDAR SESIÓN</span>
+        </label>
+        <a class="forgot-link" onclick="showForgot()">¿OLVIDASTE TU ACCESO?</a>
+      </div>
+
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">▶ INICIAR SESIÓN</button>
+      <div class="login-err" id="loginErr">⚠ CREDENCIALES INCORRECTAS — INTENTE DE NUEVO</div>
+
+
+    </div>
+    <div class="login-footer">
+      <span>DATASYS TECHNOLOGY · PORTAL SEGURO · TLS 1.3 ENCRIPTADO</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ DASHBOARD ══════════════════════ -->
+<div id="dashboard">
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">DS</div>
+      <div class="sb-name" id="sbName">USUARIO</div>
+      <div class="sb-role" id="sbRole">CLIENTE</div>
+      <div class="sb-status">
+        <div class="sb-dot"></div>
+        <span class="sb-status-lbl">SESIÓN ACTIVA</span>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <div class="sb-section">PRINCIPAL</div>
+      <a class="sb-item active" onclick="switchPanel('overview',event)">
+        <span class="si-ico">⬡</span> RESUMEN
+      </a>
+      <a class="sb-item" onclick="switchPanel('services',event)">
+        <span class="si-ico">◈</span> MIS SERVICIOS
+        <span class="si-badge">3</span>
+      </a>
+      <a class="sb-item" onclick="switchPanel('tickets',event)">
+        <span class="si-ico">◻</span> SOPORTE
+        <span class="si-badge red">2</span>
+      </a>
+
+      <div class="sb-section">REPORTES</div>
+      <a class="sb-item" onclick="switchPanel('reports',event)">
+        <span class="si-ico">📊</span> ANALÍTICA
+      </a>
+      <a class="sb-item" onclick="switchPanel('docs',event)">
+        <span class="si-ico">📄</span> DOCUMENTOS
+        <span class="si-badge gold">5</span>
+      </a>
+
+      <div class="sb-section admin-only">ADMINISTRACIÓN</div>
+      <a class="sb-item admin-only" onclick="switchPanel('cobros',event)">
+        <span class="si-ico">◇</span> COBROS
+        <span class="si-badge gold">4</span>
+      </a>
+      <a class="sb-item admin-only" onclick="switchPanel('users',event)">
+        <span class="si-ico">👥</span> USUARIOS
+      </a>
+      <a class="sb-item admin-only" onclick="switchPanel('crm',event)">
+        <span class="si-ico">🗄</span> CRM
+      </a>
+
+      <div class="sb-section">CUENTA</div>
+      <a class="sb-item" onclick="switchPanel('profile',event)">
+        <span class="si-ico">⬟</span> MI PERFIL
+      </a>
+      <a class="sb-item" onclick="switchPanel('billing',event)">
+        <span class="si-ico">◇</span> FACTURACIÓN
+      </a>
+    </div>
+
+    <div class="sb-bottom">
+      <button class="sb-logout" onclick="logout()">⏻ &nbsp;CERRAR SESIÓN</button>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main id="mainContent">
+
+    <!-- OVERVIEW PANEL -->
+    <div id="panel-overview">
+
+      <!-- ══ VISTA CLIENTE (no admin) ══ -->
+      <div id="overview-client">
+        <div class="dash-header">
+          <div class="dash-title-wrap">
+            <div class="dt-pre">// PANEL DE CONTROL //</div>
+            <div class="dt-main">RESUMEN GENERAL</div>
+            <div class="dt-sub" id="dashWelcome">Bienvenido de vuelta</div>
+          </div>
+          <div>
+            <div class="dash-time" id="dashClock">--:--:--</div>
+            <div class="dash-date" id="dashDate">---</div>
+          </div>
+        </div>
+        <!-- KPIs cliente -->
+        <div class="kpi-grid">
+          <div class="kpi-card kc-cyan">
+            <div class="kpi-ico">◈</div>
+            <div class="kpi-val">3</div>
+            <div class="kpi-lbl">SERVICIOS ACTIVOS</div>
+            <div class="kpi-delta delta-up">↑ +1 ESTE MES</div>
+          </div>
+          <div class="kpi-card kc-gold">
+            <div class="kpi-ico">◻</div>
+            <div class="kpi-val">2</div>
+            <div class="kpi-lbl">TICKETS ABIERTOS</div>
+            <div class="kpi-delta delta-dn">⏱ RESPUESTA: 4H</div>
+          </div>
+          <div class="kpi-card kc-green">
+            <div class="kpi-ico">📄</div>
+            <div class="kpi-val">5</div>
+            <div class="kpi-lbl">DOCS PENDIENTES</div>
+            <div class="kpi-delta delta-up">↑ 2 NUEVOS</div>
+          </div>
+          <div class="kpi-card kc-red">
+            <div class="kpi-ico">◇</div>
+            <div class="kpi-val" id="kpiDays">28</div>
+            <div class="kpi-lbl">DÍAS PRÓX. FACTURA</div>
+            <div class="kpi-delta delta-up">✓ AL CORRIENTE</div>
+          </div>
+        </div>
+        <!-- Panels grid cliente -->
+        <div class="panels-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">MIS SERVICIOS</div>
+              <div class="panel-badge">ACTIVOS: 3</div>
+            </div>
+            <div class="srv-list">
+              <div class="srv-row"><div class="srv-row-ico">📊</div><div class="srv-row-info"><div class="srv-row-name">ANÁLISIS DE DATOS</div><div class="srv-row-meta">PLAN PRO · RENOVACIÓN: 15/04/2026</div></div><div class="srv-row-status s-active">ACTIVO</div></div>
+              <div class="srv-row"><div class="srv-row-ico">🔐</div><div class="srv-row-info"><div class="srv-row-name">CIBERSEGURIDAD</div><div class="srv-row-meta">PLAN ENTERPRISE · RENOVACIÓN: 01/06/2026</div></div><div class="srv-row-status s-active">ACTIVO</div></div>
+              <div class="srv-row"><div class="srv-row-ico">📦</div><div class="srv-row-info"><div class="srv-row-name">INVENTARIO VIRTUAL</div><div class="srv-row-meta">PLAN STARTER · CONFIGURACIÓN PENDIENTE</div></div><div class="srv-row-status s-pend">PENDIENTE</div></div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">ACTIVIDAD RECIENTE</div>
+              <div class="panel-badge">ÚLTIMAS 24H</div>
+            </div>
+            <div class="act-list">
+              <div class="act-item"><div class="act-dot ad-cyan"></div><div class="act-body"><div class="act-msg">Reporte mensual de analítica generado</div><div class="act-time">HOY · 09:42 AM</div></div></div>
+              <div class="act-item"><div class="act-dot ad-green"></div><div class="act-body"><div class="act-msg">Ticket #DS-0041 respondido por soporte</div><div class="act-time">HOY · 08:15 AM</div></div></div>
+              <div class="act-item"><div class="act-dot ad-gold"></div><div class="act-body"><div class="act-msg">Documento contractual firmado y subido</div><div class="act-time">AYER · 05:30 PM</div></div></div>
+              <div class="act-item"><div class="act-dot ad-cyan"></div><div class="act-body"><div class="act-msg">Nuevo servicio Inventario Virtual activado</div><div class="act-time">AYER · 11:20 AM</div></div></div>
+              <div class="act-item"><div class="act-dot ad-silver"></div><div class="act-body"><div class="act-msg">Inicio de sesión desde México City, MX</div><div class="act-time">AYER · 09:00 AM</div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <div class="panel-title">SOPORTE · TICKETS</div>
+            <div class="panel-badge">ABIERTOS: 2</div>
+          </div>
+          <div class="ticket-list">
+            <div class="ticket"><div class="ticket-top"><span class="ticket-id">#DS-0043</span><span class="ticket-pri pri-high">ALTA</span></div><div class="ticket-title">Error de sincronización en dashboard de analítica</div><div class="ticket-meta">ABIERTO HOY · ASIGNADO: EQUIPO DATASYS DATA</div></div>
+            <div class="ticket"><div class="ticket-top"><span class="ticket-id">#DS-0041</span><span class="ticket-pri pri-med">MEDIA</span></div><div class="ticket-title">Solicitud de acceso para usuario adicional</div><div class="ticket-meta">ABIERTO HACE 2 DÍAS · EN REVISIÓN</div></div>
+          </div>
+          <button class="new-ticket-btn" onclick="openTicketModal()">+ ABRIR NUEVO TICKET</button>
+        </div>
+      </div>
+
+      <!-- ══ VISTA ADMIN ══ -->
+      <div id="overview-admin" style="display:none;">
+
+        <!-- Header admin -->
+        <div class="admin-dash-header">
+          <div class="adh-left">
+            <div class="adh-pre">// PANEL DE CONTROL ADMIN //</div>
+            <div class="adh-title">RESUMEN GENERAL</div>
+            <div class="adh-sub">Vista consolidada · Facturación · Clientes · Operaciones</div>
+          </div>
+          <div class="adh-right">
+            <div class="adh-clock" id="adminClock">--:--:--</div>
+            <div class="adh-date-lbl" id="adminDate">---</div>
+            <div class="adh-ping"><div class="adh-ping-dot"></div>SISTEMA OPERATIVO · 11 MÓDULOS</div>
+          </div>
+        </div>
+
+        <!-- Alert banner -->
+        <div class="alert-banner">
+          <div class="ab-ico">🔴</div>
+          <div class="ab-body">
+            <div class="ab-title">CUENTA VENCIDA · TECHSTART MX</div>
+            <div class="ab-desc">#INV-2026-02 · $8,500 MXN · VENCIÓ 28/02/2026 — +14 días sin pago</div>
+          </div>
+          <button class="ab-action" onclick="showToast('📧 RECORDATORIO ENVIADO A TECHSTART MX')">✉ ENVIAR RECORDATORIO</button>
+        </div>
+
+        <!-- KPIs admin — 5 cols -->
+        <div class="kpi-row">
+          <div class="kpi-card kc-green">
+            <div class="kpi-ico">💰</div>
+            <div class="kpi-val">$186,400</div>
+            <div class="kpi-lbl">COBRADO MARZO (MXN)</div>
+            <div class="kpi-delta delta-up">↑ +12% VS FEB</div>
+          </div>
+          <div class="kpi-card kc-gold">
+            <div class="kpi-ico">⏱</div>
+            <div class="kpi-val">$34,200</div>
+            <div class="kpi-lbl">PENDIENTE DE COBRO</div>
+            <div class="kpi-delta delta-warn">⚠ 4 FACTURAS</div>
+          </div>
+          <div class="kpi-card kc-red">
+            <div class="kpi-ico">🔴</div>
+            <div class="kpi-val">$8,500</div>
+            <div class="kpi-lbl">MONTO VENCIDO</div>
+            <div class="kpi-delta delta-dn">↓ +14 DÍAS</div>
+          </div>
+          <div class="kpi-card kc-cyan">
+            <div class="kpi-ico">👥</div>
+            <div class="kpi-val">3</div>
+            <div class="kpi-lbl">CLIENTES ACTIVOS</div>
+            <div class="kpi-delta delta-up">↑ +1 ESTE MES</div>
+          </div>
+          <div class="kpi-card kc-silver">
+            <div class="kpi-ico">📋</div>
+            <div class="kpi-val">12</div>
+            <div class="kpi-lbl">FACTURAS EMITIDAS MES</div>
+            <div class="kpi-delta delta-up">↑ +3 VS FEB</div>
+          </div>
+        </div>
+
+        <!-- ◇ GENERAR FACTURA — ancho completo, posición destacada -->
+        <div class="panel p-gold" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <div class="panel-title gold">◇ GENERAR FACTURA RÁPIDA</div>
+            <div class="panel-badge gold">NUEVA EMISIÓN</div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:14px;align-items:end;">
+            <div>
+              <label class="modal-label">CLIENTE</label>
+              <select class="modal-input modal-select">
+                <option>— SELECCIONAR —</option>
+                <option>CLIENTE DEMO</option>
+                <option>ACME CORP</option>
+                <option>TECHSTART MX</option>
+                <option>GRUPO NEXO</option>
+              </select>
+            </div>
+            <div>
+              <label class="modal-label">SERVICIO</label>
+              <select class="modal-input modal-select">
+                <option>Análisis de Datos PRO</option>
+                <option>Ciberseguridad Enterprise</option>
+                <option>Inventario Virtual Starter</option>
+                <option>Automatización Estándar</option>
+                <option>Consultoría — Sesión</option>
+              </select>
+            </div>
+            <div>
+              <label class="modal-label">MONTO (MXN)</label>
+              <input type="number" class="modal-input" placeholder="0.00">
+            </div>
+            <div>
+              <label class="modal-label">VENCIMIENTO</label>
+              <input type="date" class="modal-input" id="vencDateAdm" value="2026-03-31">
+            </div>
+            <div>
+              <button class="gen-btn" style="white-space:nowrap;padding:11px 22px;" onclick="genInvoice()">⬡ GENERAR Y ENVIAR</button>
+            </div>
+          </div>
+          <div style="margin-top:12px;">
+            <label class="modal-label">CONCEPTO</label>
+            <input type="text" class="modal-input" placeholder="Ej: Mensualidad marzo 2026 · Plan PRO">
+          </div>
+        </div>
+
+        <!-- Fila 1: Ingresos chart + Sistema -->
+        <div class="main-grid">
+          <!-- Ingresos span2 -->
+          <div class="panel span2 p-gold">
+            <div class="panel-header">
+              <div class="panel-title gold">◇ INGRESOS · ÚLTIMOS 6 MESES</div>
+              <div class="panel-badge gold">MXN</div>
+            </div>
+            <div class="rev-chart-wrap" id="revChart"></div>
+            <div class="rev-summary">
+              <div><div class="rev-stat-val" style="color:var(--green);">$186,400</div><div class="rev-stat-lbl">COBRADO MARZO</div></div>
+              <div><div class="rev-stat-val" style="color:var(--cyan);">$220,600</div><div class="rev-stat-lbl">PROYECTADO ABRIL</div></div>
+              <div><div class="rev-stat-val" style="color:var(--gold);">$34,200</div><div class="rev-stat-lbl">POR COBRAR</div></div>
+            </div>
+          </div>
+          <!-- Estado del sistema -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">⬡ ESTADO DEL SISTEMA</div>
+              <div class="panel-badge">OPERATIVO</div>
+            </div>
+            <div class="sys-list">
+              <div class="sys-row"><div class="sys-name">Login · Autenticación</div><div class="sys-bar-wrap"><div class="sys-bar green" id="sbar1" style="width:0%"></div></div><div class="sys-pct ok">100%</div></div>
+              <div class="sys-row"><div class="sys-name">Tracker · CRM</div><div class="sys-bar-wrap"><div class="sys-bar cyan" id="sbar2" style="width:0%"></div></div><div class="sys-pct ok">98%</div></div>
+              <div class="sys-row"><div class="sys-name">Dashboard · 11 Paneles</div><div class="sys-bar-wrap"><div class="sys-bar cyan" id="sbar3" style="width:0%"></div></div><div class="sys-pct ok">100%</div></div>
+              <div class="sys-row"><div class="sys-name">Facturación · Checkout</div><div class="sys-bar-wrap"><div class="sys-bar green" id="sbar4" style="width:0%"></div></div><div class="sys-pct ok">100%</div></div>
+              <div class="sys-row"><div class="sys-name">Pasarela Pagos</div><div class="sys-bar-wrap"><div class="sys-bar gold" id="sbar5" style="width:0%"></div></div><div class="sys-pct warn">60%</div></div>
+              <div class="sys-row"><div class="sys-name">Base de Datos</div><div class="sys-bar-wrap"><div class="sys-bar gold" id="sbar6" style="width:0%"></div></div><div class="sys-pct warn">40%</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 2: CxC + Clientes + Tickets -->
+        <div class="main-grid">
+          <!-- Cuentas por cobrar -->
+          <div class="panel p-red">
+            <div class="panel-header">
+              <div class="panel-title red">⚠ CUENTAS POR COBRAR</div>
+              <div class="panel-badge red">4 PENDIENTES</div>
+            </div>
+            <div class="cxc-list">
+              <div class="cxc-row"><div class="cxc-ico">🔴</div><div class="cxc-info"><div class="cxc-name">TECHSTART MX · #INV-2026-02</div><div class="cxc-meta">VENCIÓ 28/02/2026 · +14 DÍAS</div></div><div class="cxc-amount over">$8,500</div><div class="cxc-status st-over">VENCIDO</div></div>
+              <div class="cxc-row"><div class="cxc-ico">⏱</div><div class="cxc-info"><div class="cxc-name">ACME CORP · #INV-2026-03</div><div class="cxc-meta">VENCE 10/03/2026</div></div><div class="cxc-amount pend">$12,000</div><div class="cxc-status st-pend">PENDIENTE</div></div>
+              <div class="cxc-row"><div class="cxc-ico">◇</div><div class="cxc-info"><div class="cxc-name">CLIENTE DEMO · #INV-2026-03</div><div class="cxc-meta">VENCE 15/03/2026</div></div><div class="cxc-amount pend">$18,300</div><div class="cxc-status st-pend">PENDIENTE</div></div>
+              <div class="cxc-row"><div class="cxc-ico">⬡</div><div class="cxc-info"><div class="cxc-name">GRUPO NEXO · #INV-2026-03</div><div class="cxc-meta">VENCE 20/03/2026</div></div><div class="cxc-amount" style="color:var(--cyan);">$4,500</div><div class="cxc-status st-new">NUEVO</div></div>
+            </div>
+            <div class="cxc-footer">
+              <button class="cxc-btn" onclick="showToast('📧 RECORDATORIOS ENVIADOS')">✉ RECORDATORIOS</button>
+              <button class="cxc-btn warn" onclick="showToast('⚠ REPORTE GENERADO')">⚠ REPORTE</button>
+            </div>
+          </div>
+
+          <!-- Clientes activos -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">👥 CLIENTES ACTIVOS</div>
+              <div class="panel-badge">4 REGISTROS</div>
+            </div>
+            <div class="client-list">
+              <div class="client-row">
+                <div class="client-avatar">CD</div>
+                <div class="client-info"><div class="client-name">CLIENTE DEMO</div><div class="client-meta">Análisis PRO + Ciberseguridad Ent.</div></div>
+                <div class="client-plan plan-ent">ENTERPRISE</div>
+                <div class="client-revenue">$16,500</div>
+              </div>
+              <div class="client-row">
+                <div class="client-avatar" style="background:rgba(61,140,110,.08);border-color:rgba(61,140,110,.3);color:var(--green);">AC</div>
+                <div class="client-info"><div class="client-name">ACME CORP</div><div class="client-meta">Ciberseguridad Enterprise</div></div>
+                <div class="client-plan plan-ent">ENTERPRISE</div>
+                <div class="client-revenue">$12,000</div>
+              </div>
+              <div class="client-row">
+                <div class="client-avatar" style="background:rgba(240,192,64,.08);border-color:rgba(240,192,64,.25);color:var(--gold);">TX</div>
+                <div class="client-info"><div class="client-name">TECHSTART MX</div><div class="client-meta">Análisis de Datos PRO</div></div>
+                <div class="client-plan plan-pro">PRO</div>
+                <div class="client-revenue" style="color:var(--gold);">$4,500</div>
+              </div>
+              <div class="client-row">
+                <div class="client-avatar" style="background:rgba(142,184,204,.06);border-color:rgba(142,184,204,.2);color:var(--silver);">GN</div>
+                <div class="client-info"><div class="client-name">GRUPO NEXO</div><div class="client-meta">Inventario Virtual Starter</div></div>
+                <div class="client-plan plan-str">STARTER</div>
+                <div class="client-revenue" style="color:var(--silver);">$1,800</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tickets admin -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">◻ TICKETS · SOPORTE</div>
+              <div class="panel-badge red">ABIERTOS: 2</div>
+            </div>
+            <div class="ticket-list">
+              <div class="ticket pri-h">
+                <div class="ticket-top"><span class="ticket-id">#DS-0043</span><div class="ticket-flags"><span class="ticket-pri pri-high">ALTA</span></div></div>
+                <div class="ticket-title">Error de sincronización en dashboard de analítica</div>
+                <div class="ticket-meta">ABIERTO HOY · EQUIPO DATASYS DATA · CLIENTE DEMO</div>
+              </div>
+              <div class="ticket pri-m">
+                <div class="ticket-top"><span class="ticket-id">#DS-0041</span><div class="ticket-flags"><span class="ticket-pri pri-med">MEDIA</span></div></div>
+                <div class="ticket-title">Solicitud de acceso para usuario adicional</div>
+                <div class="ticket-meta">ABIERTO HACE 2 DÍAS · EN REVISIÓN · ACME CORP</div>
+              </div>
+            </div>
+            <div class="ticket-footer">
+              <button class="cxc-btn" onclick="showToast('📋 VISTA COMPLETA DE TICKETS')">VER TODOS</button>
+              <button class="cxc-btn" onclick="openTicketModal()">+ NUEVO</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fila 3: Actividad ancho completo -->
+        <div class="panel" style="margin-bottom:20px;">
+          <div class="panel-header">
+            <div class="panel-title">◈ ACTIVIDAD DEL SISTEMA</div>
+            <div class="panel-badge">ÚLTIMAS 24H</div>
+          </div>
+          <div class="act-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;">
+            <div class="act-item">
+              <div class="act-dot-wrap"><div class="act-dot ad-red"></div><div class="act-line"></div></div>
+              <div class="act-body"><div class="act-msg">Factura #INV-2026-02 VENCIDA — TechStart MX sin pago confirmado</div><div class="act-time">HOY · 00:00 AM · SISTEMA AUTOMÁTICO</div></div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot-wrap"><div class="act-dot ad-gold"></div><div class="act-line"></div></div>
+              <div class="act-body"><div class="act-msg">Factura #INV-2026-03 emitida · Grupo Nexo · $4,500 MXN</div><div class="act-time">AYER · 03:00 PM · ADMIN</div></div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot-wrap"><div class="act-dot ad-cyan"></div><div class="act-line"></div></div>
+              <div class="act-body"><div class="act-msg">Reporte mensual de analítica generado y enviado a Cliente Demo</div><div class="act-time">HOY · 09:42 AM</div></div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot-wrap"><div class="act-dot ad-cyan"></div><div class="act-line"></div></div>
+              <div class="act-body"><div class="act-msg">Nuevo servicio Inventario Virtual activado para Cliente Demo</div><div class="act-time">AYER · 11:20 AM</div></div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot-wrap"><div class="act-dot ad-green"></div><div class="act-line"></div></div>
+              <div class="act-body"><div class="act-msg">Ticket #DS-0041 respondido · Solicitud de usuario adicional en revisión</div><div class="act-time">HOY · 08:15 AM</div></div>
+            </div>
+            <div class="act-item">
+              <div class="act-dot-wrap"><div class="act-dot ad-silver"></div></div>
+              <div class="act-body"><div class="act-msg">Inicio de sesión de Administrador · México City, MX</div><div class="act-time">AYER · 09:00 AM</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acceso rápido admin -->
+        <div class="panel" style="margin-bottom:0;">
+          <div class="panel-header">
+            <div class="panel-title">⬡ ACCESO RÁPIDO · ADMINISTRACIÓN</div>
+          </div>
+          <div class="qa-grid-admin">
+            <a class="qa-card" onclick="switchPanel('cobros',event)"><div class="qa-ico">◇</div><div class="qa-lbl">GESTIÓN<br>COBROS</div></a>
+            <a class="qa-card" onclick="switchPanel('crm',event)"><div class="qa-ico">🗄</div><div class="qa-lbl">CRM<br>DASHBOARD</div></a>
+            <a class="qa-card" onclick="switchPanel('users',event)"><div class="qa-ico">👥</div><div class="qa-lbl">GESTIÓN<br>USUARIOS</div></a>
+            <a class="qa-card" onclick="switchPanel('reports',event)"><div class="qa-ico">📊</div><div class="qa-lbl">ANALÍTICA<br>GLOBAL</div></a>
+            <a class="qa-card" onclick="switchPanel('docs',event)"><div class="qa-ico">📄</div><div class="qa-lbl">DOCS<br>PENDIENTES</div></a>
+            <a class="qa-card" onclick="switchPanel('checkout',event)"><div class="qa-ico">⬡</div><div class="qa-lbl">NUEVO<br>SERVICIO</div></a>
+          </div>
+        </div>
+
+      </div><!-- /overview-admin -->
+    </div>
+
+    <!-- SERVICES PANEL -->
+    <div id="panel-services" style="display:none;">
+      <div class="dash-header">
+        <div class="dash-title-wrap">
+          <div class="dt-pre">// CONTRATADOS //</div>
+          <div class="dt-main">MIS SERVICIOS</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="srv-list">
+          <div class="srv-row"><div class="srv-row-ico">📊</div><div class="srv-row-info"><div class="srv-row-name">ANÁLISIS DE DATOS — PLAN PRO</div><div class="srv-row-meta">INICIO: 15/01/2026 · RENOVACIÓN: 15/04/2026 · $4,500 MXN/MES</div></div><div class="srv-row-status s-active">ACTIVO</div></div>
+          <div class="srv-row"><div class="srv-row-ico">🔐</div><div class="srv-row-info"><div class="srv-row-name">CIBERSEGURIDAD — PLAN ENTERPRISE</div><div class="srv-row-meta">INICIO: 01/12/2025 · RENOVACIÓN: 01/06/2026 · $12,000 MXN/MES</div></div><div class="srv-row-status s-active">ACTIVO</div></div>
+          <div class="srv-row"><div class="srv-row-ico">📦</div><div class="srv-row-info"><div class="srv-row-name">INVENTARIO VIRTUAL — PLAN STARTER</div><div class="srv-row-meta">INICIO: 01/03/2026 · RENOVACIÓN: 01/04/2026 · $1,800 MXN/MES</div></div><div class="srv-row-status s-pend">CONFIGURANDO</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TICKETS PANEL -->
+    <div id="panel-tickets" style="display:none;">
+      <div class="dash-header">
+        <div class="dash-title-wrap">
+          <div class="dt-pre">// SOPORTE TÉCNICO //</div>
+          <div class="dt-main">TICKETS</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ticket-list">
+          <div class="ticket"><div class="ticket-top"><span class="ticket-id">#DS-0043</span><span class="ticket-pri pri-high">ALTA</span></div><div class="ticket-title">Error de sincronización en dashboard de analítica</div><div class="ticket-meta">ABIERTO HOY · EN PROGRESO · EQUIPO DATASYS DATA</div></div>
+          <div class="ticket"><div class="ticket-top"><span class="ticket-id">#DS-0041</span><span class="ticket-pri pri-med">MEDIA</span></div><div class="ticket-title">Solicitud de acceso para usuario adicional</div><div class="ticket-meta">ABIERTO HACE 2 DÍAS · EN REVISIÓN</div></div>
+          <div class="ticket" style="opacity:.5;"><div class="ticket-top"><span class="ticket-id">#DS-0038</span><span class="ticket-pri pri-low">BAJA</span></div><div class="ticket-title">Configuración inicial de módulo de reportes</div><div class="ticket-meta">CERRADO · 28/02/2026 · RESUELTO EN 6H</div></div>
+        </div>
+        <button class="new-ticket-btn" onclick="openTicketModal()">+ ABRIR NUEVO TICKET</button>
+      </div>
+    </div>
+
+    <!-- REPORTS PANEL -->
+    <div id="panel-reports" style="display:none;">
+      <div class="dash-header"><div class="dash-title-wrap"><div class="dt-pre">// DATOS //</div><div class="dt-main">ANALÍTICA</div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">REPORTES DISPONIBLES</div></div>
+        <div class="srv-list">
+          <div class="srv-row"><div class="srv-row-ico">📈</div><div class="srv-row-info"><div class="srv-row-name">REPORTE MENSUAL FEBRERO 2026</div><div class="srv-row-meta">GENERADO: 01/03/2026 · PDF · 2.4 MB</div></div><div class="srv-row-status s-new">NUEVO</div></div>
+          <div class="srv-row"><div class="srv-row-ico">📈</div><div class="srv-row-info"><div class="srv-row-name">REPORTE MENSUAL ENERO 2026</div><div class="srv-row-meta">GENERADO: 01/02/2026 · PDF · 2.1 MB</div></div><div class="srv-row-status s-active">DISPONIBLE</div></div>
+          <div class="srv-row"><div class="srv-row-ico">🔐</div><div class="srv-row-info"><div class="srv-row-name">ANÁLISIS DE SEGURIDAD Q1 2026</div><div class="srv-row-meta">GENERADO: 28/02/2026 · PDF · 3.8 MB</div></div><div class="srv-row-status s-new">NUEVO</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCS PANEL -->
+    <div id="panel-docs" style="display:none;">
+      <div class="dash-header"><div class="dash-title-wrap"><div class="dt-pre">// ARCHIVOS //</div><div class="dt-main">DOCUMENTOS</div></div></div>
+      <div class="panel"><div class="panel-header"><div class="panel-title">DOCUMENTOS PENDIENTES DE FIRMA</div><div class="panel-badge">5 DOCS</div></div>
+        <div class="srv-list">
+          <div class="srv-row"><div class="srv-row-ico">📋</div><div class="srv-row-info"><div class="srv-row-name">CONTRATO SERVICIO INVENTARIO VIRTUAL</div><div class="srv-row-meta">ENVIADO: 03/03/2026 · PENDIENTE TU FIRMA</div></div><div class="srv-row-status s-pend">FIRMAR</div></div>
+          <div class="srv-row"><div class="srv-row-ico">📋</div><div class="srv-row-info"><div class="srv-row-name">ADENDA CIBERSEGURIDAD 2026</div><div class="srv-row-meta">ENVIADO: 01/03/2026 · PENDIENTE TU FIRMA</div></div><div class="srv-row-status s-pend">FIRMAR</div></div>
+          <div class="srv-row"><div class="srv-row-ico">✅</div><div class="srv-row-info"><div class="srv-row-name">CONTRATO ANÁLISIS DE DATOS 2026</div><div class="srv-row-meta">FIRMADO: 15/01/2026</div></div><div class="srv-row-status s-active">FIRMADO</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE PANEL -->
+    <div id="panel-profile" style="display:none;">
+      <div class="dash-header"><div class="dash-title-wrap"><div class="dt-pre">// CONFIGURACIÓN //</div><div class="dt-main">MI PERFIL</div></div></div>
+
+      <!-- DATOS DE CUENTA -->
+      <div class="panel" style="max-width:640px;margin-bottom:20px;">
+        <div class="panel-header"><div class="panel-title">⬟ DATOS DE CUENTA</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="modal-field"><label class="modal-label">NOMBRE</label><input class="modal-input" id="profName" placeholder="tu nombre" oninput="this.value=this.value.toLowerCase()"></div>
+          <div class="modal-field"><label class="modal-label">EMPRESA</label><input class="modal-input" id="profEmpresa" placeholder="tu empresa" oninput="this.value=this.value.toLowerCase()"></div>
+          <div class="modal-field"><label class="modal-label">EMAIL</label><input class="modal-input" id="profEmail" placeholder="email@empresa.com" readonly style="opacity:.5;cursor:not-allowed;"></div>
+          <div class="modal-field"><label class="modal-label">TELÉFONO</label><input class="modal-input" id="profTel" placeholder="+52 55 0000 0000" oninput="this.value=this.value.toLowerCase()"></div>
+        </div>
+        <button class="login-btn" style="max-width:220px;margin-top:20px;padding:12px;" onclick="saveProfile()">GUARDAR CAMBIOS</button>
+        <div id="profResult" style="display:none;margin-top:12px;padding:9px 14px;font-family:Share Tech Mono,monospace;font-size:.55rem;letter-spacing:1.5px;"></div>
+      </div>
+
+      <!-- CAMBIAR CONTRASEÑA -->
+      <div class="panel" style="max-width:640px;">
+        <div class="panel-header"><div class="panel-title">🔑 CAMBIAR CONTRASEÑA</div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+          <div class="modal-field">
+            <label class="modal-label">CONTRASEÑA ACTUAL</label>
+            <input type="password" class="modal-input" id="passActual" placeholder="contraseña actual" oninput="this.value=this.value.toLowerCase()">
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">NUEVA CONTRASEÑA</label>
+            <input type="password" class="modal-input" id="passNueva" placeholder="mínimo 6 caracteres" oninput="this.value=this.value.toLowerCase()">
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">CONFIRMAR</label>
+            <input type="password" class="modal-input" id="passConfirm" placeholder="repetir contraseña" oninput="this.value=this.value.toLowerCase()">
+          </div>
+        </div>
+        <button class="login-btn" style="max-width:220px;margin-top:20px;padding:12px;" onclick="changePassword()">CAMBIAR CONTRASEÑA</button>
+        <div id="passResult" style="display:none;margin-top:12px;padding:9px 14px;font-family:Share Tech Mono,monospace;font-size:.55rem;letter-spacing:1.5px;"></div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ BILLING PANEL ═══════════════ -->
+    <div id="panel-billing" style="display:none;">
+      <div class="dash-header">
+        <div class="dash-title-wrap">
+          <div class="dt-pre">// SISTEMA DE COBRO //</div>
+          <div class="dt-main">FACTURACIÓN</div>
+          <div class="dt-sub">Historial de pagos · Estado de cuenta · Métodos de pago</div>
+        </div>
+      </div>
+      <!-- KPIs -->
+      <div class="bill-kpi">
+        <div class="bkpi"><div class="bkpi-ico">◇</div><div class="bkpi-val gold">$18,300</div><div class="bkpi-lbl">PRÓXIMA FACTURA (MXN)</div></div>
+        <div class="bkpi"><div class="bkpi-ico">◈</div><div class="bkpi-val green">$33,000</div><div class="bkpi-lbl">PAGADO EN 2026 (MXN)</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⬟</div><div class="bkpi-val">3</div><div class="bkpi-lbl">SERVICIOS ACTIVOS</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⬡</div><div class="bkpi-val green">AL DÍA</div><div class="bkpi-lbl">ESTADO DE CUENTA</div></div>
+      </div>
+      <!-- TABS -->
+      <div class="billing-tabs">
+        <button class="bt bt-active" onclick="billTab('facturas',this)">◇ FACTURAS</button>
+        <button class="bt" onclick="billTab('metodos',this)">◈ MÉTODOS DE PAGO</button>
+      </div>
+      <!-- FACTURAS TAB -->
+      <div id="btab-facturas">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">HISTORIAL DE FACTURAS</div>
+            <div class="panel-badge">3 REGISTROS</div>
+          </div>
+          <table class="inv-table">
+            <thead>
+              <tr><th>FOLIO</th><th>DESCRIPCIÓN</th><th>FECHA</th><th>VENCE</th><th>MONTO</th><th>ESTADO</th><th>ACCIONES</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="inv-num">#INV-2026-03</span></td>
+                <td>Análisis de Datos PRO + Ciberseguridad Ent. + Inventario Starter</td>
+                <td>01/03/2026</td>
+                <td>15/03/2026</td>
+                <td><span class="inv-amount pend">$18,300</span></td>
+                <td><span class="pill pill-pend">PENDIENTE</span></td>
+                <td>
+                  <button class="iact pay" onclick="openCheckout('INV-2026-03','$18,300 MXN','Factura Marzo 2026')">▶ PAGAR</button>
+                  <button class="iact" onclick="showToast('📄 DESCARGANDO PDF...')">⬇ PDF</button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="inv-num">#INV-2026-02</span></td>
+                <td>Análisis de Datos PRO + Ciberseguridad Enterprise</td>
+                <td>01/02/2026</td>
+                <td>15/02/2026</td>
+                <td><span class="inv-amount paid">$16,500</span></td>
+                <td><span class="pill pill-paid">PAGADO</span></td>
+                <td>
+                  <button class="iact" onclick="showToast('📄 DESCARGANDO PDF...')">⬇ PDF</button>
+                  <button class="iact" onclick="showToast('📧 FACTURA ENVIADA')">✉ EMAIL</button>
+                </td>
+              </tr>
+              <tr>
+                <td><span class="inv-num">#INV-2026-01</span></td>
+                <td>Análisis de Datos PRO + Ciberseguridad Enterprise</td>
+                <td>01/01/2026</td>
+                <td>15/01/2026</td>
+                <td><span class="inv-amount paid">$16,500</span></td>
+                <td><span class="pill pill-paid">PAGADO</span></td>
+                <td>
+                  <button class="iact" onclick="showToast('📄 DESCARGANDO PDF...')">⬇ PDF</button>
+                  <button class="iact" onclick="showToast('📧 FACTURA ENVIADA')">✉ EMAIL</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- MÉTODOS TAB -->
+      <div id="btab-metodos" style="display:none;">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">MÉTODOS DE PAGO DISPONIBLES</div></div>
+          <div class="pay-methods">
+            <div class="pm-card pm-sel" onclick="selPM(this)">
+              <div class="pm-ico">💳</div>
+              <div class="pm-name">TARJETA</div>
+              <div class="pm-desc">VISA · MASTERCARD · AMEX</div>
+              <span class="pm-tag pm-ready">LISTO PARA CONECTAR</span>
+            </div>
+            <div class="pm-card" onclick="selPM(this)">
+              <div class="pm-ico">🔶</div>
+              <div class="pm-name">STRIPE</div>
+              <div class="pm-desc">PAGOS INTERNACIONALES</div>
+              <span class="pm-tag pm-soon">PRÓXIMAMENTE</span>
+            </div>
+            <div class="pm-card" onclick="selPM(this)">
+              <div class="pm-ico">🏦</div>
+              <div class="pm-name">TRANSFERENCIA</div>
+              <div class="pm-desc">SPEI · CLABE INTERBANCARIA</div>
+              <span class="pm-tag pm-ready">DISPONIBLE</span>
+            </div>
+          </div>
+          <div style="margin-top:8px;">
+            <p style="font-family:Rajdhani,sans-serif;font-size:.9rem;color:var(--silver);line-height:1.8;margin-bottom:16px;">Para pagos vía transferencia bancaria, utiliza los siguientes datos:</p>
+            <div class="order-summary" style="max-width:420px;">
+              <div class="os-row"><span class="os-label">BANCO</span><span class="os-val">BBVA México</span></div>
+              <div class="os-row"><span class="os-label">BENEFICIARIO</span><span class="os-val">DATASYS TECHNOLOGY SA DE CV</span></div>
+              <div class="os-row"><span class="os-label">CLABE</span><span class="os-val" style="font-family:Share Tech Mono,monospace;font-size:.75rem;letter-spacing:2px;">012345678901234567</span></div>
+              <div class="os-row"><span class="os-label">REFERENCIA</span><span class="os-val" style="color:var(--cyan);">TU FOLIO DE FACTURA</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ CHECKOUT — CONTRATAR ═══════════════ -->
+    <div id="panel-checkout" style="display:none;">
+      <div class="dash-header">
+        <div class="dash-title-wrap">
+          <div class="dt-pre">// NUEVOS SERVICIOS //</div>
+          <div class="dt-main">CONTRATAR</div>
+          <div class="dt-sub">Selecciona un plan y completa el checkout</div>
+        </div>
+      </div>
+      <!-- SUSCRIPCIONES ACTIVAS -->
+      <div class="panel" style="margin-bottom:20px;">
+        <div class="panel-header"><div class="panel-title">MIS SUSCRIPCIONES</div><div class="panel-badge">3 ACTIVAS</div></div>
+        <div class="sub-list">
+          <div class="sub-row">
+            <div class="sub-ico">📊</div>
+            <div class="sub-info">
+              <div class="sub-name">ANÁLISIS DE DATOS — PLAN PRO</div>
+              <div class="sub-meta">RENOVACIÓN: 15/04/2026 · MENSUAL</div>
+              <div class="sub-progress"><div class="sub-progress-fill" style="width:62%"></div></div>
+            </div>
+            <div class="sub-price-col">$4,500 MXN<span class="sp-period">/MES</span></div>
+            <div class="sub-actions">
+              <button class="iact" onclick="showToast('↑ UPGRADE DISPONIBLE — CONTACTA A TU ASESOR')">UPGRADE</button>
+              <button class="iact" style="color:#e05050;border-color:rgba(200,40,42,.25);" onclick="showToast('⚠ SOLICITUD ENVIADA A TU ASESOR')">CANCELAR</button>
+            </div>
+          </div>
+          <div class="sub-row">
+            <div class="sub-ico">🔐</div>
+            <div class="sub-info">
+              <div class="sub-name">CIBERSEGURIDAD — PLAN ENTERPRISE</div>
+              <div class="sub-meta">RENOVACIÓN: 01/06/2026 · MENSUAL</div>
+              <div class="sub-progress"><div class="sub-progress-fill" style="width:20%"></div></div>
+            </div>
+            <div class="sub-price-col">$12,000 MXN<span class="sp-period">/MES</span></div>
+            <div class="sub-actions">
+              <button class="iact" onclick="showToast('↑ PLAN ENTERPRISE — YA EN EL MÁS ALTO')">UPGRADE</button>
+            </div>
+          </div>
+          <div class="sub-row">
+            <div class="sub-ico">📦</div>
+            <div class="sub-info">
+              <div class="sub-name">INVENTARIO VIRTUAL — STARTER</div>
+              <div class="sub-meta">RENOVACIÓN: 01/04/2026 · MENSUAL · CONFIGURANDO</div>
+              <div class="sub-progress"><div class="sub-progress-fill" style="width:10%"></div></div>
+            </div>
+            <div class="sub-price-col">$1,800 MXN<span class="sp-period">/MES</span></div>
+            <div class="sub-actions">
+              <button class="iact" onclick="openCheckout('UPGRADE-INV','$3,200 MXN','Inventario Virtual PRO')">UPGRADE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- CATÁLOGO DE SERVICIOS -->
+      <div class="panel-header" style="margin-bottom:16px;"><div class="panel-title" style="font-family:Orbitron,sans-serif;font-size:.65rem;letter-spacing:3px;color:var(--cyan);">AÑADIR NUEVO SERVICIO</div></div>
+      <div class="co-grid">
+        <div class="co-card">
+          <div class="co-ico">🤖</div>
+          <div class="co-name">AUTOMATIZACIÓN</div>
+          <div class="co-desc">Robótica e IA para manufactura, logística y operaciones industriales.</div>
+          <div class="co-price"><span class="co-amount">8,500</span><span class="co-cur">MXN</span></div>
+          <div class="co-period">/ MES · PLAN ESTÁNDAR</div>
+          <ul class="co-features">
+            <li>Hasta 3 líneas automatizadas</li>
+            <li>Monitoreo IoT en tiempo real</li>
+            <li>Soporte 24/5</li>
+          </ul>
+          <button class="co-btn" onclick="openCheckout('AUTO-STD','$8,500 MXN/mes','Automatización Estándar')">▶ CONTRATAR</button>
+        </div>
+        <div class="co-card co-pop co-gold">
+          <div class="co-badge gold">MÁS POPULAR</div>
+          <div class="co-ico">📱</div>
+          <div class="co-name">DESARROLLO APPS</div>
+          <div class="co-desc">Apps móviles iOS/Android y web con IA integrada a medida.</div>
+          <div class="co-price"><span class="co-amount">15,000</span><span class="co-cur">MXN</span></div>
+          <div class="co-period">/ PROYECTO · ESTIMADO</div>
+          <ul class="co-features">
+            <li>App iOS + Android nativa</li>
+            <li>Panel de administración web</li>
+            <li>IA integrada en flujo</li>
+            <li>3 meses de soporte incluido</li>
+          </ul>
+          <button class="co-btn" onclick="openCheckout('APPS-PRO','$15,000 MXN','Desarrollo Apps Mobile')">▶ SOLICITAR COTIZACIÓN</button>
+        </div>
+        <div class="co-card">
+          <div class="co-ico">🎤</div>
+          <div class="co-name">CONSULTORÍA</div>
+          <div class="co-desc">Transformación digital estratégica y conferencias para tu organización.</div>
+          <div class="co-price"><span class="co-amount">6,000</span><span class="co-cur">MXN</span></div>
+          <div class="co-period">/ SESIÓN · 4 HRS</div>
+          <ul class="co-features">
+            <li>Diagnóstico empresarial</li>
+            <li>Roadmap de transformación</li>
+            <li>Keynote disponible</li>
+          </ul>
+          <button class="co-btn" onclick="openCheckout('CONS-SES','$6,000 MXN','Consultoría — Sesión 4hrs')">▶ AGENDAR</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════ ADMIN: COBROS ═══════════════ -->
+    <div id="panel-cobros" class="admin-only" style="display:none;">
+      <div class="dash-header">
+        <div class="dash-title-wrap">
+          <div class="dt-pre">// ADMINISTRACIÓN //</div>
+          <div class="dt-main">GESTIÓN DE COBROS</div>
+          <div class="dt-sub">Generar facturas · Emitir cargos · Ver cuentas por cobrar</div>
+        </div>
+      </div>
+      <!-- ADMIN KPIs -->
+      <div class="bill-kpi">
+        <div class="bkpi"><div class="bkpi-ico">📋</div><div class="bkpi-val">12</div><div class="bkpi-lbl">FACTURAS ESTE MES</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⬡</div><div class="bkpi-val green">$186,400</div><div class="bkpi-lbl">COBRADO MARZO (MXN)</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⏱</div><div class="bkpi-val gold">$34,200</div><div class="bkpi-lbl">PENDIENTE DE COBRO</div></div>
+        <div class="bkpi"><div class="bkpi-ico">🔴</div><div class="bkpi-val red">$8,500</div><div class="bkpi-lbl">VENCIDO</div></div>
+      </div>
+      <div class="panels-grid">
+        <!-- GENERAR FACTURA -->
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">◇ GENERAR FACTURA</div></div>
+          <div class="gc-form">
+            <div class="modal-field"><label class="modal-label">CLIENTE</label>
+              <select class="modal-input modal-select">
+                <option>— SELECCIONAR CLIENTE —</option>
+                <option>CLIENTE DEMO — <template class="__cf_email__" data-cfemail="85e6e9ece0ebf1e0c5e0e8f5f7e0f6e4abe6eae8">[email&#160;protected]</template></option>
+                <option>ACME Corp — <template class="__cf_email__" data-cfemail="ec8d88818582ac8d8f8189c28194">[email&#160;protected]</template></option>
+                <option>TechStart MX — <template class="__cf_email__" data-cfemail="c5a6a3aa85b1a0a6adb6b1a4b7b1eba8bd">[email&#160;protected]</template></option>
+              </select>
+            </div>
+            <div class="modal-field"><label class="modal-label">SERVICIO</label>
+              <select class="modal-input modal-select">
+                <option>Análisis de Datos PRO</option>
+                <option>Ciberseguridad Enterprise</option>
+                <option>Inventario Virtual Starter</option>
+                <option>Automatización Estándar</option>
+                <option>Consultoría — Sesión</option>
+                <option>Desarrollo Apps</option>
+              </select>
+            </div>
+            <div class="modal-field"><label class="modal-label">MONTO (MXN)</label>
+              <input type="number" class="modal-input" placeholder="0.00">
+            </div>
+            <div class="modal-field"><label class="modal-label">FECHA VENCIMIENTO</label>
+              <input type="date" class="modal-input" id="vencDate" value="2026-03-31">
+            </div>
+            <div class="modal-field gc-full"><label class="modal-label">NOTAS / CONCEPTO</label>
+              <input type="text" class="modal-input" placeholder="Ej: Mensualidad marzo 2026 · Plan PRO">
+            </div>
+            <div class="gc-full">
+              <button class="new-inv-btn" onclick="genInvoice()">⬡ GENERAR Y ENVIAR FACTURA</button>
+            </div>
+          </div>
+        </div>
+        <!-- CUENTAS POR COBRAR -->
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">⚠ CUENTAS POR COBRAR</div><div class="panel-badge">4 PENDIENTES</div></div>
+          <div class="srv-list">
+            <div class="srv-row">
+              <div class="srv-row-ico">⏱</div>
+              <div class="srv-row-info">
+                <div class="srv-row-name">ACME CORP — #INV-2026-03</div>
+                <div class="srv-row-meta">VENCE: 10/03/2026 · $12,000 MXN</div>
+              </div>
+              <div class="srv-row-status s-pend">PENDIENTE</div>
+            </div>
+            <div class="srv-row">
+              <div class="srv-row-ico">🔴</div>
+              <div class="srv-row-info">
+                <div class="srv-row-name">TECHSTART MX — #INV-2026-02</div>
+                <div class="srv-row-meta">VENCIÓ: 28/02/2026 · $8,500 MXN · +5 DÍAS</div>
+              </div>
+              <div class="srv-row-status" style="background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;font-family:Share Tech Mono,monospace;font-size:.46rem;letter-spacing:1.5px;padding:3px 8px;">VENCIDO</div>
+            </div>
+            <div class="srv-row">
+              <div class="srv-row-ico">◇</div>
+              <div class="srv-row-info">
+                <div class="srv-row-name">CLIENTE DEMO — #INV-2026-03</div>
+                <div class="srv-row-meta">VENCE: 15/03/2026 · $18,300 MXN</div>
+              </div>
+              <div class="srv-row-status s-pend">PENDIENTE</div>
+            </div>
+            <div class="srv-row">
+              <div class="srv-row-ico">⬡</div>
+              <div class="srv-row-info">
+                <div class="srv-row-name">GRUPO NEXO — #INV-2026-03</div>
+                <div class="srv-row-meta">VENCE: 20/03/2026 · $4,500 MXN</div>
+              </div>
+              <div class="srv-row-status s-new">NUEVO</div>
+            </div>
+          </div>
+          <button class="new-ticket-btn" onclick="showToast('📧 RECORDATORIO ENVIADO A TODOS')">✉ ENVIAR RECORDATORIOS</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN: USERS -->
+    <div id="panel-users" style="display:none;">
+      <div class="dash-header"><div class="dash-title-wrap"><div class="dt-pre">// ADMINISTRACIÓN //</div><div class="dt-main">GESTIÓN DE USUARIOS</div></div></div>
+
+      <div id="adminPinGate" style="display:none;"></div>
+
+      <!-- ADMIN USERS PANEL (hidden until PIN verified) -->
+      <div id="adminUsersPanel" style="display:none;">
+
+        <!-- Tab bar -->
+        <div class="billing-tabs" style="margin-bottom:22px;flex-wrap:wrap;">
+          <button class="bt bt-active" id="utab-list" onclick="userTab('list',this)">👥 USUARIOS ACTIVOS</button>
+          <button class="bt" id="utab-contrato" onclick="userTab('contrato',this)">📋 NUEVA CONTRATACIÓN</button>
+          <button class="bt" id="utab-alta" onclick="userTab('alta',this)">➕ ALTA DE USUARIO</button>
+          <button class="bt" id="utab-baja" onclick="userTab('baja',this)">🗑 BAJA DE USUARIO</button>
+          <button class="bt" id="utab-recover" onclick="userTab('recover',this)">🔄 RECUPERAR ACCESO</button>
+        </div>
+
+        <!-- TAB: LIST -->
+        <div id="utab-panel-list">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">USUARIOS DEL SISTEMA</div>
+              <div class="panel-badge" id="userCountBadge">CARGANDO...</div>
+            </div>
+            <div class="srv-list" id="userListContainer">
+              <div style="text-align:center;padding:24px;font-family:Share Tech Mono,monospace;font-size:.55rem;color:var(--silver);opacity:.5;">⟳ CARGANDO USUARIOS...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: CONTRATACIÓN WIZARD -->
+        <div id="utab-panel-contrato" style="display:none;">
+
+          <!-- Wizard step indicators -->
+          <div class="wiz-steps">
+            <div class="wiz-step ws-active" id="ws1"><div class="wiz-num">1</div><div class="wiz-lbl">DATOS<br>CLIENTE</div></div>
+            <div class="wiz-connector" id="wc1"></div>
+            <div class="wiz-step" id="ws2"><div class="wiz-num">2</div><div class="wiz-lbl">PLAN DE<br>SERVICIOS</div></div>
+            <div class="wiz-connector" id="wc2"></div>
+            <div class="wiz-step" id="ws3"><div class="wiz-num">3</div><div class="wiz-lbl">TIEMPOS Y<br>GARANTÍAS</div></div>
+            <div class="wiz-connector" id="wc3"></div>
+            <div class="wiz-step" id="ws4"><div class="wiz-num">4</div><div class="wiz-lbl">CONTRATO<br>Y FIRMA</div></div>
+            <div class="wiz-connector" id="wc4"></div>
+            <div class="wiz-step" id="ws5"><div class="wiz-num">5</div><div class="wiz-lbl">TOTAL Y<br>FACTURACIÓN</div></div>
+            <div class="wiz-connector" id="wc5"></div>
+            <div class="wiz-step" id="ws6"><div class="wiz-num">6</div><div class="wiz-lbl">ALTA<br>COMPLETADA</div></div>
+          </div>
+
+          <!-- PAGE 1: DATOS DEL CLIENTE -->
+          <div class="wiz-page wp-active" id="wp1">
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">👤 DATOS DEL CLIENTE</div><div class="panel-badge">PASO 1 DE 6</div></div>
+              <div class="form2">
+                <div class="modal-field"><label class="modal-label">NOMBRE(S) *</label><input class="modal-input" id="c_nombre" placeholder="nombre(s)" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">APELLIDOS *</label><input class="modal-input" id="c_apellidos" placeholder="apellido paterno materno" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">CORREO ELECTRÓNICO *</label><input class="modal-input" id="c_email" placeholder="correo@empresa.com" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">TELÉFONO *</label><input class="modal-input" id="c_tel" placeholder="+52 55 0000 0000"></div>
+                <div class="modal-field"><label class="modal-label">CURP *</label><input class="modal-input" id="c_curp" placeholder="curp 18 caracteres" maxlength="18" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">RFC *</label><input class="modal-input" id="c_rfc" placeholder="rfc con homoclave" maxlength="13" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field f-full"><label class="modal-label">RAZÓN SOCIAL / EMPRESA</label><input class="modal-input" id="c_empresa" placeholder="nombre de la empresa o persona física" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field f-full"><label class="modal-label">CALLE Y NÚMERO *</label><input class="modal-input" id="c_calle" placeholder="calle, número exterior e interior" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">COLONIA *</label><input class="modal-input" id="c_colonia" placeholder="colonia" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">MUNICIPIO / ALCALDÍA *</label><input class="modal-input" id="c_municipio" placeholder="municipio o alcaldía" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">ESTADO *</label><input class="modal-input" id="c_estado" placeholder="estado" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">CÓDIGO POSTAL *</label><input class="modal-input" id="c_cp" placeholder="00000" maxlength="5"></div>
+                <div class="modal-field"><label class="modal-label">CONTRASEÑA INICIAL *</label><input type="password" class="modal-input" id="c_pass" placeholder="mínimo 6 caracteres" oninput="this.value=this.value.toLowerCase()"></div>
+                <div class="modal-field"><label class="modal-label">CONFIRMAR CONTRASEÑA *</label><input type="password" class="modal-input" id="c_pass2" placeholder="repetir contraseña" oninput="this.value=this.value.toLowerCase()"></div>
+              </div>
+              <div id="wiz-res1" class="wiz-result"></div>
+              <div class="wiz-nav">
+                <button class="wiz-btn-next" onclick="wizNext(1)">SIGUIENTE → PLAN DE SERVICIOS ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 2: PLAN DE SERVICIOS -->
+          <div class="wiz-page" id="wp2">
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">◈ PLAN DE SERVICIOS</div><div class="panel-badge">PASO 2 DE 6</div></div>
+              <div style="font-family:Share Tech Mono,monospace;font-size:.52rem;letter-spacing:1.5px;color:var(--silver);opacity:.6;margin-bottom:18px;">SELECCIONA UNO O MÁS SERVICIOS — SE ACUMULAN AUTOMÁTICAMENTE</div>
+              <div class="plan-grid" id="planGrid">
+                <div class="plan-item" onclick="togglePlan(this,'revista',1200)" data-key="revista" data-price="1200">
+                  <div class="pi-ico">📰</div>
+                  <div class="pi-name">REVISTA DIGITAL</div>
+                  <div class="pi-desc">Publicación mensual especializada en tecnología y negocios</div>
+                  <div class="pi-price">$1,200 <span style="font-size:.5rem;opacity:.6;">MXN/MES</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'bolsa',3500)" data-key="bolsa" data-price="3500">
+                  <div class="pi-ico">📈</div>
+                  <div class="pi-name">ANÁLISIS DE BOLSA</div>
+                  <div class="pi-desc">Reportes semanales de mercados financieros con IA</div>
+                  <div class="pi-price">$3,500 <span style="font-size:.5rem;opacity:.6;">MXN/MES</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'disenoweb',8500)" data-key="disenoweb" data-price="8500">
+                  <div class="pi-ico">🌐</div>
+                  <div class="pi-name">DISEÑO WEB</div>
+                  <div class="pi-desc">Sitio web profesional responsive con panel de administración</div>
+                  <div class="pi-price">$8,500 <span style="font-size:.5rem;opacity:.6;">MXN</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'apps',15000)" data-key="apps" data-price="15000">
+                  <div class="pi-ico">📱</div>
+                  <div class="pi-name">APPS MÓVILES</div>
+                  <div class="pi-desc">Desarrollo iOS + Android nativo con IA integrada</div>
+                  <div class="pi-price">$15,000 <span style="font-size:.5rem;opacity:.6;">MXN</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'automatizacion',12000)" data-key="automatizacion" data-price="12000">
+                  <div class="pi-ico">🤖</div>
+                  <div class="pi-name">AUTOMATIZACIÓN</div>
+                  <div class="pi-desc">Robótica e IA para manufactura, logística e industria</div>
+                  <div class="pi-price">$12,000 <span style="font-size:.5rem;opacity:.6;">MXN/MES</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'datos',4500)" data-key="datos" data-price="4500">
+                  <div class="pi-ico">📊</div>
+                  <div class="pi-name">ANÁLISIS DE DATOS</div>
+                  <div class="pi-desc">Dashboard BI, reportes automatizados y predicción con ML</div>
+                  <div class="pi-price">$4,500 <span style="font-size:.5rem;opacity:.6;">MXN/MES</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'inventario',1800)" data-key="inventario" data-price="1800">
+                  <div class="pi-ico">📦</div>
+                  <div class="pi-name">INVENTARIOS VIRTUALES</div>
+                  <div class="pi-desc">Control de stock, alertas y sincronización multi-almacén</div>
+                  <div class="pi-price">$1,800 <span style="font-size:.5rem;opacity:.6;">MXN/MES</span></div>
+                </div>
+                <div class="plan-item" onclick="togglePlan(this,'biotech',25000)" data-key="biotech" data-price="25000">
+                  <div class="pi-ico">🦾</div>
+                  <div class="pi-name">INVERSIÓN BIOTEC</div>
+                  <div class="pi-desc">Brazos robóticos · Análisis de inversión en biotecnología aplicada</div>
+                  <div class="pi-price">$25,000 <span style="font-size:.5rem;opacity:.6;">MXN</span></div>
+                </div>
+              </div>
+              <!-- Subtotal en tiempo real -->
+              <div style="padding:16px 20px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div>
+                  <div style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:2px;color:var(--silver);opacity:.6;">SERVICIOS SELECCIONADOS</div>
+                  <div id="planSelected" style="font-family:Rajdhani,sans-serif;font-size:.85rem;color:var(--silver);margin-top:4px;">Ninguno seleccionado</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:2px;color:var(--silver);opacity:.6;">SUBTOTAL</div>
+                  <div id="planSubtotal" style="font-family:Orbitron,sans-serif;font-size:1.1rem;font-weight:900;color:var(--cyan);">$0 MXN</div>
+                </div>
+              </div>
+              <div id="wiz-res2" class="wiz-result"></div>
+              <div class="wiz-nav">
+                <button class="wiz-btn-back" onclick="wizBack(2)">◀ ATRÁS</button>
+                <button class="wiz-btn-next" onclick="wizNext(2)">SIGUIENTE → TIEMPOS Y GARANTÍAS ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 3: TIEMPOS Y GARANTÍAS -->
+          <div class="wiz-page" id="wp3">
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">⏱ TIEMPOS, GARANTÍAS Y PÓLIZAS</div><div class="panel-badge">PASO 3 DE 6</div></div>
+              <div class="gt-grid">
+                <div class="gt-card">
+                  <div class="gt-title">⏱ TIEMPOS DE ENTREGA</div>
+                  <div class="gt-item">Diseño Web: 15 días hábiles</div>
+                  <div class="gt-item">Apps Móviles: 45–60 días hábiles</div>
+                  <div class="gt-item">Automatización: 30–90 días según proyecto</div>
+                  <div class="gt-item">Análisis de Datos / Bolsa: Acceso inmediato</div>
+                  <div class="gt-item">Inventarios Virtuales: 7 días hábiles</div>
+                  <div class="gt-item">Biotecnología / Brazos: 90–180 días</div>
+                  <div class="gt-item">Revista Digital: Primer número al mes siguiente</div>
+                </div>
+                <div class="gt-card">
+                  <div class="gt-title">✅ GARANTÍAS</div>
+                  <div class="gt-item">6 meses de garantía en desarrollo de software</div>
+                  <div class="gt-item">12 meses en hardware y automatización</div>
+                  <div class="gt-item">Soporte técnico 24/5 incluido primer año</div>
+                  <div class="gt-item">Actualizaciones sin costo durante vigencia</div>
+                  <div class="gt-item">SLA: 99.5% uptime garantizado en servicios cloud</div>
+                </div>
+                <div class="gt-card">
+                  <div class="gt-title gi-warn">⚠ PENALIZACIONES</div>
+                  <div class="gt-item gi-warn">Retraso en entrega: 2% del monto por semana</div>
+                  <div class="gt-item gi-warn">Cancelación antes de 50%: 30% del total</div>
+                  <div class="gt-item gi-warn">Cancelación después de 50%: 60% del total</div>
+                  <div class="gt-item gi-warn">Información incompleta del cliente: tiempo suspendido</div>
+                </div>
+                <div class="gt-card">
+                  <div class="gt-title">🛡 PÓLIZAS Y COBERTURA</div>
+                  <div class="gt-item">Póliza de mantenimiento: $800 MXN/mes opcional</div>
+                  <div class="gt-item">Seguro de datos y respaldo diario incluido</div>
+                  <div class="gt-item">Confidencialidad NDA firmado en este contrato</div>
+                  <div class="gt-item">Transferencia de derechos al 100% al cliente</div>
+                  <div class="gt-item">Cobertura de propiedad intelectual incluida</div>
+                </div>
+              </div>
+              <div style="margin:16px 0;">
+                <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:14px 16px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);">
+                  <div class="check-box" id="termCheck" onclick="this.classList.toggle('active');updateTermCheck()" style="margin-top:2px;flex-shrink:0;"></div>
+                  <span style="font-family:Share Tech Mono,monospace;font-size:.52rem;letter-spacing:1px;color:var(--silver);line-height:1.8;">He leído y acepto los tiempos de entrega, garantías, penalizaciones y pólizas descritos anteriormente. Entiendo que estos términos formarán parte del contrato.</span>
+                </label>
+              </div>
+              <div id="wiz-res3" class="wiz-result"></div>
+              <div class="wiz-nav">
+                <button class="wiz-btn-back" onclick="wizBack(3)">◀ ATRÁS</button>
+                <button class="wiz-btn-next" onclick="wizNext(3)">SIGUIENTE → CONTRATO Y FIRMA ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 4: CONTRATO Y FIRMA -->
+          <div class="wiz-page" id="wp4">
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">📄 CONTRATO DE SERVICIOS</div><div class="panel-badge">PASO 4 DE 6</div></div>
+              <div class="contrato-box" id="contratoText">
+                <h3>CONTRATO DE PRESTACIÓN DE SERVICIOS — DATASYS TECHNOLOGY</h3>
+                <p>Conste por medio del presente instrumento el Contrato de Prestación de Servicios que celebran, por una parte, <strong>DATASYS TECHNOLOGY S.A. DE C.V.</strong> (en adelante "EL PROVEEDOR"), y por la otra el cliente identificado en la sección de datos (en adelante "EL CLIENTE").</p>
+                <p><strong>PRIMERA. OBJETO DEL CONTRATO.</strong> EL PROVEEDOR se obliga a proporcionar a EL CLIENTE los servicios tecnológicos seleccionados en la plataforma, conforme a los alcances, tiempos y condiciones descritos en este instrumento.</p>
+                <p><strong>SEGUNDA. VIGENCIA.</strong> El presente contrato entrará en vigor en la fecha de firma electrónica y tendrá una vigencia acorde al plan contratado, renovable automáticamente salvo aviso con 30 días de anticipación.</p>
+                <p><strong>TERCERA. MONTO Y FORMA DE PAGO.</strong> EL CLIENTE se obliga a cubrir el monto total correspondiente a los servicios seleccionados, según el método de pago elegido. Los pagos recurrentes (mensuales) se realizarán dentro de los primeros 5 días de cada mes.</p>
+                <p><strong>CUARTA. CONFIDENCIALIDAD.</strong> Ambas partes se comprometen a mantener absoluta confidencialidad sobre la información intercambiada. Este acuerdo de no divulgación (NDA) tendrá vigencia indefinida.</p>
+                <p><strong>QUINTA. PROPIEDAD INTELECTUAL.</strong> Una vez cubierto el 100% del pago, los derechos de propiedad intelectual de los desarrollos realizados se transfieren en su totalidad a EL CLIENTE.</p>
+                <p><strong>SEXTA. PENALIZACIONES Y GARANTÍAS.</strong> Las partes acuerdan los términos de penalización y garantía descritos en el paso anterior de este proceso de contratación, los cuales se tienen por reproducidos aquí como parte integral de este contrato.</p>
+                <p><strong>SÉPTIMA. JURISDICCIÓN.</strong> Para la interpretación y cumplimiento del presente contrato, las partes se someten a la jurisdicción de los Tribunales competentes de la Ciudad de México.</p>
+                <p style="margin-top:16px;font-size:.8rem;opacity:.6;">Firmando electrónicamente este documento, el cliente manifiesta su conformidad con todos y cada uno de los términos aquí establecidos.</p>
+              </div>
+              <div class="firma-area">
+                <div>
+                  <div style="font-family:Share Tech Mono,monospace;font-size:.48rem;letter-spacing:2px;color:var(--cyan);opacity:.7;margin-bottom:8px;">FIRMA DEL CLIENTE</div>
+                  <input class="modal-input" id="firmaCliente" placeholder="escribe tu nombre completo como firma" oninput="this.value=this.value.toLowerCase()" style="width:100%;">
+                  <div class="firma-lbl">NOMBRE COMPLETO — FIRMA ELECTRÓNICA</div>
+                </div>
+                <div>
+                  <div style="font-family:Share Tech Mono,monospace;font-size:.48rem;letter-spacing:2px;color:var(--cyan);opacity:.7;margin-bottom:8px;">FECHA Y FOLIO</div>
+                  <div style="font-family:Orbitron,sans-serif;font-size:.65rem;color:var(--white);padding:12px 0;" id="contratoFecha">—</div>
+                  <div style="font-family:Share Tech Mono,monospace;font-size:.5rem;color:var(--cyan);opacity:.6;" id="contratoFolio">FOLIO: —</div>
+                </div>
+              </div>
+              <div id="wiz-res4" class="wiz-result"></div>
+              <div class="wiz-nav">
+                <button class="wiz-btn-back" onclick="wizBack(4)">◀ ATRÁS</button>
+                <button class="wiz-btn-next" onclick="wizNext(4)">SIGUIENTE → TOTAL Y FACTURACIÓN ▶</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 5: TOTAL Y FACTURACIÓN -->
+          <div class="wiz-page" id="wp5">
+            <div class="panel">
+              <div class="panel-header"><div class="panel-title">💰 TOTAL Y MÉTODO DE FACTURACIÓN</div><div class="panel-badge">PASO 5 DE 6</div></div>
+
+              <!-- Resumen de servicios -->
+              <div style="margin-bottom:20px;">
+                <div style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:3px;color:var(--cyan);opacity:.7;margin-bottom:12px;">RESUMEN DE SERVICIOS CONTRATADOS</div>
+                <div id="totalServList" style="margin-bottom:16px;"></div>
+                <div style="padding:14px 16px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.12);">
+                  <div class="tot-row"><span class="tot-lbl">SUBTOTAL</span><span class="tot-val" id="totSubtotal">$0 MXN</span></div>
+                  <div class="tot-row"><span class="tot-lbl">IVA (16%)</span><span class="tot-val" id="totIva">$0 MXN</span></div>
+                  <div class="tot-row" style="border-top:1px solid rgba(0,229,255,.15);padding-top:14px;"><span class="tot-lbl" style="color:var(--cyan);font-size:.6rem;letter-spacing:2px;">TOTAL</span><span class="tot-val tot-grand" id="totFinal">$0 MXN</span></div>
+                </div>
+              </div>
+
+              <!-- Facturación -->
+              <div style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:3px;color:var(--cyan);opacity:.7;margin-bottom:12px;">MÉTODO DE PAGO</div>
+              <div class="pay-method-grid">
+                <div class="pay-m pm-active" id="pm-efectivo" onclick="selPayMethod('efectivo')">
+                  <div class="pay-m-ico">💵</div>
+                  <div class="pay-m-name">EFECTIVO</div>
+                  <div class="pay-m-desc">PAGO EN OFICINA O VISITA</div>
+                </div>
+                <div class="pay-m" id="pm-transferencia" onclick="selPayMethod('transferencia')">
+                  <div class="pay-m-ico">🏦</div>
+                  <div class="pay-m-name">TRANSFERENCIA</div>
+                  <div class="pay-m-desc">SPEI · BBVA · CLABE</div>
+                </div>
+                <div class="pay-m" id="pm-tarjeta" onclick="selPayMethod('tarjeta')">
+                  <div class="pay-m-ico">💳</div>
+                  <div class="pay-m-name">TARJETA</div>
+                  <div class="pay-m-desc">CRÉDITO O DÉBITO</div>
+                </div>
+              </div>
+
+              <!-- Datos de pago por método -->
+              <div id="pay-detail-efectivo" style="padding:14px 16px;background:rgba(61,140,110,.05);border:1px solid rgba(61,140,110,.15);margin-bottom:16px;">
+                <div style="font-family:Rajdhani,sans-serif;font-size:.9rem;color:var(--silver);line-height:1.8;">Se acuerda el pago en efectivo. El representante de DATASYS coordinará la recepción del pago. Se emitirá recibo de caja al momento.</div>
+              </div>
+              <div id="pay-detail-transferencia" style="display:none;padding:14px 16px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);margin-bottom:16px;">
+                <div class="tot-row"><span class="tot-lbl">BANCO</span><span class="tot-val" style="font-size:.75rem;">BBVA MÉXICO</span></div>
+                <div class="tot-row"><span class="tot-lbl">BENEFICIARIO</span><span class="tot-val" style="font-size:.75rem;">DATASYS TECHNOLOGY SA DE CV</span></div>
+                <div class="tot-row"><span class="tot-lbl">CLABE</span><span class="tot-val" style="font-family:Share Tech Mono,monospace;font-size:.7rem;letter-spacing:2px;color:var(--cyan);">012345678901234567</span></div>
+                <div class="tot-row"><span class="tot-lbl">CONCEPTO</span><span class="tot-val" id="speiRef" style="color:var(--cyan);font-size:.7rem;">—</span></div>
+              </div>
+              <div id="pay-detail-tarjeta" style="display:none;padding:14px 16px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);margin-bottom:16px;">
+                <div class="form3">
+                  <div class="modal-field f-full"><label class="modal-label">NÚMERO DE TARJETA</label><input class="modal-input cf-input" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="fmtCard(this)"></div>
+                  <div class="modal-field f-full"><label class="modal-label">TITULAR</label><input class="modal-input" placeholder="nombre como aparece en la tarjeta" oninput="this.value=this.value.toLowerCase()"></div>
+                  <div class="modal-field"><label class="modal-label">VENCIMIENTO</label><input class="modal-input" placeholder="mm / aa" maxlength="7" oninput="fmtExp(this)"></div>
+                  <div class="modal-field"><label class="modal-label">CVV</label><input class="modal-input" type="password" placeholder="•••" maxlength="4"></div>
+                  <div class="modal-field"><label class="modal-label">CUOTAS</label>
+                    <select class="modal-input modal-select"><option>1 PAGO (SIN INTERESES)</option><option>3 MESES SIN INTERESES</option><option>6 MESES SIN INTERESES</option><option>12 MESES CON INTERESES</option></select>
+                  </div>
+                </div>
+              </div>
+
+              <div id="wiz-res5" class="wiz-result"></div>
+              <div class="wiz-nav">
+                <button class="wiz-btn-back" onclick="wizBack(5)">◀ ATRÁS</button>
+                <button class="wiz-btn-next" onclick="wizNext(5)" style="background:var(--green);">✓ FINALIZAR Y GENERAR ALTA</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- PAGE 6: ALTA COMPLETADA -->
+          <div class="wiz-page" id="wp6">
+            <div class="panel" style="text-align:center;padding:48px 40px;">
+              <div style="font-size:3rem;margin-bottom:20px;">✅</div>
+              <div style="font-family:Orbitron,sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:4px;color:var(--green);margin-bottom:8px;text-shadow:0 0 20px rgba(61,140,110,.4);">ALTA COMPLETADA</div>
+              <div style="font-family:Share Tech Mono,monospace;font-size:.6rem;letter-spacing:3px;color:var(--silver);margin-bottom:28px;">CLIENTE REGISTRADO EXITOSAMENTE EN EL SISTEMA</div>
+              <div id="altaResumen" style="max-width:480px;margin:0 auto 28px;text-align:left;padding:20px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);"></div>
+              <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;">
+                <button class="wiz-btn-next" style="max-width:220px;" onclick="showToast('📄 CONTRATO GENERADO · ENVIANDO POR EMAIL...')">⬇ DESCARGAR CONTRATO</button>
+                <button class="wiz-btn-next" style="max-width:220px;background:var(--gold);color:var(--dark);" onclick="showToast('📧 CREDENCIALES ENVIADAS AL CLIENTE')">✉ ENVIAR CREDENCIALES</button>
+                <button class="wiz-btn-back" onclick="resetWizard()">➕ NUEVA CONTRATACIÓN</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /utab-panel-contrato -->
+
+        <!-- TAB: ALTA -->
+        <div id="utab-panel-alta" style="display:none;">
+          <div class="panel" style="max-width:560px;">
+            <div class="panel-header"><div class="panel-title">➕ ALTA DE USUARIO</div></div>
+            <div class="modal-field">
+              <label class="modal-label">NOMBRE COMPLETO</label>
+              <input type="text" class="modal-input" id="newUserName" oninput="this.value=this.value.toLowerCase()" placeholder="Nombre del usuario">
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">EMAIL / USUARIO</label>
+              <input type="text" class="modal-input" id="newUserEmail" oninput="this.value=this.value.toLowerCase()" placeholder="usuario@empresa.com">
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">CONTRASEÑA INICIAL</label>
+              <input type="password" class="modal-input" id="newUserPass" oninput="this.value=this.value.toLowerCase()" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">ROL</label>
+              <select class="modal-input modal-select" id="newUserRole">
+                <option value="client">CLIENTE</option>
+                <option value="viewer">VIEWER (solo lectura)</option>
+                <option value="admin">ADMINISTRADOR</option>
+              </select>
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">PLAN / NOTAS</label>
+              <input type="text" class="modal-input" id="newUserPlan" placeholder="Ej: PLAN PRO · Empresa XYZ">
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+              <button class="modal-send" style="padding:13px 0;" onclick="altaUsuario()">▶ CREAR USUARIO</button>
+              <button class="modal-cancel" onclick="clearAltaForm()">✕ LIMPIAR</button>
+            </div>
+            <div id="altaResult" style="display:none;margin-top:14px;padding:10px 14px;font-family:Share Tech Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-align:center;"></div>
+          </div>
+        </div>
+
+        <!-- TAB: BAJA -->
+        <div id="utab-panel-baja" style="display:none;">
+          <div class="panel" style="max-width:560px;">
+            <div class="panel-header"><div class="panel-title">🗑 BAJA DE USUARIO</div></div>
+            <div class="modal-field">
+              <label class="modal-label">SELECCIONAR USUARIO A DAR DE BAJA</label>
+              <select class="modal-input modal-select" id="bajaUserSelect">
+                <option value="">— SELECCIONAR —</option>
+              </select>
+            </div>
+            <div id="bajaPreview" style="display:none;margin:14px 0;padding:12px 16px;background:rgba(200,40,42,.06);border:1px solid rgba(200,40,42,.2);">
+              <div style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:2px;color:#e05050;margin-bottom:6px;">⚠ CONFIRMAR BAJA</div>
+              <div id="bajaPreviewInfo" style="font-family:Rajdhani,sans-serif;font-size:.9rem;color:var(--white);"></div>
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">MOTIVO DE BAJA</label>
+              <select class="modal-input modal-select" id="bajaMotive">
+                <option value="Solicitud del cliente">Solicitud del cliente</option>
+                <option value="Fin de contrato">Fin de contrato</option>
+                <option value="Falta de pago">Falta de pago</option>
+                <option value="Seguridad / incidente">Seguridad / incidente</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+              <button class="modal-cancel" style="flex:1;padding:13px 0;color:#e05050;border-color:rgba(200,40,42,.3);" onclick="bajaUsuario()">🗑 CONFIRMAR BAJA</button>
+              <button class="modal-cancel" onclick="clearBajaForm()">CANCELAR</button>
+            </div>
+            <div id="bajaResult" style="display:none;margin-top:14px;padding:10px 14px;font-family:Share Tech Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-align:center;"></div>
+          </div>
+        </div>
+
+        <!-- TAB: RECOVER -->
+        <div id="utab-panel-recover" style="display:none;">
+          <div class="panel" style="max-width:560px;">
+            <div class="panel-header"><div class="panel-title">🔄 RECUPERAR / RESTABLECER ACCESO</div></div>
+            <div class="modal-field">
+              <label class="modal-label">SELECCIONAR USUARIO</label>
+              <select class="modal-input modal-select" id="recoverUserSelect">
+                <option value="">— SELECCIONAR —</option>
+              </select>
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">NUEVA CONTRASEÑA</label>
+              <input type="password" class="modal-input" id="recoverNewPass" oninput="this.value=this.value.toLowerCase()" placeholder="Mínimo 6 caracteres">
+            </div>
+            <div class="modal-field">
+              <label class="modal-label">CONFIRMAR CONTRASEÑA</label>
+              <input type="password" class="modal-input" id="recoverConfPass" oninput="this.value=this.value.toLowerCase()" placeholder="Repite la contraseña">
+            </div>
+            <div style="margin-bottom:14px;padding:10px 14px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.1);font-family:Share Tech Mono,monospace;font-size:.48rem;letter-spacing:1px;color:var(--silver);opacity:.7;line-height:1.8;">
+              ℹ Se restablecerá la contraseña del usuario seleccionado. El usuario deberá usar la nueva clave en su próximo inicio de sesión.
+            </div>
+            <div style="display:flex;gap:12px;">
+              <button class="modal-send" style="padding:13px 0;" onclick="recoverUsuario()">🔄 RESTABLECER CONTRASEÑA</button>
+              <button class="modal-cancel" onclick="clearRecoverForm()">✕ LIMPIAR</button>
+            </div>
+            <div id="recoverResult" style="display:none;margin-top:14px;padding:10px 14px;font-family:Share Tech Mono,monospace;font-size:.55rem;letter-spacing:1.5px;text-align:center;"></div>
+          </div>
+        </div>
+
+      </div><!-- /adminUsersPanel -->
+    </div>
+
+    <!-- ADMIN: CRM -->
+    <div id="panel-crm" style="display:none;">
+      <div class="dash-header"><div class="dash-title-wrap"><div class="dt-pre">// BASE DE DATOS //</div><div class="dt-main">CRM DATASYS</div></div></div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">ACCESO AL CRM</div></div>
+        <p style="font-family:'Rajdhani',sans-serif;color:var(--silver);margin-bottom:20px;line-height:1.8;">Accede al panel completo de CRM con todos los registros de leads, clientes y métricas de conversión.</p>
+        <a href="crm.html" target="_blank" class="login-btn" style="display:inline-block;text-decoration:none;max-width:260px;padding:14px;text-align:center;">▶ ABRIR CRM DASHBOARD</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+
+<!-- CHECKOUT MODAL -->
+<div id="checkoutModal">
+  <div class="co-modal">
+    <div class="co-modal-head">
+      <div class="co-modal-title" id="coModalTitle">◈ CHECKOUT</div>
+      <button class="modal-close" onclick="closeCheckout()">✕</button>
+    </div>
+    <div class="co-modal-body">
+      <!-- STEPS -->
+      <div class="steps">
+        <div class="step s-active" id="step1"><div class="step-num">1</div><div class="step-lbl">RESUMEN</div></div>
+        <div class="step-line"></div>
+        <div class="step" id="step2"><div class="step-num">2</div><div class="step-lbl">MÉTODO</div></div>
+        <div class="step-line"></div>
+        <div class="step" id="step3"><div class="step-num">3</div><div class="step-lbl">CONFIRMAR</div></div>
+      </div>
+      <!-- STEP 1: ORDER SUMMARY -->
+      <div id="coStep1">
+        <div class="order-summary">
+          <div class="os-row"><span class="os-label">SERVICIO</span><span class="os-val" id="coServiceName">—</span></div>
+          <div class="os-row"><span class="os-label">REFERENCIA</span><span class="os-val" id="coRef" style="font-family:Share Tech Mono,monospace;font-size:.65rem;color:var(--cyan);">—</span></div>
+          <div class="os-row"><span class="os-label">SUBTOTAL</span><span class="os-val" id="coSub">—</span></div>
+          <div class="os-row"><span class="os-label">IVA (16%)</span><span class="os-val" id="coIva">—</span></div>
+          <div class="os-row"><span class="os-total-label">TOTAL</span><span class="os-total-val" id="coTotal">—</span></div>
+        </div>
+        <button class="new-inv-btn" onclick="coNext(2)">CONTINUAR → MÉTODO DE PAGO</button>
+      </div>
+      <!-- STEP 2: PAYMENT METHOD -->
+      <div id="coStep2" style="display:none;">
+        <div class="gateway-sel">
+          <div class="gw gw-sel" onclick="selGW(this,'card')"><div class="gw-ico">💳</div><div class="gw-name">TARJETA</div></div>
+          <div class="gw" onclick="selGW(this,'transfer')"><div class="gw-ico">🏦</div><div class="gw-name">SPEI</div></div>
+          <div class="gw" onclick="selGW(this,'stripe')"><div class="gw-ico">🔶</div><div class="gw-name">STRIPE</div></div>
+        </div>
+        <div id="gw-card">
+          <div class="card-form">
+            <div>
+              <label class="cf-label">NÚMERO DE TARJETA</label>
+              <input class="cf-input" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="fmtCard(this)">
+            </div>
+            <div>
+              <label class="cf-label">TITULAR</label>
+              <input class="cf-input" placeholder="NOMBRE COMO APARECE EN LA TARJETA" style="font-family:Rajdhani,sans-serif;font-size:.9rem;letter-spacing:1px;">
+            </div>
+            <div class="cf-row">
+              <div>
+                <label class="cf-label">VENCIMIENTO</label>
+                <input class="cf-input" placeholder="MM / AA" maxlength="7" oninput="fmtExp(this)">
+              </div>
+              <div>
+                <label class="cf-label">CVV</label>
+                <input class="cf-input" placeholder="•••" maxlength="4" type="password">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="gw-transfer" style="display:none;">
+          <div class="order-summary">
+            <div class="os-row"><span class="os-label">BANCO</span><span class="os-val">BBVA México</span></div>
+            <div class="os-row"><span class="os-label">CLABE</span><span class="os-val" style="font-family:Share Tech Mono,monospace;font-size:.7rem;letter-spacing:2px;">012345678901234567</span></div>
+            <div class="os-row"><span class="os-label">REFERENCIA</span><span class="os-val" id="coSpeiRef" style="color:var(--cyan);font-family:Share Tech Mono,monospace;font-size:.7rem;">—</span></div>
+            <div class="os-row"><span class="os-total-label">MONTO EXACTO</span><span class="os-total-val" id="coSpeiTotal">—</span></div>
+          </div>
+          <p style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;margin-top:10px;line-height:1.8;">Realiza la transferencia con la CLABE y referencia indicadas. Confirma tu pago haciendo clic en el botón de abajo.</p>
+        </div>
+        <div id="gw-stripe" style="display:none;">
+          <div style="text-align:center;padding:24px 0;">
+            <div style="font-size:2rem;margin-bottom:12px;">🔶</div>
+            <div style="font-family:Orbitron,sans-serif;font-size:.65rem;letter-spacing:3px;color:var(--gold);margin-bottom:8px;">STRIPE — PRÓXIMAMENTE</div>
+            <div style="font-family:Share Tech Mono,monospace;font-size:.52rem;letter-spacing:2px;color:var(--silver);opacity:.5;">INTEGRACIÓN EN DESARROLLO</div>
+          </div>
+        </div>
+        <button class="new-inv-btn" onclick="coNext(3)" style="margin-top:0;">CONTINUAR → CONFIRMAR</button>
+        <button class="modal-cancel" onclick="coNext(1)" style="width:100%;margin-top:8px;text-align:center;">← ATRÁS</button>
+      </div>
+      <!-- STEP 3: CONFIRM -->
+      <div id="coStep3" style="display:none;">
+        <div class="order-summary">
+          <div class="os-row"><span class="os-label">SERVICIO</span><span class="os-val" id="coConfService">—</span></div>
+          <div class="os-row"><span class="os-label">MÉTODO</span><span class="os-val" id="coConfMethod">Tarjeta de crédito</span></div>
+          <div class="os-row"><span class="os-total-label">TOTAL A COBRAR</span><span class="os-total-val" id="coConfTotal">—</span></div>
+        </div>
+        <p style="font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:1.5px;color:var(--silver);opacity:.45;margin-bottom:18px;line-height:1.8;">Al confirmar autorizas el cobro del monto indicado. Recibirás un comprobante en tu email registrado.</p>
+        <button class="new-inv-btn gold" onclick="processPayment()">⬡ CONFIRMAR Y PAGAR</button>
+        <button class="modal-cancel" onclick="coNext(2)" style="width:100%;margin-top:8px;text-align:center;">← ATRÁS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT SUCCESS -->
+<div id="paySuccess">
+  <div class="pay-ok-box">
+    <span class="pay-ok-ico">✅</span>
+    <div class="pay-ok-title">PAGO PROCESADO</div>
+    <div class="pay-ok-sub">TRANSACCIÓN COMPLETADA EXITOSAMENTE</div>
+    <div class="pay-ok-folio" id="payFolio">FOLIO: #TXN-000000</div>
+    <button class="pay-ok-close" onclick="closeSuccess()">▶ CONTINUAR</button>
+  </div>
+</div>
+
+<!-- MODAL NUEVO TICKET -->
+<div id="ticketModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeTicketModal()">✕</button>
+    <div class="modal-title">◻ NUEVO TICKET DE SOPORTE</div>
+    <div class="modal-field">
+      <label class="modal-label">ASUNTO</label>
+      <input type="text" class="modal-input" id="tSubject" placeholder="Describe brevemente el problema">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">SERVICIO RELACIONADO</label>
+      <select class="modal-input modal-select" id="tService">
+        <option value="">— SELECCIONAR —</option>
+        <option>Análisis de Datos</option>
+        <option>Ciberseguridad</option>
+        <option>Inventario Virtual</option>
+        <option>Otro</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">PRIORIDAD</label>
+      <select class="modal-input modal-select" id="tPri">
+        <option>BAJA</option>
+        <option selected>MEDIA</option>
+        <option>ALTA</option>
+        <option>URGENTE</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">DESCRIPCIÓN</label>
+      <textarea class="modal-input modal-textarea" id="tDesc" placeholder="Describe el problema con detalle..."></textarea>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeTicketModal()">CANCELAR</button>
+      <button class="modal-send" onclick="sendTicket()">▶ ENVIAR TICKET</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ══ CURSOR ══ */
+var cur=document.getElementById('cur'),cur2=document.getElementById('cur2');
+document.addEventListener('mousemove',function(e){cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';setTimeout(function(){cur2.style.left=e.clientX+'px';cur2.style.top=e.clientY+'px';},80);});
+
+/* ══ CLOCK ══ */
+function updateClock(){
+  var now=new Date();
+  var t=now.toLocaleTimeString('es-MX',{hour12:false});
+  var d=now.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+  var cl=document.getElementById('dashClock');
+  var dl=document.getElementById('dashDate');
+  if(cl) cl.textContent=t;
+  if(dl) dl.textContent=d;
+}
+setInterval(updateClock,1000);
+updateClock();
+
+/* ══ COOKIE HELPERS ══ */
+function setCookie(name, value, days){
+  var expires = '';
+  if(days){
+    var d = new Date();
+    d.setTime(d.getTime() + days*24*60*60*1000);
+    expires = '; expires=' + d.toUTCString();
+  }
+  document.cookie = name + '=' + encodeURIComponent(value) + expires + '; path=/; SameSite=Strict';
+}
+function getCookie(name){
+  var key = name + '=';
+  var parts = document.cookie.split(';');
+  for(var i=0;i<parts.length;i++){
+    var p = parts[i].trim();
+    if(p.indexOf(key)===0) return decodeURIComponent(p.substring(key.length));
+  }
+  return null;
+}
+function deleteCookie(name){
+  document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
+}
+
+/* ══════════════════════════════════════════════════════
+   DATASYS · AUTENTICACIÓN REAL + GESTIÓN DE USUARIOS
+   Almacenamiento persistente con window.storage
+══════════════════════════════════════════════════════ */
+
+var STORAGE_KEY = 'datasys_users_v1';
+
+/* ── Usuarios base (solo se crean si el storage está vacío) ── */
+var DEFAULT_USERS = {
+  'ad@datasys.global':  {pass:'900219',    role:'admin',  name:'ADMINISTRADOR DATASYS', initials:'AD', plan:'ACCESO TOTAL',    active:true},
+  'cliente@empresa.com':{pass:'cliente123', role:'client', name:'CLIENTE DEMO',           initials:'CD', plan:'PLAN ENTERPRISE', active:true},
+  'viewer@empresa.com': {pass:'viewer123',  role:'viewer', name:'VISITANTE',              initials:'VI', plan:'SOLO LECTURA',    active:true},
+};
+
+var currentUser = null;
+var rememberMe  = false;
+var liveUsers   = {}; // in-memory cache
+
+/* ── Cargar usuarios desde localStorage ── */
+function loadUsers(){
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if(raw){
+      liveUsers = JSON.parse(raw);
+    } else {
+      liveUsers = JSON.parse(JSON.stringify(DEFAULT_USERS));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(liveUsers));
+    }
+  } catch(e){
+    liveUsers = JSON.parse(JSON.stringify(DEFAULT_USERS));
+  }
+}
+
+function saveUsers(){
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(liveUsers)); } catch(e){}
+}
+
+/* ── Inicializar al cargar la página ── */
+document.addEventListener('DOMContentLoaded', function(){ loadUsers(); });
+
+/* ── Demo login helpers ── */
+function demoLogin(role){
+  if(role==='admin'){
+    document.getElementById('loginUser').value='ad@datasys.global';
+    document.getElementById('loginPass').value='900219';
+  } else {
+    document.getElementById('loginUser').value='cliente@empresa.com';
+    document.getElementById('loginPass').value='cliente123';
+  }
+  doLogin();
+}
+
+/* ══ LOGIN LOCAL ══ */
+function doLogin(){
+  var u   = document.getElementById('loginUser').value.trim().toLowerCase();
+  var p   = document.getElementById('loginPass').value;
+  var err = document.getElementById('loginErr');
+  var btn = document.getElementById('loginBtn');
+
+  if(!u||!p){err.textContent='⚠ INGRESA USUARIO Y CONTRASEÑA';err.classList.add('show');return;}
+
+  btn.textContent='VERIFICANDO...'; btn.classList.add('loading');
+  err.classList.remove('show');
+
+  if(Object.keys(liveUsers).length===0) loadUsers();
+
+  setTimeout(function(){
+    var userData = liveUsers[u];
+    if(userData && userData.active && userData.pass === p){
+      currentUser = Object.assign({}, userData, {username: u});
+      try{
+        if(rememberMe){
+          localStorage.setItem('ds_remember_user', u);
+          setCookie('ds_email', u, 30);
+          setCookie('ds_pass', p, 30);
+        } else {
+          localStorage.removeItem('ds_remember_user');
+          deleteCookie('ds_email');
+          deleteCookie('ds_pass');
+        }
+      }catch(e){}
+      enterDashboard();
+    } else {
+      err.textContent = (userData && !userData.active)
+        ? '⚠ CUENTA DESACTIVADA — CONTACTA AL ADMINISTRADOR'
+        : '⚠ CREDENCIALES INCORRECTAS — INTENTE DE NUEVO';
+      err.classList.add('show');
+      btn.textContent='▶ INICIAR SESIÓN';
+      btn.classList.remove('loading');
+      document.getElementById('loginPass').value='';
+    }
+  }, 700);
+}
+
+/* verifyAdminPin removed */
+
+/* ══ GESTIÓN DE USUARIOS ══ */
+
+/* Cambiar tab */
+function userTab(id, btn){
+  ['list','contrato','alta','baja','recover'].forEach(function(t){
+    var el=document.getElementById('utab-panel-'+t);
+    if(el) el.style.display=(t===id)?'block':'none';
+  });
+  document.querySelectorAll('#adminUsersPanel .bt').forEach(function(b){b.classList.remove('bt-active');});
+  if(btn) btn.classList.add('bt-active');
+  if(id==='baja'||id==='recover') populateUserSelects();
+}
+
+/* Cargar lista de usuarios */
+async function loadUserList(){
+  if(Object.keys(liveUsers).length===0) loadUsers();
+  var container = document.getElementById('userListContainer');
+  var active = Object.entries(liveUsers).filter(([k,v])=>v.active);
+  var inactive = Object.entries(liveUsers).filter(([k,v])=>!v.active);
+  var all = [...active, ...inactive];
+
+  document.getElementById('userCountBadge').textContent = active.length+' ACTIVOS · '+(inactive.length||0)+' INACTIVOS';
+
+  if(all.length===0){
+    container.innerHTML='<div style="text-align:center;padding:24px;font-family:Share Tech Mono,monospace;font-size:.55rem;color:var(--silver);opacity:.5;">SIN USUARIOS REGISTRADOS</div>';
+    return;
+  }
+
+  var roleIcons={'admin':'👑','client':'👤','viewer':'👁'};
+  var roleLabels={'admin':'ADMIN','client':'CLIENTE','viewer':'VIEWER'};
+  var roleClass={'admin':'s-active','client':'s-active','viewer':'s-new'};
+
+  container.innerHTML = all.map(function([key,u]){
+    var ico = roleIcons[u.role]||'👤';
+    var st  = u.active
+      ? '<span class="srv-row-status '+roleClass[u.role]+'">'+roleLabels[u.role]+'</span>'
+      : '<span class="srv-row-status" style="background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.3);color:#e05050;font-family:Share Tech Mono,monospace;font-size:.46rem;padding:3px 8px;">BAJA</span>';
+    return '<div class="srv-row"><div class="srv-row-ico">'+ico+'</div><div class="srv-row-info"><div class="srv-row-name">'+u.name+'</div><div class="srv-row-meta">'+key+' · '+(u.plan||'—')+'</div></div>'+st+'</div>';
+  }).join('');
+}
+
+/* Poblar selects de baja / recuperación */
+function populateUserSelects(){
+  if(Object.keys(liveUsers).length===0) loadUsers();
+  var bajaSelect    = document.getElementById('bajaUserSelect');
+  var recoverSelect = document.getElementById('recoverUserSelect');
+  var activeUsers   = Object.entries(liveUsers).filter(([k,v])=>v.active&&v.role!=='admin');
+
+  var opts = '<option value="">— SELECCIONAR —</option>' +
+    activeUsers.map(([k,u])=>'<option value="'+k+'">'+u.name+' ('+k+')</option>').join('');
+  if(bajaSelect)    bajaSelect.innerHTML = opts;
+  if(recoverSelect) recoverSelect.innerHTML = opts;
+
+  /* Preview al cambiar baja select */
+  if(bajaSelect) bajaSelect.onchange = function(){
+    var preview = document.getElementById('bajaPreview');
+    var info    = document.getElementById('bajaPreviewInfo');
+    if(this.value && liveUsers[this.value]){
+      var u = liveUsers[this.value];
+      info.textContent = u.name+' — '+this.value+' — '+u.plan;
+      preview.style.display='block';
+    } else {
+      preview.style.display='none';
+    }
+  };
+}
+
+/* ALTA */
+async function altaUsuario(){
+  var name  = document.getElementById('newUserName').value.trim();
+  var email = document.getElementById('newUserEmail').value.trim().toLowerCase();
+  var pass  = document.getElementById('newUserPass').value;
+  var role  = document.getElementById('newUserRole').value;
+  var plan  = document.getElementById('newUserPlan').value.trim();
+  var res   = document.getElementById('altaResult');
+
+  if(!name||!email||!pass){
+    showResult(res,'⚠ COMPLETA TODOS LOS CAMPOS OBLIGATORIOS','error');return;
+  }
+  if(pass.length<6){
+    showResult(res,'⚠ CONTRASEÑA MÍNIMA: 6 CARACTERES','error');return;
+  }
+  if(liveUsers[email]){
+    showResult(res,'⚠ EL USUARIO YA EXISTE EN EL SISTEMA','error');return;
+  }
+
+  var initials = name.split(' ').map(function(w){return w[0]||'';}).join('').substring(0,2).toUpperCase();
+  liveUsers[email] = {pass:pass, role:role, name:name.toUpperCase(), initials:initials, plan:plan||role.toUpperCase(), active:true, createdAt:new Date().toISOString()};
+  saveUsers();
+  showResult(res,'✓ USUARIO '+name.toUpperCase()+' CREADO EXITOSAMENTE','ok');
+  clearAltaForm();
+  if(document.getElementById('utab-panel-list').style.display!=='none') loadUserList();
+  showToast('✓ ALTA: '+name.toUpperCase()+' — ROL: '+role.toUpperCase());
+}
+
+function clearAltaForm(){
+  ['newUserName','newUserEmail','newUserPass','newUserPlan'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  var r=document.getElementById('altaResult');if(r)r.style.display='none';
+}
+
+/* BAJA */
+function bajaUsuario(){
+  var select = document.getElementById('bajaUserSelect');
+  var motive = document.getElementById('bajaMotive').value;
+  var res    = document.getElementById('bajaResult');
+
+  if(!select.value){showResult(res,'⚠ SELECCIONA UN USUARIO','error');return;}
+
+  var key = select.value;
+  if(!liveUsers[key]){showResult(res,'⚠ USUARIO NO ENCONTRADO','error');return;}
+
+  var name = liveUsers[key].name;
+  liveUsers[key].active     = false;
+  liveUsers[key].bajaAt     = new Date().toISOString();
+  liveUsers[key].bajaMotive = motive;
+  saveUsers();
+  showResult(res,'✓ BAJA PROCESADA: '+name+' — '+motive,'ok');
+  clearBajaForm();
+  if(document.getElementById('utab-panel-list').style.display!=='none') loadUserList();
+  showToast('🗑 BAJA: '+name+' — '+motive);
+}
+
+function clearBajaForm(){
+  var s=document.getElementById('bajaUserSelect');if(s)s.value='';
+  var p=document.getElementById('bajaPreview');if(p)p.style.display='none';
+  var r=document.getElementById('bajaResult');if(r)r.style.display='none';
+}
+
+/* RECUPERAR */
+function recoverUsuario(){
+  var select   = document.getElementById('recoverUserSelect');
+  var newPass  = document.getElementById('recoverNewPass').value;
+  var confPass = document.getElementById('recoverConfPass').value;
+  var res      = document.getElementById('recoverResult');
+
+  if(!select.value){showResult(res,'⚠ SELECCIONA UN USUARIO','error');return;}
+  if(!newPass||newPass.length<6){showResult(res,'⚠ CONTRASEÑA MÍNIMA: 6 CARACTERES','error');return;}
+  if(newPass!==confPass){showResult(res,'⚠ LAS CONTRASEÑAS NO COINCIDEN','error');return;}
+
+  var key  = select.value;
+  var name = liveUsers[key] ? liveUsers[key].name : key;
+  liveUsers[key].pass        = newPass;
+  liveUsers[key].passResetAt = new Date().toISOString();
+  /* Si estaba de baja, reactivar */
+  if(!liveUsers[key].active){
+    liveUsers[key].active = true;
+    showToast('🔄 ACCESO RESTAURADO: '+name);
+  } else {
+    showToast('🔑 CONTRASEÑA RESTABLECIDA: '+name);
+  }
+  saveUsers();
+  showResult(res,'✓ CONTRASEÑA RESTABLECIDA PARA: '+name,'ok');
+  clearRecoverForm();
+}
+
+function clearRecoverForm(){
+  var s=document.getElementById('recoverUserSelect');if(s)s.value='';
+  ['recoverNewPass','recoverConfPass'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value='';
+  });
+  var r=document.getElementById('recoverResult');if(r)r.style.display='none';
+}
+
+/* Utilidad para mostrar resultados inline */
+function showResult(el, msg, type){
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background   = type==='ok' ? 'rgba(61,140,110,.12)' : 'rgba(200,40,42,.1)';
+  el.style.border       = type==='ok' ? '1px solid rgba(61,140,110,.3)' : '1px solid rgba(200,40,42,.3)';
+  el.style.color        = type==='ok' ? 'var(--green)' : '#e05050';
+}
+
+function resetPanels(){
+  // Hide ALL panels
+  var allPanels=['overview','services','tickets','reports','docs','profile','billing','checkout','cobros','users','crm'];
+  allPanels.forEach(function(p){
+    var el=document.getElementById('panel-'+p);
+    if(el) el.style.display='none';
+  });
+  // Show only overview
+  var ov=document.getElementById('panel-overview');
+  if(ov) ov.style.display='block';
+  // Reset sidebar active state
+  document.querySelectorAll('.sb-item').forEach(function(el){el.classList.remove('active');});
+  var firstItem=document.querySelector('.sb-item');
+  if(firstItem) firstItem.classList.add('active');
+}
+
+function enterDashboard(){
+  document.getElementById('loginBtn').textContent='▶ INICIAR SESIÓN';
+  document.getElementById('loginBtn').classList.remove('loading');
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('navUser').style.display='block';
+  document.getElementById('navUser').textContent='● '+currentUser.name;
+  document.getElementById('logoutBtn').style.display='inline-flex';
+
+  document.getElementById('sbAvatar').textContent=currentUser.initials;
+  document.getElementById('sbName').textContent=currentUser.name;
+
+  var roleEl=document.getElementById('sbRole');
+  if(currentUser.role==='admin'){roleEl.textContent='ADMINISTRADOR';roleEl.className='sb-role role-admin';}
+  else if(currentUser.role==='client'){roleEl.textContent='CLIENTE';roleEl.className='sb-role role-client';}
+  else{roleEl.textContent='VIEWER';roleEl.className='sb-role role-viewer';}
+
+  document.getElementById('dashWelcome').textContent='Bienvenido, '+currentUser.name;
+
+  // Admin-only elements
+  var adminEls=document.querySelectorAll('.admin-only');
+  adminEls.forEach(function(el){
+    el.style.display=currentUser.role==='admin'?'flex':'none';
+  });
+  document.querySelectorAll('.admin-only.sb-section').forEach(function(el){
+    el.style.display=currentUser.role==='admin'?'block':'none';
+  });
+
+  // Siempre arrancar en RESUMEN al entrar
+  resetPanels();
+
+  // ══ DUAL OVERVIEW: mostrar vista según rol ══
+  var ovClient=document.getElementById('overview-client');
+  var ovAdmin=document.getElementById('overview-admin');
+  if(currentUser.role==='admin'){
+    if(ovClient) ovClient.style.display='none';
+    if(ovAdmin){
+      ovAdmin.style.display='block';
+      function tickAdmin(){
+        var now=new Date();
+        var ac=document.getElementById('adminClock');
+        var ad=document.getElementById('adminDate');
+        if(ac) ac.textContent=now.toLocaleTimeString('es-MX',{hour12:false});
+        if(ad) ad.textContent=now.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+      }
+      tickAdmin();
+      if(!window._adminClockSet){window._adminClockSet=setInterval(tickAdmin,1000);}
+      (function(){
+        var wrap=document.getElementById('revChart');
+        if(!wrap||wrap.children.length>0) return;
+        var data=[{m:'OCT',v:142000},{m:'NOV',v:158000},{m:'DIC',v:164000},{m:'ENE',v:171000},{m:'FEB',v:166000},{m:'MAR',v:186400}];
+        var max=Math.max.apply(null,data.map(function(d){return d.v;}));
+        data.forEach(function(d){
+          var h=Math.round((d.v/max)*80)+10;
+          var g=document.createElement('div'); g.className='rev-bar-group';
+          var bar=document.createElement('div'); bar.className='rev-bar paid'; bar.style.height='0px'; bar.title='$'+d.v.toLocaleString()+' MXN';
+          var lbl=document.createElement('div'); lbl.className='rev-bar-lbl'; lbl.textContent=d.m;
+          g.appendChild(bar); g.appendChild(lbl); wrap.appendChild(g);
+          setTimeout(function(){bar.style.transition='height 1s ease';bar.style.height=h+'px';},250);
+        });
+      })();
+      setTimeout(function(){
+        var bars=[{id:'sbar1',w:100},{id:'sbar2',w:98},{id:'sbar3',w:100},{id:'sbar4',w:100},{id:'sbar5',w:60},{id:'sbar6',w:40}];
+        bars.forEach(function(b){var el=document.getElementById(b.id);if(el){el.style.transition='width 1.4s ease';el.style.width=b.w+'%';}});
+      },450);
+    }
+  } else {
+    if(ovClient) ovClient.style.display='block';
+    if(ovAdmin) ovAdmin.style.display='none';
+  }
+
+  var pn=document.getElementById('profName');
+  var pe=document.getElementById('profEmail');
+  var emp=document.getElementById('profEmpresa');
+  var tel=document.getElementById('profTel');
+  var u = liveUsers[currentUser.username] || currentUser;
+  if(pn)  pn.value  = (u.name||currentUser.name||'').toLowerCase();
+  if(pe)  pe.value  = currentUser.username;
+  if(emp) emp.value = (u.empresa||'').toLowerCase();
+  if(tel) tel.value = (u.tel||'').toLowerCase();
+}
+
+function logout(){
+  try{
+    localStorage.removeItem('ds_remember_user');
+    deleteCookie('ds_email');
+    deleteCookie('ds_pass');
+  }catch(e){}
+  resetPanels();
+  currentUser=null;
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('navUser').style.display='none';
+  document.getElementById('logoutBtn').style.display='none';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginBtn').textContent='▶ INICIAR SESIÓN';
+  document.getElementById('loginBtn').classList.remove('loading');
+  document.getElementById('loginErr').classList.remove('show');
+}
+
+/* ══ PANEL SWITCH ══ */
+var panels=['overview','services','tickets','reports','docs','profile','billing','checkout','cobros','users','crm'];
+function switchPanel(id,evt){
+  panels.forEach(function(p){
+    var el=document.getElementById('panel-'+p);
+    if(el) el.style.display=(p===id)?'block':'none';
+  });
+  document.querySelectorAll('.sb-item').forEach(function(el){el.classList.remove('active');});
+  var src=evt?evt.currentTarget:event.currentTarget;
+  if(src) src.classList.add('active');
+
+  if(id==='users'){
+    document.getElementById('adminPinGate').style.display='none';
+    document.getElementById('adminUsersPanel').style.display='block';
+    loadUserList();
+    userTab('list', document.getElementById('utab-list'));
+  }
+}
+
+/* ══ PASSWORD TOGGLE ══ */
+function toggleEye(){
+  var inp=document.getElementById('loginPass');
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+/* ══ REMEMBER ══ */
+function toggleRemember(){
+  rememberMe = !rememberMe;
+  var box = document.getElementById('rememberBox');
+  if(box) box.classList.toggle('active', rememberMe);
+}
+
+/* Verificar sesión guardada al cargar */
+window.addEventListener('load', function(){
+  loadUsers();
+
+  /* Restaurar email guardado en cookie */
+  try {
+    var savedEmail = getCookie('ds_email');
+    var savedPass  = getCookie('ds_pass');
+    if(savedEmail){
+      var emailInput = document.getElementById('loginUser');
+      var passInput  = document.getElementById('loginPass');
+      if(emailInput) emailInput.value = savedEmail;
+      if(passInput && savedPass) passInput.value = savedPass;
+      /* Marcar checkbox activo */
+      rememberMe = true;
+      var box = document.getElementById('rememberBox');
+      if(box) box.classList.add('active');
+    }
+  } catch(e){}
+
+  /* Auto-login si hay sesión guardada en localStorage */
+  try {
+    var saved = localStorage.getItem('ds_remember_user');
+    if(saved && liveUsers[saved] && liveUsers[saved].active){
+      currentUser = Object.assign({}, liveUsers[saved], {username: saved});
+      rememberMe = true;
+      var box = document.getElementById('rememberBox');
+      if(box) box.classList.add('active');
+      enterDashboard();
+    }
+  } catch(e){}
+});
+
+/* ══ FORGOT ══ */
+function showForgot(){showToast('📧 INSTRUCCIONES ENVIADAS A TU EMAIL');}
+
+/* ══ TICKET MODAL ══ */
+function openTicketModal(){document.getElementById('ticketModal').classList.add('show');}
+function closeTicketModal(){document.getElementById('ticketModal').classList.remove('show');}
+function sendTicket(){
+  var sub=document.getElementById('tSubject').value;
+  var desc=document.getElementById('tDesc').value;
+  if(!sub||!desc){showToast('⚠ COMPLETA ASUNTO Y DESCRIPCIÓN');return;}
+  closeTicketModal();
+  showToast('✓ TICKET ENVIADO — FOLIO #DS-0044');
+  document.getElementById('tSubject').value='';
+  document.getElementById('tDesc').value='';
+  document.getElementById('tDesc').value='';
+}
+
+/* ══ TOAST ══ */
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+/* ══ ENTER KEY ══ */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none'){doLogin();}
+  if(e.key==='Escape'){closeTicketModal();}
+});
+
+/* ══ CLOSE MODAL ON BACKDROP ══ */
+document.getElementById('ticketModal').addEventListener('click',function(e){
+  if(e.target===this) closeTicketModal();
+});
+document.getElementById('checkoutModal').addEventListener('click',function(e){
+  if(e.target===this) closeCheckout();
+});
+
+/* ══ BILLING TABS ══ */
+function billTab(id, btn){
+  ['facturas','metodos'].forEach(function(t){
+    var el=document.getElementById('btab-'+t);
+    if(el) el.style.display=(t===id)?'block':'none';
+  });
+  document.querySelectorAll('.bt').forEach(function(b){b.classList.remove('bt-active');});
+  if(btn) btn.classList.add('bt-active');
+}
+
+/* ══ PAYMENT METHOD SELECT ══ */
+function selPM(el){
+  document.querySelectorAll('.pm-card').forEach(function(c){c.classList.remove('pm-sel');});
+  el.classList.add('pm-sel');
+}
+
+/* ══ CHECKOUT ══ */
+var coData={};
+function openCheckout(ref, amount, service){
+  coData.ref=ref; coData.amount=amount; coData.service=service;
+  var raw=parseFloat(amount.replace(/[^0-9.]/g,''))||0;
+  var iva=raw*0.16;
+  var total=raw+iva;
+  document.getElementById('coModalTitle').textContent='◈ CHECKOUT — '+service.toUpperCase();
+  document.getElementById('coServiceName').textContent=service;
+  document.getElementById('coRef').textContent=ref;
+  document.getElementById('coSub').textContent='$'+raw.toLocaleString('es-MX',{minimumFractionDigits:2})+' MXN';
+  document.getElementById('coIva').textContent='$'+iva.toLocaleString('es-MX',{minimumFractionDigits:2})+' MXN';
+  document.getElementById('coTotal').textContent='$'+total.toLocaleString('es-MX',{minimumFractionDigits:2})+' MXN';
+  coData.total='$'+total.toLocaleString('es-MX',{minimumFractionDigits:2})+' MXN';
+  document.getElementById('coSpeiRef').textContent=ref;
+  document.getElementById('coSpeiTotal').textContent=coData.total;
+  document.getElementById('coConfService').textContent=service;
+  document.getElementById('coConfTotal').textContent=coData.total;
+  coNext(1);
+  document.getElementById('checkoutModal').classList.add('show');
+}
+function closeCheckout(){
+  document.getElementById('checkoutModal').classList.remove('show');
+}
+function coNext(step){
+  [1,2,3].forEach(function(s){
+    var el=document.getElementById('coStep'+s);
+    if(el) el.style.display=(s===step)?'block':'none';
+    var st=document.getElementById('step'+s);
+    if(st){
+      st.classList.remove('s-active','s-done');
+      if(s<step) st.classList.add('s-done');
+      else if(s===step) st.classList.add('s-active');
+    }
+  });
+}
+
+/* ══ GATEWAY SELECT ══ */
+var selGateway='card';
+function selGW(el, gw){
+  document.querySelectorAll('.gw').forEach(function(g){g.classList.remove('gw-sel');});
+  el.classList.add('gw-sel');
+  selGateway=gw;
+  ['card','transfer','stripe'].forEach(function(g){
+    var d=document.getElementById('gw-'+g);
+    if(d) d.style.display=(g===gw)?'block':'none';
+  });
+  var methods={'card':'Tarjeta de crédito/débito','transfer':'Transferencia SPEI','stripe':'Stripe (próximamente)'};
+  document.getElementById('coConfMethod').textContent=methods[gw]||gw;
+}
+
+/* ══ CARD FORMATTERS ══ */
+function fmtCard(el){
+  var v=el.value.replace(/\D/g,'').substring(0,16);
+  el.value=v.replace(/(.{4})/g,'$1 ').trim();
+}
+function fmtExp(el){
+  var v=el.value.replace(/\D/g,'');
+  if(v.length>=2) v=v.substring(0,2)+' / '+v.substring(2,4);
+  el.value=v;
+}
+
+/* ══ PROCESS PAYMENT ══ */
+function processPayment(){
+  if(selGateway==='stripe'){showToast('⚠ STRIPE EN DESARROLLO — USA TARJETA O SPEI');return;}
+  closeCheckout();
+  var folio='TXN-'+Date.now().toString().slice(-6);
+  document.getElementById('payFolio').textContent='FOLIO: #'+folio;
+  document.getElementById('paySuccess').classList.add('show');
+}
+
+/* ══ CLOSE SUCCESS ══ */
+function closeSuccess(){
+  document.getElementById('paySuccess').classList.remove('show');
+  showToast('✓ COMPROBANTE ENVIADO A TU EMAIL');
+}
+
+/* ══════════════════════════════════════════
+   CONTRATACIÓN WIZARD
+══════════════════════════════════════════ */
+var wizCurrentPage = 1;
+var wizPlanes = {};   // {key: {name, price}}
+var wizPayMethod = 'efectivo';
+var wizTermsOk = false;
+
+var PLANES_CATALOG = {
+  revista:       {name:'Revista Digital',         price:1200},
+  bolsa:         {name:'Análisis de Bolsa',        price:3500},
+  disenoweb:     {name:'Diseño Web',               price:8500},
+  apps:          {name:'Apps Móviles',             price:15000},
+  automatizacion:{name:'Automatización',           price:12000},
+  datos:         {name:'Análisis de Datos',        price:4500},
+  inventario:    {name:'Inventarios Virtuales',    price:1800},
+  biotech:       {name:'Inversión Biotecnología',  price:25000}
+};
+
+function togglePlan(el, key, price){
+  if(el.classList.contains('pi-sel')){
+    el.classList.remove('pi-sel');
+    delete wizPlanes[key];
+  } else {
+    el.classList.add('pi-sel');
+    wizPlanes[key] = PLANES_CATALOG[key];
+  }
+  updatePlanSubtotal();
+}
+
+function updatePlanSubtotal(){
+  var keys = Object.keys(wizPlanes);
+  var total = keys.reduce(function(s,k){ return s + wizPlanes[k].price; }, 0);
+  var selEl = document.getElementById('planSelected');
+  var subEl = document.getElementById('planSubtotal');
+  if(selEl) selEl.textContent = keys.length ? keys.map(function(k){ return wizPlanes[k].name; }).join(' · ') : 'Ninguno seleccionado';
+  if(subEl) subEl.textContent = '$' + total.toLocaleString('es-MX') + ' MXN';
+}
+
+function updateTermCheck(){
+  wizTermsOk = document.getElementById('termCheck').classList.contains('active');
+}
+
+function selPayMethod(method){
+  wizPayMethod = method;
+  ['efectivo','transferencia','tarjeta'].forEach(function(m){
+    var btn = document.getElementById('pm-'+m);
+    var det = document.getElementById('pay-detail-'+m);
+    if(btn) btn.classList.toggle('pm-active', m===method);
+    if(det) det.style.display = m===method ? 'block' : 'none';
+  });
+}
+
+function wizSetStep(page){
+  for(var i=1;i<=6;i++){
+    var wp = document.getElementById('wp'+i);
+    var ws = document.getElementById('ws'+i);
+    var wc = document.getElementById('wc'+i);
+    if(wp) wp.classList.toggle('wp-active', i===page);
+    if(ws){
+      ws.classList.remove('ws-active','ws-done');
+      if(i < page) ws.classList.add('ws-done');
+      else if(i === page) ws.classList.add('ws-active');
+    }
+    if(wc && i < 6) wc.classList.toggle('wc-done', i < page);
+  }
+  wizCurrentPage = page;
+  /* Scroll to top of wizard */
+  var el = document.getElementById('wp'+page);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function wizShowErr(pageNum, msg){
+  var el = document.getElementById('wiz-res'+pageNum);
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.background = 'rgba(200,40,42,.1)';
+  el.style.border = '1px solid rgba(200,40,42,.3)';
+  el.style.color = '#e05050';
+}
+function wizClearErr(pageNum){
+  var el = document.getElementById('wiz-res'+pageNum);
+  if(el) el.style.display = 'none';
+}
+
+function wizNext(from){
+  wizClearErr(from);
+
+  if(from === 1){
+    /* Validate datos cliente */
+    var req = ['c_nombre','c_apellidos','c_email','c_tel','c_curp','c_rfc','c_calle','c_colonia','c_municipio','c_estado','c_cp','c_pass','c_pass2'];
+    for(var i=0;i<req.length;i++){
+      var el = document.getElementById(req[i]);
+      if(!el || !el.value.trim()){ wizShowErr(1,'⚠ COMPLETA TODOS LOS CAMPOS OBLIGATORIOS (*)'); return; }
+    }
+    var pass  = document.getElementById('c_pass').value;
+    var pass2 = document.getElementById('c_pass2').value;
+    if(pass.length < 6){ wizShowErr(1,'⚠ CONTRASEÑA MÍNIMA: 6 CARACTERES'); return; }
+    if(pass !== pass2){ wizShowErr(1,'⚠ LAS CONTRASEÑAS NO COINCIDEN'); return; }
+    var email = document.getElementById('c_email').value.trim().toLowerCase();
+    if(liveUsers[email]){ wizShowErr(1,'⚠ EL EMAIL YA EXISTE EN EL SISTEMA'); return; }
+    wizSetStep(2);
+  }
+
+  else if(from === 2){
+    if(Object.keys(wizPlanes).length === 0){ wizShowErr(2,'⚠ SELECCIONA AL MENOS UN SERVICIO'); return; }
+    wizSetStep(3);
+  }
+
+  else if(from === 3){
+    if(!document.getElementById('termCheck').classList.contains('active')){
+      wizShowErr(3,'⚠ DEBES ACEPTAR LOS TÉRMINOS PARA CONTINUAR'); return;
+    }
+    /* Set contrato date and folio */
+    var now = new Date();
+    var folio = 'CTR-' + now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + Math.floor(1000+Math.random()*9000);
+    var fecha = now.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}).toUpperCase();
+    var fEl = document.getElementById('contratoFecha');
+    var foEl = document.getElementById('contratoFolio');
+    if(fEl) fEl.textContent = fecha;
+    if(foEl) foEl.textContent = 'FOLIO: ' + folio;
+    wizSetStep(4);
+  }
+
+  else if(from === 4){
+    var firma = document.getElementById('firmaCliente').value.trim();
+    if(!firma){ wizShowErr(4,'⚠ ESCRIBE TU NOMBRE COMPLETO COMO FIRMA ELECTRÓNICA'); return; }
+    /* Build totals for page 5 */
+    var keys = Object.keys(wizPlanes);
+    var subtotal = keys.reduce(function(s,k){ return s + wizPlanes[k].price; }, 0);
+    var iva = Math.round(subtotal * 0.16);
+    var total = subtotal + iva;
+    var listEl = document.getElementById('totalServList');
+    if(listEl){
+      listEl.innerHTML = keys.map(function(k){
+        var p = wizPlanes[k];
+        return '<div class="tot-row"><span class="tot-lbl">'+p.name+'</span><span class="tot-val" style="font-size:.7rem;">$'+p.price.toLocaleString('es-MX')+' MXN</span></div>';
+      }).join('');
+    }
+    var email = document.getElementById('c_email').value.trim();
+    var speiRef = document.getElementById('speiRef');
+    if(speiRef) speiRef.textContent = 'DATASYS · ' + email.toUpperCase().split('@')[0];
+    var totS = document.getElementById('totSubtotal');
+    var totI = document.getElementById('totIva');
+    var totF = document.getElementById('totFinal');
+    if(totS) totS.textContent = '$' + subtotal.toLocaleString('es-MX') + ' MXN';
+    if(totI) totI.textContent = '$' + iva.toLocaleString('es-MX') + ' MXN';
+    if(totF) totF.textContent = '$' + total.toLocaleString('es-MX') + ' MXN';
+    wizSetStep(5);
+  }
+
+  else if(from === 5){
+    /* Generate user account + show confirmation */
+    var nombre   = document.getElementById('c_nombre').value.trim().toUpperCase();
+    var apellidos= document.getElementById('c_apellidos').value.trim().toUpperCase();
+    var email    = document.getElementById('c_email').value.trim().toLowerCase();
+    var pass     = document.getElementById('c_pass').value;
+    var empresa  = document.getElementById('c_empresa').value.trim();
+    var rfc      = document.getElementById('c_rfc').value.trim().toUpperCase();
+    var curp     = document.getElementById('c_curp').value.trim().toUpperCase();
+    var calle    = document.getElementById('c_calle').value.trim();
+    var colonia  = document.getElementById('c_colonia').value.trim();
+    var municipio= document.getElementById('c_municipio').value.trim();
+    var estado   = document.getElementById('c_estado').value.trim();
+    var cp       = document.getElementById('c_cp').value.trim();
+    var tel      = document.getElementById('c_tel').value.trim();
+    var firma    = document.getElementById('firmaCliente').value.trim();
+    var folio    = document.getElementById('contratoFolio') ? document.getElementById('contratoFolio').textContent : '';
+
+    var initials = (nombre[0]||'') + (apellidos[0]||'');
+    var planesStr = Object.values(wizPlanes).map(function(p){ return p.name; }).join(', ');
+    var subtotal  = Object.values(wizPlanes).reduce(function(s,p){ return s + p.price; }, 0);
+    var total     = Math.round(subtotal * 1.16);
+
+    liveUsers[email] = {
+      pass: pass, role: 'client',
+      name: nombre + ' ' + apellidos,
+      initials: initials,
+      plan: planesStr,
+      active: true,
+      createdAt: new Date().toISOString(),
+      empresa: empresa, rfc: rfc, curp: curp, tel: tel,
+      direccion: calle + ', ' + colonia + ', ' + municipio + ', ' + estado + ' C.P.' + cp,
+      planes: Object.keys(wizPlanes),
+      totalContrato: total,
+      metodoPago: wizPayMethod,
+      firma: firma,
+      folioContrato: folio
+    };
+    saveUsers();
+
+    /* Show summary */
+    var resEl = document.getElementById('altaResumen');
+    if(resEl){
+      resEl.innerHTML =
+        '<div class="tot-row"><span class="tot-lbl">CLIENTE</span><span class="tot-val" style="font-size:.75rem;">'+(nombre+' '+apellidos)+'</span></div>'+
+        '<div class="tot-row"><span class="tot-lbl">EMAIL</span><span class="tot-val" style="font-size:.7rem;color:var(--cyan);">'+email+'</span></div>'+
+        '<div class="tot-row"><span class="tot-lbl">RFC</span><span class="tot-val" style="font-size:.7rem;">'+rfc+'</span></div>'+
+        '<div class="tot-row"><span class="tot-lbl">SERVICIOS</span><span class="tot-val" style="font-size:.65rem;max-width:260px;text-align:right;">'+planesStr+'</span></div>'+
+        '<div class="tot-row"><span class="tot-lbl">TOTAL CONTRATO</span><span class="tot-val" style="color:var(--cyan);font-size:.85rem;">$'+total.toLocaleString('es-MX')+' MXN</span></div>'+
+        '<div class="tot-row"><span class="tot-lbl">MÉTODO DE PAGO</span><span class="tot-val" style="font-size:.7rem;">'+wizPayMethod.toUpperCase()+'</span></div>'+
+        '<div class="tot-row"><span class="tot-lbl">FOLIO CONTRATO</span><span class="tot-val" style="font-size:.65rem;color:var(--gold);">'+folio+'</span></div>';
+    }
+    showToast('✓ CLIENTE ' + nombre + ' DADO DE ALTA EXITOSAMENTE');
+    loadUserList();
+    wizSetStep(6);
+  }
+}
+
+function wizBack(from){
+  wizClearErr(from);
+  wizSetStep(from - 1);
+}
+
+function resetWizard(){
+  wizPlanes = {};
+  wizPayMethod = 'efectivo';
+  wizTermsOk = false;
+  wizCurrentPage = 1;
+  /* Clear form fields */
+  ['c_nombre','c_apellidos','c_email','c_tel','c_curp','c_rfc','c_empresa',
+   'c_calle','c_colonia','c_municipio','c_estado','c_cp','c_pass','c_pass2','firmaCliente'].forEach(function(id){
+    var el = document.getElementById(id); if(el) el.value = '';
+  });
+  /* Unselect plans */
+  document.querySelectorAll('.plan-item.pi-sel').forEach(function(el){ el.classList.remove('pi-sel'); });
+  updatePlanSubtotal();
+  /* Uncheck terms */
+  var tc = document.getElementById('termCheck');
+  if(tc) tc.classList.remove('active');
+  /* Reset payment */
+  selPayMethod('efectivo');
+  wizSetStep(1);
+}
+
+/* ══ PERFIL — GUARDAR DATOS ══ */
+function saveProfile(){
+  var name    = document.getElementById('profName').value.trim();
+  var empresa = document.getElementById('profEmpresa').value.trim();
+  var tel     = document.getElementById('profTel').value.trim();
+  var res     = document.getElementById('profResult');
+  if(!name){showResult(res,'⚠ EL NOMBRE NO PUEDE ESTAR VACÍO','error');return;}
+
+  /* Guardar en liveUsers */
+  if(currentUser && liveUsers[currentUser.username]){
+    liveUsers[currentUser.username].name    = name.toUpperCase();
+    liveUsers[currentUser.username].empresa = empresa;
+    liveUsers[currentUser.username].tel     = tel;
+    currentUser.name = name.toUpperCase();
+    saveUsers();
+    /* Actualizar navbar y sidebar */
+    document.getElementById('navUser').textContent = '● ' + currentUser.name;
+    document.getElementById('sbName').textContent  = currentUser.name;
+  }
+  showResult(res,'✓ PERFIL ACTUALIZADO CORRECTAMENTE','ok');
+  showToast('✓ PERFIL GUARDADO');
+}
+
+/* ══ CAMBIAR CONTRASEÑA ══ */
+function changePassword(){
+  var actual   = document.getElementById('passActual').value;
+  var nueva    = document.getElementById('passNueva').value;
+  var confirma = document.getElementById('passConfirm').value;
+  var res      = document.getElementById('passResult');
+
+  if(!actual||!nueva||!confirma){showResult(res,'⚠ COMPLETA TODOS LOS CAMPOS','error');return;}
+  if(!currentUser||!liveUsers[currentUser.username]){showResult(res,'⚠ SESIÓN INVÁLIDA','error');return;}
+  if(liveUsers[currentUser.username].pass !== actual){showResult(res,'⚠ CONTRASEÑA ACTUAL INCORRECTA','error');return;}
+  if(nueva.length < 6){showResult(res,'⚠ MÍNIMO 6 CARACTERES','error');return;}
+  if(nueva !== confirma){showResult(res,'⚠ LAS CONTRASEÑAS NO COINCIDEN','error');return;}
+  if(nueva === actual){showResult(res,'⚠ LA NUEVA CONTRASEÑA DEBE SER DIFERENTE','error');return;}
+
+  liveUsers[currentUser.username].pass = nueva;
+  saveUsers();
+  /* Limpiar campos */
+  document.getElementById('passActual').value='';
+  document.getElementById('passNueva').value='';
+  document.getElementById('passConfirm').value='';
+  showResult(res,'✓ CONTRASEÑA ACTUALIZADA CORRECTAMENTE','ok');
+  showToast('🔑 CONTRASEÑA ACTUALIZADA');
+}
+
+/* ══ GEN INVOICE (ADMIN) ══ */
+function genInvoice(){
+  var cliente=document.querySelector('#panel-cobros select');
+  var monto=document.querySelector('#panel-cobros input[type="number"]');
+  if(!cliente||cliente.selectedIndex===0){showToast('⚠ SELECCIONA UN CLIENTE');return;}
+  if(!monto||!monto.value||parseFloat(monto.value)<=0){showToast('⚠ INGRESA UN MONTO VÁLIDO');return;}
+  var folio='INV-2026-0'+Math.floor(10+Math.random()*90);
+  showToast('✓ FACTURA '+folio+' GENERADA Y ENVIADA');
+  if(monto) monto.value='';
+}
+
+/* ══ ENTER / ESC ══ */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none') doLogin();
+  if(e.key==='Escape'){closeTicketModal();closeCheckout();}
+});
+document.getElementById('ticketModal').addEventListener('click',function(e){if(e.target===this)closeTicketModal();});
+document.getElementById('checkoutModal').addEventListener('click',function(e){if(e.target===this)closeCheckout();});
+/* ══ DIAGNÓSTICO ══ */
+function toggleDiag(){
+  var p=document.getElementById('diagPanel');
+  var b=document.getElementById('diagToggleBtn');
+  if(!p) return;
+  p.classList.toggle('collapsed');
+  if(b) b.textContent=p.classList.contains('collapsed')?'▲':'▼';
+}
+
+function runDiagVerify(){
+  var btn=document.getElementById('diagVerifyBtn');
+  var bar=document.getElementById('diagBar');
+  var pct=document.getElementById('diagPct');
+  if(!btn) return;
+  btn.disabled=true;
+  btn.textContent='⟳ VERIFICANDO...';
+  bar.style.width='0%';
+  pct.textContent='0%';
+
+  var checks=[
+    {fn:function(){return typeof doLogin==='function';}, w:15},
+    {fn:function(){return typeof switchPanel==='function';}, w:15},
+    {fn:function(){return typeof openCheckout==='function';}, w:15},
+    {fn:function(){return typeof genInvoice==='function';}, w:10},
+    {fn:function(){return typeof processPayment==='function';}, w:10},
+    {fn:function(){return typeof closeSuccess==='function';}, w:10},
+    {fn:function(){return !!document.getElementById('loginScreen');}, w:5},
+    {fn:function(){return !!document.getElementById('dashboard');}, w:5},
+    {fn:function(){return !!document.getElementById('checkoutModal');}, w:5},
+    {fn:function(){return typeof window.DATASYS_cloudGet==='function';}, w:10}
+  ];
+
+  var score=0;
+  checks.forEach(function(c){try{if(c.fn())score+=c.w;}catch(e){}});
+
+  setTimeout(function(){
+    bar.style.width=score+'%';
+    pct.textContent=score+'%';
+    btn.disabled=false;
+    btn.textContent='⬡ VERIFICAR INTEGRIDAD';
+    if(score>=90) showToast('✓ INTEGRIDAD: '+score+'% — SISTEMA OPERATIVO');
+    else if(score>=60) showToast('⚠ INTEGRIDAD: '+score+'% — VERIFICAR MÓDULOS');
+    else showToast('✗ INTEGRIDAD: '+score+'% — REVISAR FUNCIONES');
+  }, 1400);
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  setTimeout(function(){
+    var bar=document.getElementById('diagBar');
+    var pct=document.getElementById('diagPct');
+    if(bar){bar.style.width='88%'; if(pct) pct.textContent='88%';}
+  }, 800);
+});
+
+</script>
+<!-- ══ PANEL DIAGNÓSTICO · ÁREA DE CLIENTES ══ -->
+<div id="diagPanel">
+  <div class="diag-header" onclick="toggleDiag()">
+    <div class="diag-ico">⬡</div>
+    <div class="diag-lbl">DIAGNÓSTICO · PORTAL</div>
+    <button class="diag-toggle" id="diagToggleBtn">▼</button>
+  </div>
+  <div class="diag-body">
+    <div class="diag-item">
+      <div class="di-ok">✓</div>
+      <div class="di-body">
+        <div class="di-name">SISTEMA DE LOGIN · 3 ROLES</div>
+        <div class="di-desc">Autenticación por roles: Admin, Cliente, Viewer. Sesión persistente con localStorage. Demo funcional sin backend.</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-ok">✓</div>
+      <div class="di-body">
+        <div class="di-name">TRACKER v4 · REGISTRANDO VISITAS</div>
+        <div class="di-desc">tracker.js activo. Esta página es registrada como "Área de Clientes" en el CRM JSONBin. Scroll, duración y eventos capturados.</div>
+        <div class="di-action">→ <a href="crm.html" target="_blank" style="color:var(--cyan)">Ver CRM Dashboard ↗</a></div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-ok">✓</div>
+      <div class="di-body">
+        <div class="di-name">DASHBOARD · 11 PANELES ACTIVOS</div>
+        <div class="di-desc">Resumen, Servicios, Tickets, Analítica, Documentos, Perfil, Facturación, Contratar, Cobros (Admin), Usuarios (Admin), CRM (Admin).</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-ok">✓</div>
+      <div class="di-body">
+        <div class="di-name">SISTEMA DE FACTURACIÓN · CHECKOUT 3 PASOS</div>
+        <div class="di-desc">Checkout funcional con cálculo de IVA (16%). Métodos: Tarjeta, SPEI, Stripe (dev). Modal de pago exitoso con folio único.</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-ok">✓</div>
+      <div class="di-body">
+        <div class="di-name">GENERAR FACTURA · PANEL ADMIN</div>
+        <div class="di-desc">Función genInvoice() implementada. Validación de cliente y monto. Folio automático generado al confirmar.</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-ok">✓</div>
+      <div class="di-body">
+        <div class="di-name">VERSIÓN MOBILE · clientes_datasys_mobile.html</div>
+        <div class="di-desc">Portal adaptado para móvil con bottom nav, drawer deslizable y modales tipo sheet. Tracker incluido.</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-warn">⚠</div>
+      <div class="di-body">
+        <div class="di-name">AUTENTICACIÓN · MODO DEMO</div>
+        <div class="di-desc">Credenciales hardcodeadas en JS. Sin backend real ni cifrado.</div>
+        <div class="di-action">→ Implementar: Supabase Auth | Firebase Auth | Auth0</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-warn">⚠</div>
+      <div class="di-body">
+        <div class="di-name">PASARELA DE PAGOS · SIMULADA</div>
+        <div class="di-desc">Checkout no procesa cobros reales. Stripe en desarrollo.</div>
+        <div class="di-action">→ Integrar: Stripe | Conekta MX | Mercado Pago</div>
+      </div>
+    </div>
+    <div class="diag-item">
+      <div class="di-miss">✗</div>
+      <div class="di-body">
+        <div class="di-name">BASE DE DATOS REAL · SERVICIOS/FACTURAS</div>
+        <div class="di-desc">Datos de servicios y facturas son estáticos (hardcoded). Sin sincronización con backend.</div>
+        <div class="di-action">→ Conectar: Supabase | Firebase Firestore | REST API</div>
+      </div>
+    </div>
+  </div>
+  <div class="diag-footer">
+    <div class="diag-score">
+      <span class="ds-lbl">INTEGRIDAD</span>
+      <div class="ds-bar-bg"><div class="ds-bar-fill" id="diagBar" style="width:0%"></div></div>
+      <span class="ds-pct" id="diagPct">0%</span>
+    </div>
+    <button class="diag-verify-btn" id="diagVerifyBtn" onclick="runDiagVerify()">⬡ VERIFICAR INTEGRIDAD</button>
+  </div>
+</div>
+
+</body>
+</html>

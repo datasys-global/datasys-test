@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>DATASYS · Meta Tags SEO — Referencia Completa</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0f0; line-height: 1.6; }
+    header { background: linear-gradient(135deg, #0d1b4b, #1a0a3c); padding: 40px; border-bottom: 2px solid #00e5ff; }
+    header h1 { font-size: 2rem; color: #00e5ff; letter-spacing: 2px; }
+    header p { color: #8090b0; margin-top: 8px; font-size: 0.95rem; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+    .page-block { background: #0f1520; border: 1px solid #1e2d50; border-radius: 12px; margin-bottom: 40px; overflow: hidden; }
+    .page-header { background: linear-gradient(90deg, #0d1b4b, #12103a); padding: 20px 28px; border-bottom: 1px solid #1e2d50; display: flex; align-items: center; gap: 14px; }
+    .page-icon { font-size: 1.6rem; }
+    .page-title { font-size: 1.15rem; font-weight: 700; color: #00e5ff; }
+    .page-file { font-size: 0.8rem; color: #556080; font-family: monospace; margin-top: 2px; }
+    .code-block { padding: 24px 28px; overflow-x: auto; }
+    pre { font-family: 'Fira Code', 'Consolas', monospace; font-size: 0.82rem; line-height: 1.8; }
+    .tag-comment { color: #4a6080; }
+    .tag-name { color: #ff79c6; }
+    .tag-attr { color: #50fa7b; }
+    .tag-value { color: #f1fa8c; }
+    .tag-bracket { color: #6272a4; }
+    .section-label { display: inline-block; background: #1a2540; color: #00e5ff; font-size: 0.7rem; font-family: monospace; padding: 3px 10px; border-radius: 4px; margin: 16px 0 8px; letter-spacing: 1px; text-transform: uppercase; }
+    footer { text-align: center; padding: 30px; color: #334060; font-size: 0.8rem; border-top: 1px solid #1a2030; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ DATASYS · META TAGS SEO</h1>
+  <p>Referencia completa de metadatos para todas las páginas del proyecto · Paste-ready para cada &lt;head&gt;</p>
+</header>
+
+<div class="container">
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 1. HOME / INDEX                             -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">🏠</span>
+    <div>
+      <div class="page-title">HOME — Página Principal</div>
+      <div class="page-file">index.html · index_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">charset</span>=<span class="tag-value">"UTF-8"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"viewport"</span> <span class="tag-attr">content</span>=<span class="tag-value">"width=device-width, initial-scale=1.0"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS — Innovate. Integrate. Automate.<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS es la plataforma líder en inteligencia de datos, automatización industrial, ciberseguridad y desarrollo de apps con IA. Transformamos negocios globales."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS, inteligencia artificial, análisis de datos, automatización, ciberseguridad, apps móviles, transformación digital, IA empresarial"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"author"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS Technology"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH (Facebook / LinkedIn) ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS — Innovate. Integrate. Automate."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Plataforma líder en inteligencia de datos, automatización industrial, ciberseguridad y desarrollo de apps con IA. Transformamos negocios globales."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-home.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:locale"</span> <span class="tag-attr">content</span>=<span class="tag-value">"es_ES"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:site"</span> <span class="tag-attr">content</span>=<span class="tag-value">"@datasystech"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS — Innovate. Integrate. Automate."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Plataforma líder en inteligencia de datos, automatización industrial, ciberseguridad y apps con IA."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-home.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "DATASYS Technology",
+  "url": "https://www.datasys.tech",
+  "logo": "https://www.datasys.tech/img/logo-datasys.png",
+  "description": "Plataforma líder en inteligencia de datos, automatización, ciberseguridad y desarrollo de apps con IA.",
+  "sameAs": [
+    "https://twitter.com/datasystech",
+    "https://www.linkedin.com/company/datasys",
+    "https://github.com/datasystech"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "customer support",
+    "availableLanguage": ["Spanish", "English"]
+  }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 2. ANÁLISIS DE DATOS                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">📊</span>
+    <div>
+      <div class="page-title">ANÁLISIS DE DATOS · Data Intelligence</div>
+      <div class="page-file">analisis_datos_datasys.html · analisis_datos_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · Análisis de Datos e Inteligencia Empresarial con IA<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Transforma tus datos en decisiones estratégicas. DATASYS ofrece análisis predictivo, dashboards en tiempo real y business intelligence potenciado con IA."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"análisis de datos, business intelligence, BI, data analytics, dashboards, analítica predictiva, big data, machine learning empresarial, DATASYS"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/analisis_datos_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/analisis_datos_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Análisis de Datos e Inteligencia Empresarial con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Transforma tus datos en decisiones estratégicas con análisis predictivo, dashboards en tiempo real y BI potenciado con IA."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-analisis.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Análisis de Datos e Inteligencia Empresarial con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Transforma datos en decisiones. Analítica predictiva, dashboards en tiempo real y BI con IA."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-analisis.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Análisis de Datos e Inteligencia Empresarial",
+  "provider": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" },
+  "description": "Servicio de análisis de datos, business intelligence y analítica predictiva con IA para empresas.",
+  "url": "https://www.datasys.tech/analisis_datos_datasys.html",
+  "serviceType": "Data Analytics",
+  "areaServed": { "@type": "Place", "name": "Global" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 3. DESARROLLO DE APPS                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">📱</span>
+    <div>
+      <div class="page-title">DESARROLLO DE APPS · Mobile & Web</div>
+      <div class="page-file">apps_datasys.html · apps_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · Desarrollo de Apps Mobile & Web con Inteligencia Artificial<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Desarrollamos aplicaciones móviles y web de alto rendimiento con IA integrada. iOS, Android y PWA para empresas que quieren liderar su mercado."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"desarrollo apps móviles, aplicaciones iOS, Android, PWA, desarrollo web, apps con IA, software empresarial, DATASYS apps"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/apps_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/apps_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Desarrollo de Apps Mobile & Web con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Apps móviles y web de alto rendimiento con IA integrada. iOS, Android y PWA para empresas líderes."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-apps.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Desarrollo de Apps Mobile & Web con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Apps iOS, Android y PWA con IA integrada para empresas que quieren liderar su mercado."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-apps.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Desarrollo de Aplicaciones Mobile y Web",
+  "provider": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" },
+  "description": "Desarrollo de apps móviles iOS/Android y aplicaciones web con inteligencia artificial integrada.",
+  "url": "https://www.datasys.tech/apps_datasys.html",
+  "serviceType": "Software Development",
+  "areaServed": { "@type": "Place", "name": "Global" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 4. AUTOMATIZACIÓN INDUSTRIAL                -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">🤖</span>
+    <div>
+      <div class="page-title">AUTOMATIZACIÓN INDUSTRIAL · Robótica & IA</div>
+      <div class="page-file">automatizacion_datasys.html · automatizacion_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · Automatización Industrial con Robótica e Inteligencia Artificial<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Automatiza procesos industriales con robótica avanzada e IA. Soluciones DATASYS para manufactura, logística y operaciones: eficiencia máxima, cero tiempo muerto."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"automatización industrial, robótica, industria 4.0, IoT industrial, RPA, automatización de procesos, manufactura inteligente, DATASYS automatización"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/automatizacion_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/automatizacion_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Automatización Industrial con Robótica e IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Robótica avanzada e IA para manufactura, logística y operaciones. Eficiencia máxima, cero tiempo muerto."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-automatizacion.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Automatización Industrial con Robótica e IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Robótica e IA para industria. Eficiencia máxima, procesos autónomos y cero tiempo muerto."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-automatizacion.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Automatización Industrial con Robótica e IA",
+  "provider": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" },
+  "description": "Automatización de procesos industriales con robótica avanzada, IoT e inteligencia artificial para manufactura y logística.",
+  "url": "https://www.datasys.tech/automatizacion_datasys.html",
+  "serviceType": "Industrial Automation",
+  "areaServed": { "@type": "Place", "name": "Global" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 5. BIOTECNOLOGÍA · INVERSORES              -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">🧬</span>
+    <div>
+      <div class="page-title">BIOTECNOLOGÍA · Investor Relations Serie A</div>
+      <div class="page-file">biotecnologia_inversores_datasys.html · biotecnologia_inversores_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS Biotech · Inversión Serie A — Oportunidad en Biotecnología con IA<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Oportunidad de inversión Serie A en DATASYS Biotech. Tecnología de vanguardia en biotecnología e IA con alto potencial de retorno. Investor Relations."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"inversión biotecnología, Serie A, biotech IA, investor relations, startups biotech, DATASYS biotech, ronda inversión, bioinformática"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/biotecnologia_inversores_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/biotecnologia_inversores_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS Biotech · Inversión Serie A en Biotecnología con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Ronda Serie A en DATASYS Biotech. Alto potencial de retorno en biotecnología e inteligencia artificial."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-biotech.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS Biotech · Serie A — Inversión en Biotecnología con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Ronda Serie A en biotech + IA. Alto ROI, tecnología de vanguardia e impacto global."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-biotech.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "DATASYS Biotech · Inversión Serie A",
+  "description": "Oportunidad de inversión Serie A en biotecnología con inteligencia artificial.",
+  "url": "https://www.datasys.tech/biotecnologia_inversores_datasys.html",
+  "publisher": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 6. BOLSA US · NYSE & NASDAQ                 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">📈</span>
+    <div>
+      <div class="page-title">BOLSA US · NYSE & NASDAQ AI Platform</div>
+      <div class="page-file">bolsa_us_datasys.html · bolsa_us_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · NYSE & NASDAQ — Plataforma de Inversión en Sector IA<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Plataforma DATASYS para inversión en el sector IA en NYSE y NASDAQ. Análisis en tiempo real, señales algorítmicas y seguimiento de las mejores acciones tech."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"NYSE, NASDAQ, acciones IA, inversión inteligencia artificial, bolsa tecnología, stocks AI, mercado valores tech, DATASYS bolsa"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/bolsa_us_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/bolsa_us_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · NYSE & NASDAQ — Plataforma de Inversión en Sector IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Análisis en tiempo real, señales algorítmicas y seguimiento de las mejores acciones tech en NYSE y NASDAQ."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-bolsa.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · NYSE & NASDAQ — Inversión en Sector IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Señales algorítmicas y análisis real-time de acciones tech en NYSE y NASDAQ."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-bolsa.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "DATASYS NYSE & NASDAQ AI Platform",
+  "description": "Plataforma de análisis e inversión en el sector IA en bolsas americanas con señales algorítmicas en tiempo real.",
+  "url": "https://www.datasys.tech/bolsa_us_datasys.html",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Web",
+  "publisher": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 7. CIBERSEGURIDAD                           -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">🔐</span>
+    <div>
+      <div class="page-title">CIBERSEGURIDAD · Protección Integral con IA</div>
+      <div class="page-file">ciberseguridad_datasys.html · ciberseguridad_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · Ciberseguridad Empresarial con Inteligencia Artificial<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Protección integral de activos digitales con IA. DATASYS ofrece detección de amenazas en tiempo real, SOC 24/7 y soluciones de ciberseguridad avanzada para empresas."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"ciberseguridad empresarial, seguridad informática, SOC, detección amenazas IA, zero trust, pentesting, protección datos, DATASYS seguridad"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/ciberseguridad_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/ciberseguridad_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Ciberseguridad Empresarial con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Detección de amenazas en tiempo real, SOC 24/7 y protección avanzada de activos digitales con IA."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-ciberseguridad.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Ciberseguridad Empresarial con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"SOC 24/7, detección de amenazas con IA y zero trust para proteger tu empresa."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-ciberseguridad.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Ciberseguridad Empresarial con IA",
+  "provider": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" },
+  "description": "Protección integral de activos digitales con detección de amenazas en tiempo real, SOC 24/7 e IA avanzada.",
+  "url": "https://www.datasys.tech/ciberseguridad_datasys.html",
+  "serviceType": "Cybersecurity",
+  "areaServed": { "@type": "Place", "name": "Global" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 8. CONSULTORÍA & CONFERENCIAS               -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">🎤</span>
+    <div>
+      <div class="page-title">CONSULTORÍA & CONFERENCIAS · Transformación Digital</div>
+      <div class="page-file">consultoria_datasys.html · consultoria_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · Consultoría & Conferencias en Transformación Digital Global<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Consultoría estratégica en transformación digital y conferencias internacionales sobre IA, innovación y tecnología. DATASYS: expertos en liderar el cambio empresarial."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"consultoría transformación digital, conferencias IA, innovación tecnológica, estrategia digital, keynote speakers, DATASYS consultoría"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/consultoria_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/consultoria_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Consultoría & Conferencias en Transformación Digital"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Consultoría estratégica y conferencias internacionales sobre IA, innovación y transformación digital empresarial."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-consultoria.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Consultoría & Conferencias en Transformación Digital"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Expertos en transformación digital. Consultoría estratégica y conferencias internacionales en IA e innovación."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-consultoria.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Consultoría en Transformación Digital",
+  "provider": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" },
+  "description": "Consultoría estratégica en transformación digital y conferencias internacionales sobre IA e innovación tecnológica.",
+  "url": "https://www.datasys.tech/consultoria_datasys.html",
+  "serviceType": "Business Consulting",
+  "areaServed": { "@type": "Place", "name": "Global" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 9. INVENTARIO VIRTUAL                       -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">📦</span>
+    <div>
+      <div class="page-title">INVENTARIO VIRTUAL · Gestión de Activos en Tiempo Real</div>
+      <div class="page-file">inventario_virtual_datasys.html · inventario_virtual_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS · Inventario Virtual — Gestión de Activos en Tiempo Real con IA<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Sistema de inventario virtual inteligente de DATASYS. Gestión de activos en tiempo real, trazabilidad total y control de stock potenciado por IA y IoT."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"inventario virtual, gestión activos, control stock IA, trazabilidad, ERP inteligente, inventario tiempo real, IoT inventario, DATASYS inventario"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/inventario_virtual_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/inventario_virtual_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Inventario Virtual — Gestión de Activos con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Gestión de activos en tiempo real con trazabilidad total y control de stock inteligente con IA e IoT."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-inventario.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS · Inventario Virtual — Gestión de Activos con IA"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"Control de stock e inventario en tiempo real con IA e IoT. Trazabilidad total de activos."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-inventario.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "DATASYS Inventario Virtual",
+  "description": "Sistema inteligente de gestión de inventario y activos en tiempo real con IA e IoT.",
+  "url": "https://www.datasys.tech/inventario_virtual_datasys.html",
+  "applicationCategory": "BusinessApplication",
+  "operatingSystem": "Web",
+  "publisher": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- 10. REVISTA TECH REVIEW                     -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">📰</span>
+    <div>
+      <div class="page-title">DATASYS TECH REVIEW · Revista de Tecnología & Innovación</div>
+      <div class="page-file">revista_datasys.html · revista_datasys_mobile.html</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+<span class="tag-comment">&lt;!-- ══ PRIMARY META TAGS ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>DATASYS TECH REVIEW · Revista de Tecnología, IA & Innovación<span class="tag-bracket">&lt;/</span><span class="tag-name">title</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS Tech Review: la revista de referencia en tecnología, inteligencia artificial e innovación empresarial. Artículos, tendencias y análisis de expertos del sector tech."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"keywords"</span> <span class="tag-attr">content</span>=<span class="tag-value">"revista tecnología, tech review, inteligencia artificial noticias, innovación empresarial, tendencias tech, artículos IA, DATASYS revista"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"robots"</span> <span class="tag-attr">content</span>=<span class="tag-value">"index, follow"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">link</span> <span class="tag-attr">rel</span>=<span class="tag-value">"canonical"</span> <span class="tag-attr">href</span>=<span class="tag-value">"https://www.datasys.tech/revista_datasys.html"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ OPEN GRAPH ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:type"</span> <span class="tag-attr">content</span>=<span class="tag-value">"website"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:url"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/revista_datasys.html"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS TECH REVIEW · Tecnología, IA & Innovación"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"La revista de referencia en tecnología, IA e innovación. Artículos, tendencias y análisis de expertos del sector tech."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-revista.jpg"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:width"</span> <span class="tag-attr">content</span>=<span class="tag-value">"1200"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:image:height"</span> <span class="tag-attr">content</span>=<span class="tag-value">"630"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">property</span>=<span class="tag-value">"og:site_name"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ TWITTER CARD ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:card"</span> <span class="tag-attr">content</span>=<span class="tag-value">"summary_large_image"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:title"</span> <span class="tag-attr">content</span>=<span class="tag-value">"DATASYS TECH REVIEW · Tecnología, IA & Innovación"</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:description"</span> <span class="tag-attr">content</span>=<span class="tag-value">"La revista tech de referencia. Artículos sobre IA, innovación empresarial y tendencias del sector."</span><span class="tag-bracket">&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">meta</span> <span class="tag-attr">name</span>=<span class="tag-value">"twitter:image"</span> <span class="tag-attr">content</span>=<span class="tag-value">"https://www.datasys.tech/img/og-revista.jpg"</span><span class="tag-bracket">&gt;</span>
+
+<span class="tag-comment">&lt;!-- ══ JSON-LD SCHEMA.ORG ══ --&gt;</span>
+<span class="tag-bracket">&lt;</span><span class="tag-name">script</span> <span class="tag-attr">type</span>=<span class="tag-value">"application/ld+json"</span><span class="tag-bracket">&gt;</span>
+{
+  "@context": "https://schema.org",
+  "@type": "NewsMediaOrganization",
+  "name": "DATASYS Tech Review",
+  "url": "https://www.datasys.tech/revista_datasys.html",
+  "description": "Revista de referencia en tecnología, inteligencia artificial e innovación empresarial.",
+  "publishingPrinciples": "https://www.datasys.tech/revista_datasys.html",
+  "parentOrganization": { "@type": "Organization", "name": "DATASYS Technology", "url": "https://www.datasys.tech" }
+}
+<span class="tag-bracket">&lt;/</span><span class="tag-name">script</span><span class="tag-bracket">&gt;</span>
+</pre></div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- robots.txt                                  -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="page-block">
+  <div class="page-header">
+    <span class="page-icon">🤖</span>
+    <div>
+      <div class="page-title">robots.txt — Recomendado crear en raíz del dominio</div>
+      <div class="page-file">robots.txt</div>
+    </div>
+  </div>
+  <div class="code-block"><pre>
+User-agent: *
+Allow: /
+
+Sitemap: https://www.datasys.tech/sitemap.xml
+</pre></div>
+</div>
+
+</div><!-- /container -->
+
+<footer>DATASYS · SEO Meta Tags Reference · Generado 2026-03-05 · Reemplaza https://www.datasys.tech con tu dominio real si difiere</footer>
+</body>
+</html>

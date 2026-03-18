@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#030d18">
+<title>DATASYS · Automatización Industrial</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c:#00e5ff;--bg:#030d18;--bg2:#060f1c;--bg3:#0a1828;
+  --txt:#dff0f8;--dim:#8eb8cc;
+  --glow:0 0 14px rgba(0,229,255,0.5);--glow2:0 0 28px rgba(0,229,255,0.7);
+  --bord:rgba(0,229,255,0.18);--bord2:rgba(0,229,255,0.4);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,0.007) 3px,rgba(0,229,255,0.007) 4px);pointer-events:none;z-index:9000;}
+a{text-decoration:none;color:inherit;}
+
+/* TOPBAR */
+#topbar{position:fixed;top:0;left:0;right:0;height:56px;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(3,13,24,.97);border-bottom:1px solid var(--bord);backdrop-filter:blur(14px);}
+.tb-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.tb-brand img{width:32px;height:32px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 7px rgba(0,229,255,0.6));}
+.tb-name{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:3px;color:var(--c);}
+.tb-crumb{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1.5px;color:var(--dim);opacity:.55;}
+.tb-home{padding:8px 14px;font-family:'Orbitron',sans-serif;font-size:.54rem;font-weight:700;letter-spacing:2px;color:var(--c);background:rgba(0,0,0,0);border:1px solid var(--bord);cursor:pointer;text-decoration:none;display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.tb-home:active{background:rgba(0,229,255,0.1);}
+
+/* HERO */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:76px 20px 40px;overflow:hidden;text-align:center;}
+.h-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.04) 1px,transparent 1px);background-size:38px 38px;animation:gd 20s linear infinite;}
+@keyframes gd{0%{background-position:0 0;}100%{background-position:38px 38px;}}
+.h-amb{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(0,30,50,.75) 0%,transparent 70%);}
+.h-img-bg{position:absolute;inset:0;}
+.h-img-bg img{width:100%;height:100%;object-fit:cover;filter:brightness(.08) saturate(.3);}
+.h-ico{font-size:4rem;margin-bottom:16px;position:relative;z-index:2;text-shadow:0 0 30px rgba(0,229,255,0.6);}
+.h-pre{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:4px;color:var(--c);opacity:.6;margin-bottom:10px;position:relative;z-index:2;}
+.h-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.4rem,7vw,2.2rem);font-weight:900;color:var(--txt);letter-spacing:2px;line-height:1.2;margin-bottom:14px;position:relative;z-index:2;}
+.h-title em{color:var(--c);font-style:normal;}
+.h-desc{font-size:.92rem;color:var(--dim);line-height:1.75;max-width:360px;margin:0 auto 24px;position:relative;z-index:2;}
+.h-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;width:100%;max-width:360px;margin:0 auto 28px;position:relative;z-index:2;}
+.hs{background:rgba(0,0,0,.35);border:1px solid var(--bord);padding:12px;text-align:center;backdrop-filter:blur(8px);}
+.hs-val{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;color:var(--c);text-shadow:var(--glow);}
+.hs-lbl{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:2px;color:var(--dim);margin-top:3px;line-height:1.4;}
+.h-ctas{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;margin:0 auto;position:relative;z-index:2;}
+.btn-p{padding:14px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--bg);background:var(--c);border:none;cursor:pointer;width:100%;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:var(--glow);}
+.btn-p:active{filter:brightness(.88);}
+.btn-s{padding:14px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:2px;color:var(--c);background:transparent;border:1px solid var(--bord);cursor:pointer;width:100%;}
+.btn-s:active{background:rgba(0,229,255,0.08);}
+
+/* SECTION */
+.sec{padding:44px 20px;}
+.sec.alt{background:var(--bg2);}
+.s-pre{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:4px;color:var(--c);opacity:.55;margin-bottom:8px;}
+.s-ttl{font-family:'Orbitron',sans-serif;font-size:1.25rem;font-weight:900;color:var(--txt);letter-spacing:2px;margin-bottom:6px;}
+.s-sub{font-size:.9rem;color:var(--dim);line-height:1.75;}
+
+/* FEATURE CARDS */
+.feat-list{display:flex;flex-direction:column;gap:12px;margin-top:24px;}
+.feat{display:flex;gap:14px;padding:16px;background:rgba(0,0,0,.2);border:1px solid var(--bord);border-left:3px solid var(--c);}
+.feat-ico{font-size:1.6rem;flex-shrink:0;padding-top:2px;}
+.feat-body{flex:1;min-width:0;}
+.feat-ttl{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--c);letter-spacing:1px;margin-bottom:5px;}
+.feat-desc{font-size:.82rem;color:var(--dim);line-height:1.65;}
+.feat-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.ftag{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.2px;padding:2px 7px;border:1px solid var(--bord);color:rgba(0,229,255,0.55);}
+
+/* PIPELINE */
+.pipe-list{display:flex;flex-direction:column;gap:0;margin-top:24px;}
+.pipe{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid rgba(0,229,255,0.08);}
+.pipe:last-child{border-bottom:none;}
+.pipe-num{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2px;color:var(--c);opacity:.45;flex-shrink:0;padding-top:2px;width:24px;}
+.pipe-ico{font-size:1.4rem;flex-shrink:0;}
+.pipe-body{flex:1;}
+.pipe-name{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--c);letter-spacing:1px;margin-bottom:4px;}
+.pipe-desc{font-size:.82rem;color:var(--dim);line-height:1.6;}
+
+/* CTA BLOCK */
+.cta-block{background:rgba(0,229,255,0.04);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:40px 20px;text-align:center;}
+.cta-block h3{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:var(--c);letter-spacing:2px;margin-bottom:12px;line-height:1.3;}
+.cta-block p{font-size:.9rem;color:var(--dim);line-height:1.75;margin-bottom:24px;}
+.btn-full{padding:15px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:2px;color:var(--bg);background:var(--c);border:none;cursor:pointer;width:100%;display:block;text-align:center;box-shadow:var(--glow);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);}
+.btn-full:active{filter:brightness(.88);}
+
+/* FORM */
+.form-sec{padding:44px 20px;background:var(--bg2);}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2.5px;color:var(--c);opacity:.55;margin-bottom:6px;}
+.fg input,.fg textarea,.fg select{width:100%;background:rgba(0,229,255,0.04);border:1px solid var(--bord);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:12px 14px;outline:none;border-radius:0;-webkit-appearance:none;}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--c);background:rgba(0,229,255,0.08);}
+.fg textarea{height:96px;resize:none;}
+.fg select option{background:var(--bg2);}
+.btn-submit{width:100%;padding:15px;font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;margin-top:8px;box-shadow:var(--glow);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);}
+.btn-submit:active{filter:brightness(.88);}
+.form-info{margin-bottom:28px;display:flex;flex-direction:column;gap:14px;}
+.fi{display:flex;gap:12px;align-items:flex-start;}
+.fi-ico{font-size:1.2rem;flex-shrink:0;}
+.fi-ttl{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:1px;margin-bottom:3px;}
+.fi-desc{font-size:.8rem;color:var(--dim);line-height:1.6;}
+
+/* FOOTER */
+footer{background:rgba(1,6,14,.95);border-top:1px solid var(--bord);padding:28px 20px;text-align:center;}
+.ft-logo{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:5px;color:var(--c);text-shadow:var(--glow);margin-bottom:6px;}
+.ft-tag{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:3px;color:var(--dim);opacity:.4;margin-bottom:10px;}
+.ft-copy{font-size:.7rem;color:rgba(142,184,204,.28);}
+
+.reveal{opacity:0;transform:translateY(16px);transition:opacity .65s ease,transform .65s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <a class="tb-brand" href="../index_mobile.html">
+    <img src="../imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
+    <div><div class="tb-name">DATASYS</div><div class="tb-crumb">AUTOMATIZACIÓN INDUSTRIAL</div></div>
+  </a>
+  <a class="tb-home" href="../index_mobile.html">🏠 INICIO</a>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="h-grid"></div>
+  <div class="h-amb"></div>
+  <div class="h-img-bg"><img src="../imagenes/automatizacion.png" alt="" onerror="this.style.display='none'"></div>
+  <div class="h-ico">🤖</div>
+  <div class="h-pre">// INDUSTRIA 4.0 · DATASYS PLATFORM</div>
+  <h1 class="h-title">Industria 4.0 para tu manufactura</h1>
+  <p class="h-desc">Robots inteligentes, brazos mecatrónicos y sistemas de control AI. Optimización de líneas de producción con IIoT y mantenimiento predictivo.</p>
+  <div class="h-stats">
+    <div class="hs"><div class="hs-val">+34%</div><div class="hs-lbl">EFICIENCIA OEE</div></div>
+    <div class="hs"><div class="hs-val">-68%</div><div class="hs-lbl">PAROS NO PLANEADOS</div></div>
+    <div class="hs"><div class="hs-val">99.2%</div><div class="hs-lbl">UPTIME PROMEDIO</div></div>
+    <div class="hs"><div class="hs-val">18 MES</div><div class="hs-lbl">PAYBACK PROMEDIO</div></div>
+
+  </div>
+  <div class="h-ctas">
+    <button class="btn-p" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">SOLICITAR DEMO →</button>
+    <button class="btn-s" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">VER SERVICIOS</button>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<div class="sec reveal" id="features">
+  <div class="s-pre">// CAPACIDADES · PLATAFORMA</div>
+  <div class="s-ttl">Qué podemos hacer</div>
+  <div class="feat-list">
+    <div class="feat">
+      <div class="feat-ico">🤖</div>
+      <div class="feat-body">
+        <div class="feat-ttl">ROBOTS INDUSTRIALES</div>
+        <div class="feat-desc">Integración de robots colaborativos (cobots) y brazos mecatrónicos para ensamble, soldadura y paletizado.</div>
+        <div class="feat-tags"><span class="ftag">FANUC</span><span class="ftag">ABB</span><span class="ftag">KUKA</span></div>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📡</div>
+      <div class="feat-body">
+        <div class="feat-ttl">IIoT & SENSÓRICA</div>
+        <div class="feat-desc">Red de sensores industriales IoT con comunicación OPC-UA, MQTT y protocolos legacy integrados.</div>
+        <div class="feat-tags"><span class="ftag">OPC-UA</span><span class="ftag">MQTT</span><span class="ftag">PROFINET</span></div>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🧠</div>
+      <div class="feat-body">
+        <div class="feat-ttl">IA PREDICTIVA</div>
+        <div class="feat-desc">Modelos ML para mantenimiento predictivo, detección de fallos y optimización de parámetros en tiempo real.</div>
+        <div class="feat-tags"><span class="ftag">ANOMALY</span><span class="ftag">FORECAST</span><span class="ftag">CV</span></div>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📊</div>
+      <div class="feat-body">
+        <div class="feat-ttl">MES & SCADA</div>
+        <div class="feat-desc">Sistemas de ejecución de manufactura y supervisión en tiempo real con dashboards de planta.</div>
+        <div class="feat-tags"><span class="ftag">MES</span><span class="ftag">SCADA</span><span class="ftag">HISTORIAN</span></div>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🔄</div>
+      <div class="feat-body">
+        <div class="feat-ttl">RPA INDUSTRIAL</div>
+        <div class="feat-desc">Automatización robótica de procesos para ERPs, logística y documentación de planta.</div>
+        <div class="feat-tags"><span class="ftag">RPA</span><span class="ftag">SAP</span><span class="ftag">ERP</span></div>
+      </div>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🏭</div>
+      <div class="feat-body">
+        <div class="feat-ttl">GEMELO DIGITAL</div>
+        <div class="feat-desc">Réplica digital de tu planta para simulación, optimización y formación de operadores.</div>
+        <div class="feat-tags"><span class="ftag">DIGITAL TWIN</span><span class="ftag">3D SIM</span><span class="ftag">AR</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PIPELINE -->
+<div class="sec alt reveal">
+  <div class="s-pre">// PROCESO · METODOLOGÍA</div>
+  <div class="s-ttl">Cómo lo hacemos</div>
+  <div class="pipe-list">
+    <div class="pipe">
+      <div class="pipe-num">// 01</div>
+      <div class="pipe-ico">🔍</div>
+      <div class="pipe-body"><div class="pipe-name">DIAGNÓSTICO</div><div class="pipe-desc">Evaluación de planta, análisis de procesos y identificación de oportunidades de automatización.</div></div>
+    </div>
+    <div class="pipe">
+      <div class="pipe-num">// 02</div>
+      <div class="pipe-ico">🎯</div>
+      <div class="pipe-body"><div class="pipe-name">DISEÑO</div><div class="pipe-desc">Arquitectura de solución, selección de tecnología y plan de implementación sin paro de producción.</div></div>
+    </div>
+    <div class="pipe">
+      <div class="pipe-num">// 03</div>
+      <div class="pipe-ico">⚙️</div>
+      <div class="pipe-body"><div class="pipe-name">INTEGRACIÓN</div><div class="pipe-desc">Instalación de hardware, desarrollo de software y configuración de sistemas existentes.</div></div>
+    </div>
+    <div class="pipe">
+      <div class="pipe-num">// 04</div>
+      <div class="pipe-ico">🧪</div>
+      <div class="pipe-body"><div class="pipe-name">VALIDACIÓN</div><div class="pipe-desc">Pruebas FAT/SAT, comisionamiento y capacitación del equipo de planta.</div></div>
+    </div>
+    <div class="pipe">
+      <div class="pipe-num">// 05</div>
+      <div class="pipe-ico">📈</div>
+      <div class="pipe-body"><div class="pipe-name">OPTIMIZACIÓN</div><div class="pipe-desc">Monitoreo continuo, ajuste de modelos ML y mejora iterativa del rendimiento.</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-block reveal">
+  <h3>¿LISTO PARA COMENZAR?</h3>
+  <p>ROI promedio en 18 meses. Evaluación gratuita de tu planta sin compromiso.</p>
+  <button class="btn-full" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">CONTÁCTANOS AHORA →</button>
+</div>
+
+<!-- FORM -->
+<div class="form-sec reveal" id="contacto">
+  <div class="s-pre">// CONTACTO · DATASYS</div>
+  <div class="s-ttl">Agenda tu evaluación gratuita</div>
+  <br>
+  <div class="form-info">
+    <div class="fi"><div class="fi-ico">⚡</div><div><div class="fi-ttl">RESPUESTA EN 24 HORAS</div><div class="fi-desc">Un especialista te contacta con una propuesta personalizada.</div></div></div>
+    <div class="fi"><div class="fi-ico">🎯</div><div><div class="fi-ttl">DEMO PERSONALIZADA</div><div class="fi-desc">Mostramos la plataforma con datos de tu industria.</div></div></div>
+    <div class="fi"><div class="fi-ico">🔒</div><div><div class="fi-ttl">CONFIDENCIALIDAD TOTAL</div><div class="fi-desc">NDA disponible. Tus datos se tratan con máxima discreción.</div></div></div>
+  </div>
+  <div class="fg"><label>NOMBRE COMPLETO *</label><input id="cf_name" type="text" placeholder="Tu nombre completo..."></div>
+  <div class="fg"><label>CORREO ELECTRÓNICO *</label><input id="cf_email" type="email" placeholder="tu@empresa.com"></div>
+  <div class="fg"><label>TELÉFONO</label><input id="cf_phone" type="tel" placeholder="+52 55 0000 0000"></div>
+  <div class="fg"><label>EMPRESA</label><input type="text" placeholder="Nombre de tu empresa..."></div>
+  <div class="fg"><label>ÁREA DE INTERÉS</label><select id="cf_service"><option value="">Selecciona un servicio...</option><option>Robótica Industrial</option>
+<option>Mantenimiento Predictivo</option>
+<option>SCADA / MES</option>
+<option>IIoT & Sensórica</option>
+<option>RPA Industrial</option>
+<option>Gemelo Digital</option></select></div>
+  <div class="fg"><label>MENSAJE</label><textarea id="cf_message" placeholder="Cuéntanos sobre tu proyecto o necesidad..."></textarea></div>
+  <div id="cf_error" style="display:none;font-family:\'Share Tech Mono\',monospace;font-size:.48rem;color:#e05050;padding:8px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.06);margin-bottom:8px;"></div>
+  <button class="btn-submit" id="cf_btn" onclick="sendContactForm()">ENVIAR SOLICITUD →</button>
+</div>
+
+<!-- FOOTER -->
+<!-- ══ MODAL ACUSE DE RECIBO ══ -->
+<div id="acuseModal" style="position:fixed;inset:0;z-index:99100;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.96);backdrop-filter:blur(16px);">
+  <div style="background:#05101e;border:1px solid rgba(0,229,255,.38);max-width:500px;width:94%;padding:0;animation:acuseIn .4s both;position:relative;">
+    <style>@keyframes acuseIn{0%{opacity:0;transform:scale(.93) translateY(18px);}100%{opacity:1;transform:none;}}</style>
+    <div style="padding:16px 22px 12px;border-bottom:1px solid rgba(0,229,255,.13);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">✓ MENSAJE ENVIADO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#00e5ff;letter-spacing:2px;">ACUSE DE RECIBO</div>
+      </div>
+      <button onclick="closeAcuse()" style="background:none;border:none;color:#aaa;font-size:1.4rem;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.13);margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;">FOLIO</span>
+        <span id="acuse_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:#00e5ff;"></span>
+        <span id="acuse_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.5;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">NOMBRE</span><span id="acuse_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">EMAIL</span><span id="acuse_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#00e5ff;font-weight:600;word-break:break-all;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">TELÉFONO</span><span id="acuse_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">SERVICIO</span><span id="acuse_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f5c842;font-weight:600;"></span></div>
+        <div style="padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;display:block;margin-bottom:3px;">MENSAJE</span><span id="acuse_msg" style="font-family:'Rajdhani',sans-serif;font-size:.85rem;color:#fff;line-height:1.6;"></span></div>
+      </div>
+      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.43rem;color:#00ff88;line-height:2;margin-bottom:14px;">
+        Mensaje enviado a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="25464a4b514446514a6541445144565c560b485d">[email&#160;protected]</a><br>
+        Tiempo de respuesta: menos de 24 horas hábiles
+      </div>
+      <button onclick="closeAcuse()" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid #00e5ff;color:#00e5ff;cursor:pointer;">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-logo">DATASYS</div>
+  <div class="ft-tag">INNOVATE · INTEGRATE · AUTOMATE</div>
+  <div class="ft-copy">© 2026 DATASYS Global · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec8f8382988d8f9883ac888d988d9f959fc28f8381">[email&#160;protected]</a> · +52 (55) 1234-5678</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+/* ══ FORMULARIO REAL — FORMSPREE (meelpnqr) ══ */
+function sendContactForm(){
+  var name    = document.getElementById('cf_name')    ? document.getElementById('cf_name').value.trim()    : '';
+  var email   = document.getElementById('cf_email')   ? document.getElementById('cf_email').value.trim()   : '';
+  var phone   = document.getElementById('cf_phone')   ? document.getElementById('cf_phone').value.trim()   : '';
+  var srvEl   = document.getElementById('cf_service');
+  var service = srvEl ? srvEl.value : '';
+  var msgEl   = document.getElementById('cf_message') || document.getElementById('cf_address');
+  var message = msgEl ? msgEl.value.trim() : '';
+  var errEl   = document.getElementById('cf_error');
+  var btn     = document.getElementById('cf_btn');
+  if(errEl) errEl.style.display = 'none';
+  if(!name){
+    if(errEl){ errEl.textContent='Por favor ingresa tu nombre.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){ errEl.textContent='Por favor ingresa un correo electrónico válido.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!service){
+    if(errEl){ errEl.textContent='Por favor selecciona un servicio.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!message){
+    if(errEl){ errEl.textContent='Por favor escribe tu mensaje.'; errEl.style.display='block'; }
+    return;
+  }
+  var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+  var fecha = new Date().toLocaleString('es-MX', {
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  var origTxt = btn ? btn.textContent : '';
+  if(btn){
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    btn.style.background = 'rgba(0,229,255,.1)';
+    btn.style.color = '#00e5ff';
+  }
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:name, email:email, phone:phone||'N/A',
+      service:service, message:message,
+      folio:folio, fecha:fecha, _replyto:email
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+  .then(function(res){
+    if(res.ok){
+      ['cf_name','cf_email','cf_phone','cf_message','cf_address'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      if(srvEl) srvEl.value = '';
+      var am = document.getElementById('acuseModal');
+      if(am){
+        document.getElementById('acuse_folio').textContent   = folio;
+        document.getElementById('acuse_fecha').textContent   = fecha;
+        document.getElementById('acuse_nombre').textContent  = name;
+        document.getElementById('acuse_email').textContent   = email;
+        document.getElementById('acuse_phone').textContent   = phone || '—';
+        document.getElementById('acuse_service').textContent = service;
+        document.getElementById('acuse_msg').textContent     = message;
+        am.style.display = 'flex';
+      }
+      if(btn){
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'rgba(0,255,136,.1)';
+        btn.style.color = '#00ff88';
+        btn.style.border = '1px solid #00ff88';
+        setTimeout(function(){
+          btn.textContent = origTxt;
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.border = '';
+        }, 8000);
+      }
+    } else {
+      if(errEl){ errEl.textContent='Error al enviar. Por favor intenta de nuevo.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+    }
+  })
+  .catch(function(){
+    if(errEl){ errEl.textContent='Error de conexión. Verifica tu red e intenta de nuevo.'; errEl.style.display='block'; }
+    if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+  });
+}
+function closeAcuse(){
+  var m = document.getElementById('acuseModal');
+  if(m) m.style.display = 'none';
+}
+var sendForm = sendContactForm;
+var sendDemo = sendContactForm;
+function submitForm(btn){ sendContactForm(); }
+function subscribePrint(btn){ sendContactForm(); }
+
+
+const obs=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('vis');obs.unobserve(en.target);}}),{threshold:.07});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+
+
+
+/* ══ FORMULARIO REAL — FORMSPREE (meelpnqr) ══ */
+function sendContactForm(){
+  var name    = document.getElementById('cf_name')    ? document.getElementById('cf_name').value.trim()    : '';
+  var email   = document.getElementById('cf_email')   ? document.getElementById('cf_email').value.trim()   : '';
+  var phone   = document.getElementById('cf_phone')   ? document.getElementById('cf_phone').value.trim()   : '';
+  var srvEl   = document.getElementById('cf_service');
+  var service = srvEl ? srvEl.value : '';
+  var msgEl   = document.getElementById('cf_message') || document.getElementById('cf_address');
+  var message = msgEl ? msgEl.value.trim() : '';
+  var errEl   = document.getElementById('cf_error');
+  var btn     = document.getElementById('cf_btn');
+  if(errEl) errEl.style.display = 'none';
+  if(!name){
+    if(errEl){ errEl.textContent='Por favor ingresa tu nombre.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){ errEl.textContent='Por favor ingresa un correo electrónico válido.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!service){
+    if(errEl){ errEl.textContent='Por favor selecciona un servicio.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!message){
+    if(errEl){ errEl.textContent='Por favor escribe tu mensaje.'; errEl.style.display='block'; }
+    return;
+  }
+  var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+  var fecha = new Date().toLocaleString('es-MX', {
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  var origTxt = btn ? btn.textContent : '';
+  if(btn){
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    btn.style.background = 'rgba(0,229,255,.1)';
+    btn.style.color = '#00e5ff';
+  }
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:name, email:email, phone:phone||'N/A',
+      service:service, message:message,
+      folio:folio, fecha:fecha, _replyto:email
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+  .then(function(res){
+    if(res.ok){
+      ['cf_name','cf_email','cf_phone','cf_message','cf_address'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      if(srvEl) srvEl.value = '';
+      var am = document.getElementById('acuseModal');
+      if(am){
+        document.getElementById('acuse_folio').textContent   = folio;
+        document.getElementById('acuse_fecha').textContent   = fecha;
+        document.getElementById('acuse_nombre').textContent  = name;
+        document.getElementById('acuse_email').textContent   = email;
+        document.getElementById('acuse_phone').textContent   = phone || '—';
+        document.getElementById('acuse_service').textContent = service;
+        document.getElementById('acuse_msg').textContent     = message;
+        am.style.display = 'flex';
+      }
+      if(btn){
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'rgba(0,255,136,.1)';
+        btn.style.color = '#00ff88';
+        btn.style.border = '1px solid #00ff88';
+        setTimeout(function(){
+          btn.textContent = origTxt;
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.border = '';
+        }, 8000);
+      }
+    } else {
+      if(errEl){ errEl.textContent='Error al enviar. Por favor intenta de nuevo.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+    }
+  })
+  .catch(function(){
+    if(errEl){ errEl.textContent='Error de conexión. Verifica tu red e intenta de nuevo.'; errEl.style.display='block'; }
+    if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+  });
+}
+function closeAcuse(){
+  var m = document.getElementById('acuseModal');
+  if(m) m.style.display = 'none';
+}
+var sendForm = sendContactForm;
+var sendDemo = sendContactForm;
+function submitForm(btn){ sendContactForm(); }
+function subscribePrint(btn){ sendContactForm(); }
+
+</script>
+</body>
+</html>

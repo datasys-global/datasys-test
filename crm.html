@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS · CRM INTEL</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c:#00e5ff; --c2:#00b8d9; --dark:#030d18; --dark2:#060f1c; --dark3:#0a1828;
+  --silver:#8eb8cc; --white:#dff0f8; --gold:#f0c040; --red:#c8282a; --green:#3d8c6e;
+  --ok:#00ff88; --warn:#f0c040; --danger:#ff4455;
+  --glow:0 0 24px rgba(0,229,255,.4); --glow2:0 0 12px rgba(0,229,255,.25);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Rajdhani',sans-serif;background:var(--dark);color:var(--white);overflow-x:hidden;min-height:100vh;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,.008) 3px,rgba(0,229,255,.008) 4px);pointer-events:none;z-index:9997;}
+#topbar{position:sticky;top:0;z-index:1000;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(3,13,24,.97);border-bottom:1px solid rgba(0,229,255,.18);backdrop-filter:blur(20px);}
+#topbar::after{content:'';position:absolute;bottom:0;left:6%;right:6%;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.4;}
+.tb-logo{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:5px;color:var(--c);text-shadow:var(--glow);}
+.tb-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:4px;color:var(--silver);opacity:.5;margin-top:2px;}
+.tb-right{display:flex;align-items:center;gap:12px;}
+.tb-badge{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;padding:4px 12px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.22);color:var(--c);display:flex;align-items:center;gap:6px;}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--ok);animation:blink 1.5s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.15;}}
+.btn-csv{padding:8px 18px;font-family:'Orbitron',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:2px;background:var(--c);color:var(--dark);border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:all .3s;}
+.btn-csv:hover{background:#00f5ff;box-shadow:var(--glow);}
+.btn-clear{padding:8px 14px;font-family:'Orbitron',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:2px;background:transparent;color:var(--danger);border:1px solid rgba(255,68,85,.3);cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:all .3s;}
+.btn-clear:hover{background:rgba(255,68,85,.1);}
+.wrap{max-width:1400px;margin:0 auto;padding:32px 24px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px;}
+.kpi{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.12);padding:20px 18px;position:relative;overflow:hidden;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:all .35s;}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.kpi:hover{border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.06);}
+.kpi-ico{font-size:1.6rem;margin-bottom:8px;opacity:.8;}
+.kpi-val{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:var(--c);text-shadow:var(--glow2);}
+.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2.5px;color:var(--silver);opacity:.5;margin-top:4px;}
+.charts-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:28px;}
+.chart-box{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:20px;}
+.chart-title{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:3px;color:var(--c);opacity:.7;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.chart-title::before{content:'//';opacity:.4;}
+.bar-list{display:flex;flex-direction:column;gap:9px;}
+.bar-item{display:flex;align-items:center;gap:9px;}
+.bar-lbl{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;color:var(--silver);width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bar-track{flex:1;height:8px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.08);position:relative;}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--c2),var(--c));transition:width .8s cubic-bezier(.2,.8,.3,1);}
+.bar-count{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--c);width:28px;text-align:right;flex-shrink:0;}
+.donut-wrap{display:flex;align-items:center;gap:20px;}
+.donut-svg{flex-shrink:0;}
+.donut-legend{display:flex;flex-direction:column;gap:8px;}
+.leg-item{display:flex;align-items:center;gap:7px;font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--silver);}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.timeline-bars{display:flex;align-items:flex-end;gap:4px;height:80px;}
+.tl-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.tl-bar{width:100%;background:linear-gradient(180deg,var(--c),var(--c2));opacity:.7;border-radius:2px 2px 0 0;transition:height .6s ease;min-height:2px;}
+.tl-lbl{font-family:'Share Tech Mono',monospace;font-size:.38rem;color:var(--silver);opacity:.4;}
+.table-section{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);margin-bottom:28px;}
+.table-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(0,229,255,.08);background:rgba(0,229,255,.03);}
+.table-title{font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;letter-spacing:3px;color:var(--c);}
+.table-search{background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);color:var(--white);font-family:'Share Tech Mono',monospace;font-size:.58rem;padding:6px 12px;outline:none;transition:border-color .3s;width:220px;}
+.table-search:focus{border-color:var(--c);}
+.table-search::placeholder{color:rgba(142,184,204,.25);}
+.tbl-wrap{overflow-x:auto;max-height:420px;overflow-y:auto;}
+.tbl-wrap::-webkit-scrollbar{width:3px;height:3px;}
+.tbl-wrap::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);}
+table{width:100%;border-collapse:collapse;font-size:.75rem;}
+thead th{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:2px;color:var(--silver);opacity:.55;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(0,229,255,.1);background:rgba(0,229,255,.02);position:sticky;top:0;z-index:2;white-space:nowrap;cursor:pointer;user-select:none;transition:color .2s;}
+thead th:hover{color:var(--c);opacity:1;}
+tbody tr{border-bottom:1px solid rgba(0,229,255,.04);transition:background .2s;}
+tbody tr:hover{background:rgba(0,229,255,.04);}
+tbody td{padding:9px 14px;font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--silver);white-space:nowrap;}
+.td-pais{color:var(--white);}
+.td-orig{color:var(--gold);}
+.td-ver-d{background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:var(--c);padding:1px 7px;font-size:.44rem;letter-spacing:1px;}
+.td-ver-m{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);padding:1px 7px;font-size:.44rem;letter-spacing:1px;}
+.td-paginas{max-width:280px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;}
+.pg-pill{display:inline-flex;align-items:center;gap:4px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.15);padding:1px 6px;margin:2px 2px 2px 0;font-size:.42rem;letter-spacing:.5px;white-space:nowrap;}
+.pg-hora{color:rgba(0,229,255,.35);font-size:.4rem;}
+.pg-nombre{color:rgba(0,229,255,.75);}
+.pg-pill-btn{border-color:rgba(240,192,64,.25);background:rgba(240,192,64,.05);display:flex;width:100%;margin:1px 0;}
+.pg-pill-btn .pg-nombre{color:rgba(240,192,64,.85);}
+#emptyState{text-align:center;padding:80px 20px;}
+.empty-ico{font-size:3rem;margin-bottom:16px;opacity:.3;}
+.empty-txt{font-family:'Orbitron',sans-serif;font-size:.8rem;letter-spacing:3px;color:var(--silver);opacity:.3;}
+.empty-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1px;color:var(--silver);opacity:.2;margin-top:10px;line-height:1.8;}
+.crm-footer{text-align:center;padding:20px;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--silver);opacity:.2;border-top:1px solid rgba(0,229,255,.05);}
+.sync-badge{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1px;padding:3px 10px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);color:#00ff88;}
+
+/* ═══════════ DIAGNÓSTICO ═══════════ */
+.btn-diag{padding:8px 14px;font-family:'Orbitron',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:2px;background:transparent;color:var(--warn);border:1px solid rgba(240,192,64,.3);cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);transition:all .3s;}
+.btn-diag:hover{background:rgba(240,192,64,.08);}
+#diagModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(3,13,24,.92);backdrop-filter:blur(12px);overflow-y:auto;}
+#diagModal.open{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:40px 20px;}
+.diag-panel{width:100%;max-width:960px;background:rgba(6,15,28,.98);border:1px solid rgba(240,192,64,.25);box-shadow:0 0 60px rgba(240,192,64,.1);}
+.diag-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid rgba(240,192,64,.15);background:rgba(240,192,64,.04);}
+.diag-title{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:900;letter-spacing:4px;color:var(--warn);}
+.diag-close{background:none;border:none;color:var(--silver);font-size:1.2rem;cursor:pointer;padding:4px 10px;transition:color .2s;}
+.diag-close:hover{color:var(--warn);}
+.diag-body{padding:24px;}
+.diag-section{margin-bottom:28px;}
+.diag-section-title{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:3px;color:var(--warn);opacity:.6;margin-bottom:14px;padding-bottom:6px;border-bottom:1px solid rgba(240,192,64,.1);}
+.diag-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;}
+.diag-card{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);padding:12px 14px;}
+.diag-card.warn{border-color:rgba(240,192,64,.25);background:rgba(240,192,64,.03);}
+.diag-card.danger{border-color:rgba(255,68,85,.3);background:rgba(255,68,85,.04);}
+.diag-card.ok{border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.03);}
+.diag-card-lbl{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;color:var(--silver);opacity:.5;margin-bottom:5px;}
+.diag-card-val{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:var(--c);}
+.diag-card.warn .diag-card-val{color:var(--warn);}
+.diag-card.danger .diag-card-val{color:var(--danger);}
+.diag-card.ok .diag-card-val{color:var(--ok);}
+.diag-issues{display:flex;flex-direction:column;gap:8px;}
+.diag-issue{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border:1px solid;font-family:'Share Tech Mono',monospace;font-size:.5rem;line-height:1.6;}
+.diag-issue.issue-ok{border-color:rgba(0,255,136,.2);color:var(--ok);background:rgba(0,255,136,.03);}
+.diag-issue.issue-warn{border-color:rgba(240,192,64,.25);color:var(--warn);background:rgba(240,192,64,.03);}
+.diag-issue.issue-danger{border-color:rgba(255,68,85,.3);color:var(--danger);background:rgba(255,68,85,.04);}
+.diag-issue-ico{font-size:.8rem;flex-shrink:0;margin-top:1px;}
+.diag-visitor-list{max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;}
+.diag-visitor-list::-webkit-scrollbar{width:3px;}
+.diag-visitor-list::-webkit-scrollbar-thumb{background:rgba(240,192,64,.2);}
+.diag-vrow{background:rgba(0,229,255,.02);border:1px solid rgba(0,229,255,.08);padding:10px 14px;}
+.diag-vrow-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+.diag-vtag{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1px;padding:2px 8px;border:1px solid rgba(0,229,255,.2);color:var(--c);}
+.diag-vtag.warn{border-color:rgba(240,192,64,.3);color:var(--warn);}
+.diag-vtag.danger{border-color:rgba(255,68,85,.3);color:var(--danger);}
+.diag-vtag.ok{border-color:rgba(0,255,136,.2);color:var(--ok);}
+.diag-clicks-raw{font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--silver);line-height:1.8;opacity:.7;}
+.diag-clicks-raw span{display:inline-block;background:rgba(240,192,64,.06);border:1px solid rgba(240,192,64,.15);padding:1px 6px;margin:2px;color:var(--warn);}
+.diag-progress{height:4px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.08);margin-top:8px;border-radius:2px;}
+.diag-progress-fill{height:100%;background:linear-gradient(90deg,var(--c2),var(--c));border-radius:2px;transition:width .6s ease;}
+.diag-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid rgba(240,192,64,.12);}
+.diag-tab{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;padding:8px 16px;cursor:pointer;color:var(--silver);opacity:.5;border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none;}
+.diag-tab.active{color:var(--warn);opacity:1;border-bottom-color:var(--warn);}
+.diag-tab-content{display:none;}
+.diag-tab-content.active{display:block;}
+.diag-log{font-family:'Share Tech Mono',monospace;font-size:.46rem;line-height:1.9;color:var(--silver);max-height:260px;overflow-y:auto;padding:12px 14px;background:rgba(0,0,0,.3);border:1px solid rgba(0,229,255,.07);}
+.diag-log::-webkit-scrollbar{width:3px;}
+.diag-log::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);}
+.diag-log-entry{display:flex;gap:10px;}
+.diag-log-ts{color:rgba(0,229,255,.3);flex-shrink:0;}
+.diag-log-ok{color:var(--ok);}
+.diag-log-warn{color:var(--warn);}
+.diag-log-err{color:var(--danger);}
+.diag-btn-run{padding:7px 16px;font-family:'Orbitron',sans-serif;font-size:.48rem;font-weight:700;letter-spacing:2px;background:rgba(240,192,64,.08);color:var(--warn);border:1px solid rgba(240,192,64,.3);cursor:pointer;transition:all .3s;margin-left:auto;display:block;}
+.diag-btn-run:hover{background:rgba(240,192,64,.15);}
+.diag-stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(0,229,255,.05);font-family:'Share Tech Mono',monospace;font-size:.5rem;}
+.diag-stat-row:last-child{border-bottom:none;}
+.diag-stat-lbl{color:var(--silver);opacity:.6;}
+.diag-stat-val{color:var(--c);}
+.diag-stat-val.warn{color:var(--warn);}
+.diag-stat-val.danger{color:var(--danger);}
+.diag-stat-val.ok{color:var(--ok);}
+.fade-in{animation:fadeIn .5s ease both;}
+@keyframes fadeIn{0%{opacity:0;transform:translateY(10px);}100%{opacity:1;transform:none;}}
+.delay-1{animation-delay:.1s;}.delay-2{animation-delay:.2s;}.delay-3{animation-delay:.3s;}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(4,1fr);}.charts-row{grid-template-columns:1fr 1fr;}}
+@media(max-width:700px){.kpi-grid{grid-template-columns:repeat(2,1fr);}.charts-row{grid-template-columns:1fr;}.tb-sub,.tb-badge{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div>
+    <div class="tb-logo">DATASYS · CRM INTEL</div>
+    <div class="tb-sub">// VISITOR DATABASE  ·  REAL-TIME  ·  CROSS-DEVICE</div>
+  </div>
+  <div class="tb-right">
+    <span class="sync-badge">☁ CLOUD SYNC</span>
+    <div class="tb-badge">
+      <span class="tb-dot"></span>
+      <span id="liveCount">CARGANDO...</span>
+    </div>
+    <button class="btn-diag" onclick="openDiag()">🔬 DIAGNÓSTICO</button>
+    <button class="btn-csv" onclick="exportarCSV()">⬇ EXPORTAR CSV</button>
+    <button class="btn-clear" onclick="clearData()">⚠ BORRAR</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="kpi-grid fade-in">
+    <div class="kpi"><div class="kpi-ico">👥</div><div class="kpi-val" id="kpiTotal">–</div><div class="kpi-lbl">VISITANTES ÚNICOS</div></div>
+    <div class="kpi"><div class="kpi-ico">🌎</div><div class="kpi-val" id="kpiPaises">–</div><div class="kpi-lbl">PAÍSES DISTINTOS</div></div>
+    <div class="kpi"><div class="kpi-ico">📱</div><div class="kpi-val" id="kpiMobile">–</div><div class="kpi-lbl">TRÁFICO MÓVIL</div></div>
+    <div class="kpi"><div class="kpi-ico">🔍</div><div class="kpi-val" id="kpiOrigen">–</div><div class="kpi-lbl">ORIGEN PRINCIPAL</div></div>
+    <div class="kpi"><div class="kpi-ico">⏱</div><div class="kpi-val" id="kpiHoy">–</div><div class="kpi-lbl">VISITAS HOY</div></div>
+    <div class="kpi"><div class="kpi-ico">📋</div><div class="kpi-val" id="kpiForms">–</div><div class="kpi-lbl">FORMS ENVIADOS</div></div>
+    <div class="kpi"><div class="kpi-ico">📜</div><div class="kpi-val" id="kpiScroll">–</div><div class="kpi-lbl">SCROLL PROM.</div></div>
+    <div class="kpi"><div class="kpi-ico">⏱</div><div class="kpi-val" id="kpiDur">–</div><div class="kpi-lbl">DURACIÓN PROM.</div></div>
+  </div>
+
+  <div class="charts-row fade-in delay-1">
+    <div class="chart-box"><div class="chart-title">TOP PAÍSES</div><div class="bar-list" id="chartPaises"></div></div>
+    <div class="chart-box"><div class="chart-title">DISPOSITIVOS</div><div class="donut-wrap" id="chartDonut"></div></div>
+    <div class="chart-box"><div class="chart-title">ORÍGENES</div><div class="bar-list" id="chartOrigenes"></div></div>
+  </div>
+
+  <div class="charts-row fade-in delay-2" style="grid-template-columns:1fr 1fr;">
+    <div class="chart-box"><div class="chart-title">IDIOMAS</div><div class="bar-list" id="chartIdiomas"></div></div>
+    <div class="chart-box"><div class="chart-title">VISITAS POR HORA (HOY)</div><div class="timeline-bars" id="chartTimeline"></div></div>
+  </div>
+
+  <div class="table-section fade-in delay-3">
+    <div class="table-header">
+      <div class="table-title">// REGISTRO COMPLETO DE VISITANTES</div>
+      <input type="text" class="table-search" id="searchInput" placeholder="Buscar país, origen, dispositivo…" oninput="filterTable()">
+    </div>
+    <div id="emptyState" style="display:none;">
+      <div class="empty-ico">📡</div>
+      <div class="empty-txt">SIN DATOS AÚN</div>
+      <div class="empty-sub">Abre el sitio desde cualquier dispositivo.<br>Los datos aparecerán aquí automáticamente.</div>
+    </div>
+    <div class="tbl-wrap" id="tableWrap">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th onclick="sortBy('fecha')">FECHA/HORA</th>
+            <th onclick="sortBy('dispositivo')">DISPOSITIVO</th>
+            <th onclick="sortBy('resolucion')">RESOLUCIÓN</th>
+            <th onclick="sortBy('idioma')">IDIOMA</th>
+            <th onclick="sortBy('pais')">PAÍS</th>
+            <th onclick="sortBy('ciudad')">CIUDAD</th>
+            <th onclick="sortBy('origen')">ORIGEN</th>
+            <th onclick="sortBy('version')">VERSIÓN</th>
+            <th onclick="sortBy('scrollDepth')">SCROLL</th>
+            <th onclick="sortBy('duracion')">DURACIÓN</th>
+            <th onclick="sortBy('formEnviado')">FORM</th>
+            <th>PÁGINAS VISITADAS</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="crm-footer">DATASYS CRM INTEL  ·  SINCRONIZACIÓN CLOUD JSONBin.io  ·  CROSS-DEVICE</div>
+
+<!-- ═══════════════════ MODAL DIAGNÓSTICO ═══════════════════ -->
+<div id="diagModal">
+  <div class="diag-panel">
+    <div class="diag-header">
+      <div class="diag-title">// DIAGNÓSTICO DE INTEGRIDAD · TRACKER</div>
+      <button class="diag-close" onclick="closeDiag()">✕ CERRAR</button>
+    </div>
+    <div class="diag-body">
+
+      <!-- TABS -->
+      <div class="diag-tabs">
+        <button class="diag-tab active" onclick="switchTab('resumen')">RESUMEN</button>
+        <button class="diag-tab" onclick="switchTab('clicks')">CLICS POR VISITA</button>
+        <button class="diag-tab" onclick="switchTab('integridad')">INTEGRIDAD DATOS</button>
+        <button class="diag-tab" onclick="switchTab('log')">LOG EN VIVO</button>
+      </div>
+
+      <!-- TAB: RESUMEN -->
+      <div class="diag-tab-content active" id="tab-resumen">
+        <div class="diag-section">
+          <div class="diag-section-title">// MÉTRICAS GLOBALES DE RASTREO</div>
+          <div class="diag-grid" id="diagMetricGrid"></div>
+        </div>
+        <div class="diag-section">
+          <div class="diag-section-title">// PROBLEMAS DETECTADOS</div>
+          <div class="diag-issues" id="diagIssues"></div>
+        </div>
+        <div class="diag-section">
+          <div class="diag-section-title">// COBERTURA DE CLICS (% visitas con al menos 1 clic registrado)</div>
+          <div id="diagCovBar"></div>
+        </div>
+      </div>
+
+      <!-- TAB: CLICS POR VISITA -->
+      <div class="diag-tab-content" id="tab-clicks">
+        <div class="diag-section">
+          <div class="diag-section-title">// DESGLOSE DE EVENTOS POR VISITANTE <span style="opacity:.4;font-size:.42rem">(🖱 = click registrado · sin icono = página/sección)</span></div>
+          <div class="diag-visitor-list" id="diagVisitorList"></div>
+        </div>
+      </div>
+
+      <!-- TAB: INTEGRIDAD -->
+      <div class="diag-tab-content" id="tab-integridad">
+        <div class="diag-section">
+          <div class="diag-section-title">// ANÁLISIS DE CAMPOS INCOMPLETOS</div>
+          <div id="diagFieldInteg"></div>
+        </div>
+        <div class="diag-section">
+          <div class="diag-section-title">// DISTRIBUCIÓN DE EVENTOS POR SESIÓN</div>
+          <div id="diagEventDist"></div>
+        </div>
+        <div class="diag-section">
+          <div class="diag-section-title">// POSIBLES DUPLICADOS DE SESIÓN</div>
+          <div id="diagDupes"></div>
+        </div>
+      </div>
+
+      <!-- TAB: LOG EN VIVO -->
+      <div class="diag-tab-content" id="tab-log">
+        <div class="diag-section">
+          <div class="diag-section-title">// REGISTRO DE ACTIVIDAD DEL DIAGNÓSTICO</div>
+          <button class="diag-btn-run" onclick="runLiveCheck()">▶ EJECUTAR VERIFICACIÓN</button>
+          <div style="margin-top:12px;"><div class="diag-log" id="diagLog"><div class="diag-log-entry"><span class="diag-log-ts">--:--:--</span><span style="opacity:.3">Esperando ejecución...</span></div></div></div>
+        </div>
+        <div class="diag-section" style="margin-top:20px;">
+          <div class="diag-section-title">// ESTADO JSONBin · CONECTIVIDAD</div>
+          <div id="diagConnStatus"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════
+   DATASYS CRM — Dashboard Logic v3
+   Cloud sync via JSONBin.io
+════════════════════════════════════════ */
+var JSONBIN_ID  = '69a7aeaeae596e708f5d2b54';
+var JSONBIN_KEY = '$2a$10$ltBKJ6GmJ0krgbTs/OldMeTFmk.HNe856CGMTXwjHfTjelIjxaa.2';
+var JSONBIN_URL = 'https://api.jsonbin.io/v3/b/' + JSONBIN_ID;
+
+var STORAGE_KEY = 'datasys_visitors';
+var allData = [];
+var sortCol = 'fecha';
+var sortDir = -1;
+var searchTerm = '';
+
+/* ── Cloud helpers ── */
+function cloudGet(cb) {
+  fetch(JSONBIN_URL + '/latest', {
+    headers: { 'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false' }
+  })
+  .then(function(r) { return r.json(); })
+  .then(function(d) {
+    var data = Array.isArray(d.record) ? d.record : (Array.isArray(d) ? d : []);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch(e) {}
+    cb(data);
+  })
+  .catch(function() {
+    try { cb(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); } catch(e) { cb([]); }
+  });
+}
+
+function cloudPut(visitors, cb) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(visitors)); } catch(e) {}
+  fetch(JSONBIN_URL, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+    body: JSON.stringify(visitors)
+  })
+  .then(function() { if (cb) cb(); })
+  .catch(function() { if (cb) cb(); });
+}
+
+/* ── Limpiar páginas basura ── */
+var BLACKLIST = /sysHUD|hudBody|hudDevice|hudRes|hudLang|hudGeo|hudTime|hudRef|hudVersion|diagPanel|diagBar|hPart|ariaPanel|chatMsgs|emailModal|acuseModal|emTo|emSubject|emBodyTxt|navbar|cf_|acuse_/;
+
+function limpiarPaginas(paginas) {
+  if (!paginas) return '';
+  return paginas.split(' | ').filter(function(p) {
+    if (!p.trim()) return false;
+    if (BLACKLIST.test(p)) return false;
+    var nombre = p.replace(/^\d{1,2}:\d{2}.*?[>·]\s*/, '').trim();
+    if (/^[a-z][a-zA-Z0-9]{2,}$/.test(nombre)) return false;
+    return nombre.length > 0;
+  }).join(' | ');
+}
+
+/* ── Cargar datos desde cloud ── */
+function loadData() {
+  document.getElementById('liveCount').textContent = 'SINCRONIZANDO...';
+  cloudGet(function(data) {
+    allData = data.map(function(v) {
+      return Object.assign({}, v, { paginas: limpiarPaginas(v.paginas || '') });
+    });
+    allData.sort(function(a, b) { return (b.fecha || '').localeCompare(a.fecha || ''); });
+    document.getElementById('liveCount').textContent = allData.length + ' REGISTROS';
+    render();
+  });
+}
+
+function render() { renderKPIs(); renderCharts(); renderTable(); }
+
+/* ── KPIs ── */
+function renderKPIs() {
+  var total = allData.length;
+  document.getElementById('kpiTotal').textContent = total;
+  var paises = {};
+  allData.forEach(function(v) { if (v.pais && v.pais !== 'Obteniendo...') paises[v.pais] = true; });
+  document.getElementById('kpiPaises').textContent = Object.keys(paises).length;
+
+  var mobile = allData.filter(function(v) { return (v.version||'').toLowerCase() === 'mobile'; }).length;
+  document.getElementById('kpiMobile').textContent = total > 0 ? Math.round(mobile/total*100)+'%' : '0%';
+
+  var origCount = {};
+  allData.forEach(function(v) { var o = v.origen||'Directo'; origCount[o] = (origCount[o]||0)+1; });
+  var topOrig = Object.entries(origCount).sort(function(a,b){return b[1]-a[1];})[0];
+  document.getElementById('kpiOrigen').textContent = topOrig ? topOrig[0].slice(0,10) : '—';
+
+  var todayStr = new Date().toISOString().slice(0,10);
+  var hoy = allData.filter(function(v) {
+    try { return new Date(v.sessionStart||0).toISOString().slice(0,10) === todayStr; } catch(e) { return false; }
+  }).length;
+  document.getElementById('kpiHoy').textContent = hoy || total;
+
+  // Formularios enviados
+  var forms = allData.filter(function(v){ return v.formEnviado === true || v.formEnviado === 'true'; }).length;
+  document.getElementById('kpiForms').textContent = forms;
+
+  // Scroll depth promedio
+  var scrollVals = allData.map(function(v){ return parseInt(v.scrollDepth)||0; }).filter(function(x){return x>0;});
+  var avgScroll = scrollVals.length ? Math.round(scrollVals.reduce(function(a,b){return a+b;},0)/scrollVals.length) : 0;
+  document.getElementById('kpiScroll').textContent = avgScroll ? avgScroll+'%' : '—';
+
+  // Duración promedio en segundos
+  var durVals = allData.map(function(v){
+    var d = parseInt((v.duracion||'0').replace('s',''));
+    return isNaN(d)?0:d;
+  }).filter(function(x){return x>0;});
+  var avgDur = durVals.length ? Math.round(durVals.reduce(function(a,b){return a+b;},0)/durVals.length) : 0;
+  var durLabel = avgDur >= 60 ? Math.floor(avgDur/60)+'m '+( avgDur%60)+'s' : avgDur+'s';
+  document.getElementById('kpiDur').textContent = avgDur ? durLabel : '—';
+}
+
+/* ── Charts ── */
+function countBy(arr, key, splitChar) {
+  var counts = {};
+  arr.forEach(function(v) {
+    var val = v[key] || 'Desconocido';
+    if (splitChar) val = val.split(splitChar)[0].trim();
+    counts[val] = (counts[val]||0)+1;
+  });
+  return Object.entries(counts).sort(function(a,b){return b[1]-a[1];});
+}
+
+function barItem(lbl, cnt, max, color) {
+  color = color || '#00e5ff';
+  var pct = Math.max(4, Math.round(cnt/max*100));
+  return '<div class="bar-item"><div class="bar-lbl" title="'+lbl+'">'+lbl+'</div><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,'+color+'88,'+color+')"></div></div><div class="bar-count">'+cnt+'</div></div>';
+}
+
+function noData() { return '<div style="opacity:.3;font-size:.6rem;font-family:\'Share Tech Mono\',monospace">Sin datos aún</div>'; }
+
+function renderCharts() {
+  var paises = countBy(allData,'pais').slice(0,7);
+  document.getElementById('chartPaises').innerHTML = paises.length ? paises.map(function(x){return barItem(x[0],x[1],paises[0][1]);}).join('') : noData();
+
+  var origs = countBy(allData,'origen').slice(0,7);
+  document.getElementById('chartOrigenes').innerHTML = origs.length ? origs.map(function(x){return barItem(x[0],x[1],origs[0][1],'#f0c040');}).join('') : noData();
+
+  var idiomas = countBy(allData,'idioma').slice(0,6);
+  document.getElementById('chartIdiomas').innerHTML = idiomas.length ? idiomas.map(function(x){return barItem(x[0],x[1],idiomas[0][1],'#3d8c6e');}).join('') : noData();
+
+  renderDonut('chartDonut', countBy(allData,'dispositivo','/').slice(0,5), ['#00e5ff','#f0c040','#3d8c6e','#c8282a','#8eb8cc']);
+  renderTimeline();
+}
+
+function renderDonut(id, items, colors) {
+  if (!items.length) { document.getElementById(id).innerHTML = noData(); return; }
+  var total = items.reduce(function(s,x){return s+x[1];},0)||1;
+  var r=54,cx=65,cy=65,stroke=18;
+  var circ = 2*Math.PI*r;
+  var offset=0, paths='';
+  items.forEach(function(x,i){
+    var len=circ*(x[1]/total);
+    paths+='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="none" stroke="'+colors[i%colors.length]+'" stroke-width="'+stroke+'" stroke-dasharray="'+len+' '+(circ-len)+'" stroke-dashoffset="'+(-offset+circ*0.25)+'" opacity=".85"/>';
+    offset+=len;
+  });
+  var legend=items.map(function(x,i){return '<div class="leg-item"><div class="leg-dot" style="background:'+colors[i%colors.length]+'"></div><span>'+x[0].slice(0,18)+' ('+x[1]+')</span></div>';}).join('');
+  document.getElementById(id).innerHTML='<svg class="donut-svg" width="130" height="130" viewBox="0 0 130 130"><circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="rgba(0,229,255,.04)" stroke="rgba(0,229,255,.08)" stroke-width="'+stroke+'"/>' +paths+'<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" fill="#dff0f8" font-family="Orbitron,sans-serif" font-size="14" font-weight="900">'+total+'</text></svg><div class="donut-legend">'+legend+'</div>';
+}
+
+function renderTimeline() {
+  var hours = Array(24).fill(0);
+  var todayStr = new Date().toISOString().slice(0,10);
+  allData.forEach(function(v){
+    try { var d=new Date(v.sessionStart||0); if(d.toISOString().slice(0,10)===todayStr) hours[d.getHours()]++; } catch(e){}
+  });
+  var maxH = Math.max.apply(null,hours.concat([1]));
+  var cols = '';
+  for(var h=0;h<24;h+=2){
+    var cnt=hours[h]+hours[h+1];
+    var height=Math.max(3,Math.round(cnt/maxH*72));
+    cols+='<div class="tl-col"><div class="tl-bar" style="height:'+height+'px;" title="'+cnt+' visitas"></div><div class="tl-lbl">'+String(h).padStart(2,'0')+'h</div></div>';
+  }
+  document.getElementById('chartTimeline').innerHTML = cols;
+}
+
+/* ── Tabla ── */
+function renderTable() {
+  if (allData.length === 0) {
+    document.getElementById('emptyState').style.display = 'block';
+    document.getElementById('tableWrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('emptyState').style.display = 'none';
+  document.getElementById('tableWrap').style.display = 'block';
+
+  var filtered = getFiltered();
+  filtered.sort(function(a,b){
+    var av=a[sortCol]||'', bv=b[sortCol]||'';
+    return sortDir*av.toString().localeCompare(bv.toString());
+  });
+
+  document.getElementById('tableBody').innerHTML = filtered.map(function(v){
+    var dev=(v.dispositivo||'').split('/')[0].trim();
+    var verCls=(v.version||'').toLowerCase()==='mobile'?'td-ver-m':'td-ver-d';
+    var formCell = (v.formEnviado===true||v.formEnviado==='true')
+      ? '<span style="color:#00ff88;font-size:.5rem;letter-spacing:1px">✓ '+(v.formServicio||'').slice(0,12)+'</span>'
+      : '<span style="opacity:.2">—</span>';
+    var scrollCell = v.scrollDepth ? esc(v.scrollDepth) : '—';
+    var ciudadCell = v.ciudad ? esc(v.ciudad) : '—';
+    return '<tr><td>'+esc(v.fecha||'—')+'</td><td>'+esc(dev)+'</td><td>'+esc(v.resolucion||'—')+'</td><td>'+esc(v.idioma||'—')+'</td><td class="td-pais">'+esc(v.pais||'—')+'</td><td>'+ciudadCell+'</td><td class="td-orig">'+esc(v.origen||'—')+'</td><td><span class="'+verCls+'">'+esc(v.version||'—')+'</span></td><td>'+scrollCell+'</td><td>'+esc(v.duracion||'0s')+'</td><td>'+formCell+'</td><td class="td-paginas">'+renderPaginas(v.paginas)+'</td></tr>';
+  }).join('');
+}
+
+function renderPaginas(paginas) {
+  if (!paginas) return '<span style="opacity:.3">—</span>';
+  var partes = paginas.split(' | ').filter(Boolean);
+  if (!partes.length) return '<span style="opacity:.3">—</span>';
+  return partes.map(function(p){
+    var m=p.match(/^(\d{2}:\d{2})\s*[>·]\s*(.+)$/);
+    var hora=m?m[1]:'', nombre=m?m[2]:p;
+    var isBtn=nombre.startsWith('🖱');
+    return '<span class="pg-pill'+(isBtn?' pg-pill-btn':'')+'" title="'+esc(p)+'">'+(hora?'<span class="pg-hora">'+esc(hora)+'</span>':'')+'<span class="pg-nombre">'+esc(nombre)+'</span></span>';
+  }).join('');
+}
+
+function esc(str) { return String(str).replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function getFiltered() {
+  if (!searchTerm) return allData;
+  var q = searchTerm.toLowerCase();
+  return allData.filter(function(v){ return Object.values(v).some(function(val){return String(val).toLowerCase().includes(q);}); });
+}
+function filterTable() { searchTerm=document.getElementById('searchInput').value; renderTable(); }
+function sortBy(col) { if(sortCol===col) sortDir*=-1; else{sortCol=col;sortDir=-1;} renderTable(); }
+
+/* ── Exportar CSV ── */
+function exportarCSV() {
+  if (!allData.length) { alert('Sin datos para exportar.'); return; }
+  var headers = ['ID Sesión','Fecha/Hora','Dispositivo','Resolución','Idioma','País','Ciudad','IP','Hora Local','Origen','Versión','Scroll Depth','Duración','Eventos','Form Enviado','Form Servicio','Páginas'];
+  var rows = allData.map(function(v){
+    return [v.id,v.fecha,v.dispositivo,v.resolucion,v.idioma,v.pais,v.ciudad||'',v.ip||'N/A',v.horaLocal,v.origen,v.version,v.scrollDepth||'0%',v.duracion||'0s',v.eventos||0,v.formEnviado||false,v.formServicio||'',v.paginas]
+      .map(function(c){return '"'+String(c||'').replace(/"/g,'""')+'"';}).join(',');
+  });
+  var csv='\uFEFF'+headers.join(',')+'\n'+rows.join('\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url;
+  a.download='datasys_visitors_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* ── Borrar datos ── */
+function clearData() {
+  if (!confirm('¿Borrar TODOS los registros? Esta acción no se puede deshacer.')) return;
+  // Limpiar localStorage primero (evita que el fallback restaure datos)
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('datasys_session');
+  } catch(e) {}
+  cloudPut([], function() {
+    // Limpiar de nuevo tras el PUT (tracker.js puede haberlo reescrito)
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    allData = [];
+    render();
+    document.getElementById('liveCount').textContent = '0 REGISTROS';
+  });
+}
+
+/* ── Auto-refresh cada 10 seg ── */
+setInterval(loadData, 10000);
+
+/* ── INIT ── */
+loadData();
+
+/* ════════════════════════════════════════════
+   MÓDULO DIAGNÓSTICO DE INTEGRIDAD v1
+   Detecta clics perdidos, sesiones huérfanas,
+   race conditions y problemas de flush
+════════════════════════════════════════════ */
+
+var diagLog = [];
+
+function diagTS() {
+  return new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function addLog(msg, type) {
+  type = type || 'info';
+  diagLog.push({ts: diagTS(), msg: msg, type: type});
+  var el = document.getElementById('diagLog');
+  if (!el) return;
+  var cls = type === 'ok' ? 'diag-log-ok' : type === 'warn' ? 'diag-log-warn' : type === 'err' ? 'diag-log-err' : '';
+  el.innerHTML += '<div class="diag-log-entry"><span class="diag-log-ts">' + diagTS() + '</span><span class="' + cls + '">' + msg + '</span></div>';
+  el.scrollTop = el.scrollHeight;
+}
+
+function openDiag() {
+  document.getElementById('diagModal').classList.add('open');
+  runDiagnostic();
+}
+function closeDiag() {
+  document.getElementById('diagModal').classList.remove('open');
+}
+function switchTab(name) {
+  document.querySelectorAll('.diag-tab').forEach(function(t,i){
+    var tabs = ['resumen','clicks','integridad','log'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.diag-tab-content').forEach(function(c){
+    c.classList.toggle('active', c.id === 'tab-' + name);
+  });
+}
+
+/* ── Parsear clics/páginas de un visitante ── */
+function parseEntradas(paginas) {
+  if (!paginas) return { clicks: [], pages: [], all: [] };
+  var all = paginas.split(' | ').filter(Boolean);
+  var clicks = all.filter(function(p){ return p.indexOf('🖱') !== -1; });
+  var pages  = all.filter(function(p){ return p.indexOf('🖱') === -1; });
+  return { clicks: clicks, pages: pages, all: all };
+}
+
+/* ── Diagnóstico principal ── */
+function runDiagnostic() {
+  if (!allData.length) {
+    document.getElementById('diagIssues').innerHTML = '<div class="diag-issue issue-warn"><span class="diag-issue-ico">⚠</span><span>No hay datos cargados. Espera a que sincronice el CRM.</span></div>';
+    return;
+  }
+
+  /* ─ Métricas globales ─ */
+  var totalVisits = allData.length;
+  var withClicks  = allData.filter(function(v){ return parseEntradas(v.paginas).clicks.length > 0; }).length;
+  var withPages   = allData.filter(function(v){ return parseEntradas(v.paginas).pages.length  > 0; }).length;
+  var noData0     = allData.filter(function(v){ return !v.paginas || v.paginas.trim() === ''; }).length;
+  var totalClicks = allData.reduce(function(s,v){ return s + parseEntradas(v.paginas).clicks.length; }, 0);
+  var totalPages  = allData.reduce(function(s,v){ return s + parseEntradas(v.paginas).pages.length;  }, 0);
+  var coverPct    = totalVisits > 0 ? Math.round(withClicks / totalVisits * 100) : 0;
+  var avgClicks   = withClicks > 0  ? (totalClicks / totalVisits).toFixed(1) : 0;
+
+  /* Sesiones con eventos > 0 pero paginas vacías (flush perdido) */
+  var flushLost = allData.filter(function(v){ return (v.eventos > 0) && (!v.paginas || v.paginas.trim() === ''); }).length;
+
+  /* Sesiones con clicks en eventos pero 0 registros 🖱 */
+  var eventMismatch = allData.filter(function(v){
+    var ev = parseInt(v.eventos) || 0;
+    var cl = parseEntradas(v.paginas).clicks.length;
+    return ev > 2 && cl === 0;
+  }).length;
+
+  /* ─ Grid de métricas ─ */
+  function metCard(lbl, val, cls) {
+    return '<div class="diag-card '+(cls||'')+'"><div class="diag-card-lbl">'+lbl+'</div><div class="diag-card-val">'+val+'</div></div>';
+  }
+  document.getElementById('diagMetricGrid').innerHTML =
+    metCard('TOTAL VISITAS', totalVisits) +
+    metCard('CON CLICS', withClicks, withClicks < totalVisits * 0.3 ? 'warn' : 'ok') +
+    metCard('SIN NINGÚN DATO', noData0, noData0 > 0 ? 'danger' : 'ok') +
+    metCard('TOTAL CLICS REG.', totalClicks) +
+    metCard('PROM. CLICS/VISITA', avgClicks, parseFloat(avgClicks) < 1 ? 'warn' : 'ok') +
+    metCard('FLUSH PERDIDOS', flushLost, flushLost > 0 ? 'danger' : 'ok') +
+    metCard('EVENTOS SIN CLICS', eventMismatch, eventMismatch > 0 ? 'warn' : 'ok') +
+    metCard('PÁGINAS TOTALES', totalPages) +
+    metCard('COBERTURA CLICS', coverPct + '%', coverPct < 30 ? 'danger' : coverPct < 60 ? 'warn' : 'ok');
+
+  /* ─ Barra de cobertura ─ */
+  document.getElementById('diagCovBar').innerHTML =
+    '<div style="display:flex;align-items:center;gap:12px;font-family:\'Share Tech Mono\',monospace;font-size:.5rem;color:var(--silver);">' +
+    '<span style="color:var(--c);font-family:\'Orbitron\',sans-serif;font-size:1.4rem;font-weight:900;">' + coverPct + '%</span>' +
+    '<div style="flex:1;"><div style="margin-bottom:4px;opacity:.5">'+withClicks+' de '+totalVisits+' visitas tienen al menos 1 clic registrado</div>' +
+    '<div class="diag-progress"><div class="diag-progress-fill" style="width:'+coverPct+'%;background:'+
+    (coverPct < 30 ? 'var(--danger)' : coverPct < 60 ? 'var(--warn)' : 'var(--ok)')+'"></div></div>' +
+    '</div></div>';
+
+  /* ─ Problemas detectados ─ */
+  var issues = [];
+
+  if (noData0 > 0) issues.push({
+    type: 'danger',
+    ico: '🔴',
+    msg: noData0 + ' sesión(es) NO tienen datos de páginas ni clics. ' +
+         'Causa probable: el usuario cerró la pestaña antes del flush (2s timeout) o hubo un error de red al guardar en JSONBin.'
+  });
+
+  if (flushLost > 0) issues.push({
+    type: 'danger',
+    ico: '🔴',
+    msg: flushLost + ' sesión(es) reportan eventos > 0 pero paginas está vacío. ' +
+         'Indica race condition en doFlush(): el cloudGet devolvió un snapshot antiguo y sobreescribió los clics ya guardados. ' +
+         'Solución: usar localStorage como buffer secundario inmediato antes del PUT.'
+  });
+
+  if (eventMismatch > 0) issues.push({
+    type: 'warn',
+    ico: '🟡',
+    msg: eventMismatch + ' sesión(es) tienen campo eventos > 2 pero CERO clics 🖱 en paginas. ' +
+         'El contador se incrementa pero el trackPage con "🖱" fue filtrado por la blacklist o por el regex de IDs técnicos. ' +
+         'Revisa si los botones tienen text corto (< 2 chars) o IDs en ID_BLACKLIST.'
+  });
+
+  if (coverPct < 30) issues.push({
+    type: 'danger',
+    ico: '🔴',
+    msg: 'Cobertura de clics muy baja ('+coverPct+'%). Menos de 1 de cada 3 visitas registra algún clic. ' +
+         'Posibles causas: (1) botones sin tag A/BUTTON ni role=button, (2) la función esElementoInteractivo no llega al elemento correcto, ' +
+         '(3) clics en iframes o elementos con pointer-events:none.'
+  });
+  else if (coverPct < 60) issues.push({
+    type: 'warn',
+    ico: '🟡',
+    msg: 'Cobertura de clics media ('+coverPct+'%). Algunos botones pueden no estar siendo detectados. ' +
+         'Verifica que los elementos tengan atributo onclick, href real, o estén en la lista CLASES_MOBILE del tracker.'
+  });
+
+  if (parseFloat(avgClicks) < 1 && totalVisits > 5) issues.push({
+    type: 'warn',
+    ico: '🟡',
+    msg: 'Promedio de clics por visita muy bajo ('+avgClicks+'). ' +
+         'El tracker puede estar perdiéndose clics en elementos con propagación detenida (stopPropagation) ' +
+         'o en botones que navegan antes de que se ejecute flushImmediate().'
+  });
+
+  /* Verificar si hay sesiones con scroll pero sin clics (indica que el tracker carga pero no captura) */
+  var scrollNoClick = allData.filter(function(v){
+    return (parseInt(v.scrollDepth) > 20) && parseEntradas(v.paginas).clicks.length === 0;
+  }).length;
+  if (scrollNoClick > 2) issues.push({
+    type: 'warn',
+    ico: '🟡',
+    msg: scrollNoClick + ' visita(s) registran scroll > 20% pero ningún clic. ' +
+         'El usuario navegó la página activamente sin que se capturara ningún click. ' +
+         'Confirmar que tracker.js se carga ANTES del cierre de </body> en index.html e index_mobile.html.'
+  });
+
+  if (issues.length === 0) issues.push({
+    type: 'ok',
+    ico: '🟢',
+    msg: 'No se detectaron problemas críticos de integridad. El tracker está funcionando correctamente.'
+  });
+
+  document.getElementById('diagIssues').innerHTML = issues.map(function(issue){
+    return '<div class="diag-issue issue-'+issue.type+'"><span class="diag-issue-ico">'+issue.ico+'</span><span>'+issue.msg+'</span></div>';
+  }).join('');
+
+  /* ─ Tab clics por visita ─ */
+  var sorted = allData.slice().sort(function(a,b){
+    return parseEntradas(b.paginas).clicks.length - parseEntradas(a.paginas).clicks.length;
+  });
+  document.getElementById('diagVisitorList').innerHTML = sorted.map(function(v){
+    var e = parseEntradas(v.paginas);
+    var hasCli = e.clicks.length > 0;
+    var clickTag = hasCli
+      ? '<span class="diag-vtag ok">🖱 '+e.clicks.length+' CLICS</span>'
+      : '<span class="diag-vtag danger">SIN CLICS</span>';
+    var evTag = '<span class="diag-vtag">⚡ '+( v.eventos||0)+' EVENTOS</span>';
+    var devTag = '<span class="diag-vtag">'+(v.version||'?')+'</span>';
+    var dateTag = '<span class="diag-vtag" style="opacity:.4">'+esc((v.fecha||'').slice(0,16))+'</span>';
+    var clicksHtml = e.clicks.length
+      ? e.clicks.map(function(c){ return '<span>'+esc(c.replace(/^\d{2}:\d{2} > /,''))+'</span>'; }).join('')
+      : '<span style="opacity:.3">— ninguno registrado —</span>';
+    return '<div class="diag-vrow">' +
+      '<div class="diag-vrow-head">' + clickTag + evTag + devTag + dateTag + '</div>' +
+      '<div class="diag-clicks-raw">' + clicksHtml + '</div>' +
+      '</div>';
+  }).join('');
+
+  /* ─ Tab Integridad: campos incompletos ─ */
+  var fields = ['pais','ciudad','ip','origen','scrollDepth','duracion','dispositivo'];
+  var fieldLabels = {'pais':'País','ciudad':'Ciudad','ip':'IP','origen':'Origen','scrollDepth':'Scroll Depth','duracion':'Duración','dispositivo':'Dispositivo'};
+  var fieldRows = fields.map(function(f){
+    var missing = allData.filter(function(v){ return !v[f] || v[f]==='N/A' || v[f]==='Obteniendo...' || v[f]===''; }).length;
+    var pct = Math.round(missing/totalVisits*100);
+    var cls = missing === 0 ? 'ok' : missing < totalVisits * 0.2 ? 'warn' : 'danger';
+    return '<div class="diag-stat-row"><span class="diag-stat-lbl">'+fieldLabels[f]+'</span>' +
+           '<span class="diag-stat-val '+cls+'">'+missing+' sin dato ('+pct+'%)</span></div>';
+  }).join('');
+  document.getElementById('diagFieldInteg').innerHTML = '<div style="padding:4px 0;">'+fieldRows+'</div>';
+
+  /* ─ Distribución de eventos ─ */
+  var buckets = {'0 eventos':0,'1-2':0,'3-5':0,'6-10':0,'11-20':0,'21+':0};
+  allData.forEach(function(v){
+    var ev = parseInt(v.eventos)||0;
+    if (ev === 0) buckets['0 eventos']++;
+    else if (ev <= 2) buckets['1-2']++;
+    else if (ev <= 5) buckets['3-5']++;
+    else if (ev <= 10) buckets['6-10']++;
+    else if (ev <= 20) buckets['11-20']++;
+    else buckets['21+']++;
+  });
+  var maxBucket = Math.max.apply(null, Object.values(buckets).concat([1]));
+  document.getElementById('diagEventDist').innerHTML =
+    Object.entries(buckets).map(function(entry){
+      var pct = Math.max(3, Math.round(entry[1]/maxBucket*100));
+      return '<div class="bar-item" style="margin-bottom:7px;">' +
+        '<div class="bar-lbl" style="width:80px">'+entry[0]+'</div>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:linear-gradient(90deg,rgba(0,229,255,.5),var(--c))"></div></div>' +
+        '<div class="bar-count">'+entry[1]+'</div></div>';
+    }).join('');
+
+  /* ─ Duplicados ─ */
+  var ipCount = {};
+  allData.forEach(function(v){ if(v.ip && v.ip !== 'N/A') { ipCount[v.ip] = (ipCount[v.ip]||0)+1; } });
+  var dupes = Object.entries(ipCount).filter(function(e){ return e[1] > 1; });
+  if (!dupes.length) {
+    document.getElementById('diagDupes').innerHTML = '<div class="diag-issue issue-ok"><span class="diag-issue-ico">🟢</span><span>No se detectaron IPs duplicadas con múltiples sesiones.</span></div>';
+  } else {
+    document.getElementById('diagDupes').innerHTML = dupes.slice(0,10).map(function(d){
+      return '<div class="diag-stat-row"><span class="diag-stat-lbl">IP '+esc(d[0])+'</span><span class="diag-stat-val warn">'+d[1]+' sesiones</span></div>';
+    }).join('') + (dupes.length > 10 ? '<div style="opacity:.4;font-family:\'Share Tech Mono\',monospace;font-size:.44rem;padding:8px 0">...y '+(dupes.length-10)+' más</div>' : '');
+  }
+}
+
+/* ─ Verificación en vivo (tab LOG) ─ */
+function runLiveCheck() {
+  var logEl = document.getElementById('diagLog');
+  logEl.innerHTML = '';
+  diagLog = [];
+  addLog('Iniciando verificación de integridad...', 'info');
+
+  /* 1. Conectividad JSONBin */
+  addLog('Probando conexión con JSONBin.io...', 'info');
+  var t0 = Date.now();
+  fetch('https://api.jsonbin.io/v3/b/' + JSONBIN_ID + '/latest', {
+    headers: { 'X-Master-Key': JSONBIN_KEY, 'X-Bin-Meta': 'false' }
+  })
+  .then(function(r){ return r.json().then(function(d){ return {r:r,d:d}; }); })
+  .then(function(obj){
+    var latency = Date.now() - t0;
+    var d = obj.d;
+    var count = Array.isArray(d.record) ? d.record.length : (Array.isArray(d) ? d.length : -1);
+    addLog('✓ JSONBin responde OK · latencia ' + latency + 'ms · ' + count + ' registros en cloud', 'ok');
+
+    /* 2. Comparar local vs cloud */
+    var local = [];
+    try { local = JSON.parse(localStorage.getItem('datasys_visitors') || '[]'); } catch(e) {}
+    if (local.length !== count) {
+      addLog('⚠ Desincronización: localStorage tiene ' + local.length + ' registros vs ' + count + ' en cloud', 'warn');
+    } else {
+      addLog('✓ localStorage y cloud sincronizados (' + count + ' registros)', 'ok');
+    }
+
+    /* 3. Analizar clics */
+    var data = Array.isArray(d.record) ? d.record : (Array.isArray(d) ? d : []);
+    var withC = data.filter(function(v){ return v.paginas && v.paginas.indexOf('🖱') !== -1; }).length;
+    var total = data.length;
+    var pct = total > 0 ? Math.round(withC/total*100) : 0;
+    addLog('Cobertura de clics: ' + withC + '/' + total + ' visitas (' + pct + '%)', pct < 40 ? 'warn' : 'ok');
+
+    /* 4. Buscar flush perdidos */
+    var lost = data.filter(function(v){ return (v.eventos > 0) && (!v.paginas || !v.paginas.trim()); }).length;
+    if (lost > 0) addLog('🔴 ' + lost + ' sesión(es) con eventos > 0 pero paginas vacío (flush perdido)', 'err');
+    else addLog('✓ Sin flushes perdidos detectados', 'ok');
+
+    /* 5. Sesiones con scroll pero sin clics */
+    var sno = data.filter(function(v){ return (parseInt(v.scrollDepth)||0) > 20 && (!v.paginas || v.paginas.indexOf('🖱') === -1); }).length;
+    if (sno > 0) addLog('⚠ ' + sno + ' visita(s) con scroll > 20% pero sin clics registrados', 'warn');
+
+    /* 6. Integridad de IDs */
+    var ids = data.map(function(v){ return v.id; });
+    var uniqueIds = new Set(ids).size;
+    if (uniqueIds !== ids.length) addLog('⚠ IDs duplicados detectados: ' + (ids.length - uniqueIds) + ' colisiones', 'warn');
+    else addLog('✓ Todos los IDs de sesión son únicos', 'ok');
+
+    addLog('─── Verificación completa ───', 'info');
+
+    /* Estado conectividad */
+    document.getElementById('diagConnStatus').innerHTML =
+      '<div class="diag-stat-row"><span class="diag-stat-lbl">JSONBin.io</span><span class="diag-stat-val ok">✓ CONECTADO · ' + latency + 'ms</span></div>' +
+      '<div class="diag-stat-row"><span class="diag-stat-lbl">Registros en cloud</span><span class="diag-stat-val">' + count + '</span></div>' +
+      '<div class="diag-stat-row"><span class="diag-stat-lbl">Registros en localStorage</span><span class="diag-stat-val '+(local.length !== count ? 'warn' : 'ok')+'">' + local.length + '</span></div>' +
+      '<div class="diag-stat-row"><span class="diag-stat-lbl">Última verificación</span><span class="diag-stat-val">' + diagTS() + '</span></div>';
+  })
+  .catch(function(err){
+    addLog('🔴 ERROR de conexión con JSONBin: ' + err.message, 'err');
+    document.getElementById('diagConnStatus').innerHTML =
+      '<div class="diag-issue issue-danger"><span class="diag-issue-ico">🔴</span><span>No se pudo conectar con JSONBin.io. Clics se perderán si no hay localStorage.</span></div>';
+  });
+}
+
+/* Cerrar modal con ESC */
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeDiag(); });
+</script>
+</body>
+</html>

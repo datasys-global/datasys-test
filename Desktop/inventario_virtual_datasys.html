@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS · Inventario Virtual — Gestión de Activos en Tiempo Real</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#000b14;--bg2:#000e1a;--bg3:#001120;--panel:rgba(0,10,20,.97);
+  --c:#00e5ff;--c2:#008fb3;--g:#00ffaa;--g2:#00cc80;
+  --amber:#ffb700;--rose:#ff3366;--teal:#14b8a6;
+  --bord:rgba(0,229,255,.1);--bord2:rgba(0,229,255,.25);
+  --text:#b8d8e8;--dim:#2a5066;--steel:#6fa8bc;
+  --glow:0 0 20px rgba(0,229,255,.3);--glow2:0 0 48px rgba(0,229,255,.5);
+  --gglow:0 0 20px rgba(0,255,170,.35);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9997;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.004) 2px,rgba(0,229,255,.004) 3px);}
+#cA{width:16px;height:16px;border:1.5px solid var(--c);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+#cB{width:3px;height:3px;background:var(--c);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--c);transition:left .07s,top .07s;}
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;height:60px;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(0,8,18,.98);border-bottom:1px solid var(--bord);backdrop-filter:blur(20px);}
+.nav::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.35;}
+.nl{display:flex;align-items:center;gap:12px;}
+.n-logo{font-family:'Orbitron',sans-serif;font-size:.88rem;font-weight:900;color:var(--c);letter-spacing:5px;text-shadow:var(--glow);}
+.n-div{width:1px;height:24px;background:var(--bord2);}
+.n-crumb{font-family:'Share Tech Mono',monospace;font-size:.57rem;letter-spacing:2px;color:var(--dim);}
+.n-crumb span{color:var(--c);}
+.nr{display:flex;align-items:center;gap:10px;}
+.n-chip{display:flex;align-items:center;gap:6px;padding:4px 12px;border:1px solid rgba(0,255,170,.22);background:rgba(0,255,170,.04);}
+.n-dot{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:var(--gglow);animation:bl 1.4s infinite;}
+@keyframes bl{0%,100%{opacity:1;}50%{opacity:.2;}}
+.n-chip-txt{font-family:'Share Tech Mono',monospace;font-size:.53rem;letter-spacing:2px;color:var(--g);}
+.n-clock{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--dim);}
+.btn-back{padding:6px 14px;font-family:'Orbitron',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:2px;color:var(--bg);background:var(--c);border:none;cursor:pointer;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);box-shadow:var(--glow);transition:filter .2s;}
+.btn-back:hover{filter:brightness(1.15);}
+/* HERO */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:60px;overflow:hidden;}
+.h-bg{position:absolute;inset:0;z-index:0;}
+.h-img{width:100%;height:100%;object-fit:cover;filter:brightness(.15) saturate(.6);}
+.h-ov{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,8,18,.7) 0%,transparent 20%,transparent 65%,var(--bg) 100%),linear-gradient(90deg,var(--bg) 0%,transparent 45%,transparent 65%,var(--bg) 100%),radial-gradient(ellipse 65% 70% at 60% 50%,rgba(0,35,80,.4) 0%,transparent 70%);}
+.h-grid{position:absolute;inset:0;z-index:1;background-image:linear-gradient(rgba(0,229,255,.032) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.032) 1px,transparent 1px);background-size:48px 48px;animation:gm 22s linear infinite;}
+@keyframes gm{0%{background-position:0 0;}100%{background-position:48px 48px;}}
+.nodes{position:absolute;inset:0;z-index:2;pointer-events:none;}
+.node{position:absolute;border-radius:50%;animation:nf var(--nd,6s) ease-in-out infinite var(--dl,0s);}
+@keyframes nf{0%,100%{transform:translate(0,0);opacity:.4;}50%{transform:translate(var(--dx,10px),var(--dy,-12px));opacity:.9;}}
+.hero-wrap{position:relative;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:40px;max-width:1320px;margin:0 auto;padding:0 60px;align-items:center;}
+.hero-left{animation:hLIn 1.1s cubic-bezier(.2,.8,.3,1) both;}
+@keyframes hLIn{0%{opacity:0;transform:translateX(-28px);}100%{opacity:1;transform:translateX(0);}}
+.h-eye{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:5px;color:var(--c);opacity:.65;margin-bottom:16px;}
+.h-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.8rem,5vw,3.8rem);font-weight:900;line-height:1.04;color:#dff0f8;margin-bottom:18px;}
+.h-title em{font-style:normal;color:var(--c);text-shadow:var(--glow);}
+.h-desc{font-size:1.05rem;line-height:1.88;color:var(--steel);margin-bottom:28px;max-width:500px;}
+.h-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;}
+.htag{padding:5px 13px;font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:2px;border:1px solid var(--bord);color:var(--dim);background:rgba(0,229,255,.03);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);transition:all .3s;}
+.htag:hover{border-color:var(--c);color:var(--c);}
+.h-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-prime{padding:12px 32px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:var(--glow2);transition:filter .3s;animation:pp 3s ease-in-out infinite;}
+@keyframes pp{0%,100%{box-shadow:var(--glow);}50%{box-shadow:var(--glow2);}}
+.btn-prime:hover{filter:brightness(1.1);}
+.btn-out{padding:11px 28px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:3px;color:var(--c);background:transparent;border:1px solid var(--c);cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:all .3s;}
+.btn-out:hover{background:rgba(0,229,255,.08);box-shadow:var(--glow);}
+/* HERO RIGHT */
+.hero-right{animation:hRIn 1.2s ease .4s both;display:flex;flex-direction:column;gap:14px;}
+@keyframes hRIn{0%{opacity:0;transform:translateX(22px);}100%{opacity:1;transform:translateX(0);}}
+.lp{background:rgba(0,10,20,.92);border:1px solid var(--bord2);backdrop-filter:blur(16px);padding:16px 18px;position:relative;overflow:visible;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));}
+.lp::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.lp-hdr{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:3px;color:var(--dim);margin-bottom:10px;display:flex;justify-content:space-between;}
+.lp-badge{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;padding:2px 8px;border:1px solid rgba(0,255,170,.3);color:var(--g);background:rgba(0,255,170,.05);}
+.lp-row{display:flex;justify-content:space-between;margin-bottom:8px;}
+.lp-kv{text-align:center;}
+.lp-v{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;}
+.lp-l{font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px;}
+.lp-bar{height:2px;background:rgba(0,229,255,.1);border-radius:1px;overflow:hidden;margin-top:6px;}
+.lp-fill{height:100%;border-radius:1px;transition:width 1.8s ease;}
+.vc{color:var(--c);text-shadow:var(--glow);}.vg{color:var(--g);text-shadow:var(--gglow);}.va{color:var(--amber);}.vr{color:var(--rose);}
+/* STRIP */
+.strip{background:rgba(0,8,18,.99);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:28px 60px;}
+.strip-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
+.sm{text-align:center;padding:0 14px;border-right:1px solid var(--bord);}
+.sm:last-child{border-right:none;}
+.sm-n{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;line-height:1;}
+.sm-l{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;color:var(--dim);margin-top:5px;}
+/* SHARED */
+.sec{padding:80px 60px;max-width:1380px;margin:0 auto;}
+.s-eye{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:5px;color:var(--c);opacity:.62;margin-bottom:10px;}
+.s-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.5rem,3.5vw,2.4rem);font-weight:900;color:#ddf0f8;letter-spacing:2px;line-height:1.12;position:relative;display:inline-block;}
+.s-h::after{content:'';position:absolute;bottom:-10px;left:0;width:48%;height:2px;background:linear-gradient(90deg,var(--c),transparent);}
+.s-p{font-size:.98rem;color:var(--steel);line-height:1.9;max-width:560px;margin-top:24px;}
+.pnl{background:var(--panel);border:1px solid var(--bord);position:relative;overflow:visible;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));}
+.pnl::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.ca2{position:absolute;top:0;right:0;width:18px;height:18px;border-top:1px solid var(--c);border-right:1px solid var(--c);}
+.cb2{position:absolute;bottom:0;left:0;width:18px;height:18px;border-bottom:1px solid rgba(0,229,255,.18);border-left:1px solid rgba(0,229,255,.18);}
+.ph{display:flex;justify-content:space-between;align-items:center;padding:13px 17px 9px;border-bottom:1px solid var(--bord);}
+.pt{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:2px;}
+.bdg{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;padding:2px 8px;border:1px solid;}
+.bg{color:var(--g);border-color:rgba(0,255,170,.3);background:rgba(0,255,170,.04);}
+.bc{color:var(--c);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.04);}
+.ba{color:var(--amber);border-color:rgba(255,183,0,.3);background:rgba(255,183,0,.04);}
+.bv{color:#a78bfa;border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.04);}
+.pb{padding:14px 17px 18px;}
+/* DASHBOARD */
+.dash-bg{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);padding:80px 0 100px;}
+.dash-inner{max-width:1360px;margin:0 auto;padding:0 44px;}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:17px;}
+.dw{grid-column:span 2;}
+.df{grid-column:span 3;}
+/* MAP */
+.map-wrap{position:relative;height:270px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.w-svg{width:100%;height:100%;opacity:.55;}
+.mdots{position:absolute;inset:0;}
+.mdot{position:absolute;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);animation:mpulse 2s ease-in-out infinite;}
+.mdot::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:1px solid currentColor;animation:mring 2s ease-in-out infinite;}
+@keyframes mpulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+@keyframes mring{0%{transform:scale(1);opacity:.8;}100%{transform:scale(2.2);opacity:0;}}
+.map-stat{position:absolute;top:8px;right:10px;font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--dim);text-align:right;line-height:1.8;}
+/* ASSET TABLE */
+.a-table{width:100%;border-collapse:collapse;}
+.a-table th{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--dim);padding:7px 10px;text-align:left;border-bottom:1px solid var(--bord);}
+.a-table td{padding:7px 10px;font-size:.77rem;border-bottom:1px solid rgba(0,229,255,.04);}
+.a-table tr:hover td{background:rgba(0,229,255,.025);}
+.td-id{font-family:'Share Tech Mono',monospace;font-size:.58rem;color:var(--c);}
+.td-n{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--steel);}
+.st-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.st-on{background:var(--g);box-shadow:0 0 7px var(--g);}
+.st-wr{background:var(--amber);box-shadow:0 0 7px var(--amber);}
+.st-off{background:var(--rose);box-shadow:0 0 6px var(--rose);}
+.s-bar{display:flex;gap:8px;margin-bottom:12px;}
+.s-input{flex:1;background:rgba(0,229,255,.04);border:1px solid var(--bord);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.58rem;padding:7px 12px;outline:none;transition:border-color .3s;}
+.s-input:focus{border-color:var(--c);}
+.s-input::placeholder{color:var(--dim);}
+.s-btn{padding:7px 13px;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1px;background:rgba(0,229,255,.07);border:1px solid var(--bord2);color:var(--c);cursor:pointer;transition:all .2s;}
+.s-btn:hover{background:rgba(0,229,255,.13);box-shadow:var(--glow);}
+.f-tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap;}
+.ftab{padding:4px 11px;font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;border:1px solid var(--bord);color:var(--dim);cursor:pointer;background:none;transition:all .2s;}
+.ftab.on,.ftab:hover{border-color:var(--c);color:var(--c);background:rgba(0,229,255,.06);}
+/* BLOCKCHAIN FEED */
+.txn{padding:9px 0;border-bottom:1px solid rgba(0,229,255,.05);cursor:pointer;transition:padding .15s;}
+.txn:hover{padding-left:5px;}
+.txn:last-child{border-bottom:none;}
+.txn-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;}
+.t-hash{font-family:'Share Tech Mono',monospace;font-size:.56rem;color:var(--c);}
+.t-type{font-family:'Share Tech Mono',monospace;font-size:.48rem;padding:2px 6px;border:1px solid;}
+.t-time{font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);}
+.t-desc{font-size:.72rem;color:var(--steel);line-height:1.45;}
+.t-meta{display:flex;gap:10px;margin-top:3px;}
+.t-fld{font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);}
+.t-fld span{color:var(--text);}
+/* CAT CARDS */
+.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px;}
+.cat{background:var(--panel);border:1px solid var(--bord);padding:22px 18px;cursor:pointer;position:relative;overflow:visible;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));transition:all .4s;}
+.cat::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);transition:left .5s;}
+.cat:hover::before{left:100%;}
+.cat:hover{border-color:var(--bord2);transform:translateY(-5px);box-shadow:0 18px 50px rgba(0,0,0,.5);}
+.cat-ico{font-size:1.7rem;margin-bottom:12px;display:block;}
+.cat-name{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:2px;margin-bottom:7px;}
+.cat-count{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;}
+.cat-lbl{font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:3px;}
+.cat-bar{height:3px;background:rgba(0,229,255,.08);border-radius:1px;overflow:hidden;margin-top:10px;}
+.cat-fill{height:100%;border-radius:1px;}
+/* GALLERY */
+.gal-bg{background:var(--bg3);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:80px 60px;}
+.gal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;max-width:1200px;margin:44px auto 0;}
+.gal-card{position:relative;overflow:visible;cursor:pointer;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));transition:all .4s;}
+.gal-card:hover{transform:scale(1.02);box-shadow:0 24px 60px rgba(0,0,0,.6);}
+.gal-img{width:100%;height:220px;object-fit:cover;filter:brightness(.4) saturate(.6);transition:filter .4s;}
+.gal-card:hover .gal-img{filter:brightness(.55) saturate(.8);}
+.gal-ov{position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,8,18,.95) 100%);}
+.gal-ov::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.gal-body{position:absolute;bottom:0;left:0;right:0;padding:16px;}
+.gal-tag{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--c);opacity:.7;margin-bottom:5px;}
+.gal-title{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--text);letter-spacing:1px;}
+.gal-desc{font-size:.72rem;color:var(--steel);margin-top:4px;line-height:1.55;}
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:46px;}
+.feat{background:var(--panel);border:1px solid var(--bord);padding:24px 20px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,0 100%);transition:all .4s;cursor:default;position:relative;}
+.feat::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.feat:hover{border-color:var(--bord2);transform:translateY(-4px);box-shadow:0 16px 44px rgba(0,0,0,.5);}
+.feat-ico{font-size:1.6rem;margin-bottom:12px;}
+.feat-name{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;color:var(--c);letter-spacing:1.5px;margin-bottom:9px;}
+.feat-desc{font-size:.84rem;color:var(--steel);line-height:1.8;}
+.feat-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:11px;}
+.fchip{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:1px;padding:2px 7px;border:1px solid var(--bord);color:var(--dim);}
+/* BLOCKCHAIN */
+.chain-bg{background:var(--bg3);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:80px 60px;}
+.chain-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;max-width:1200px;margin:44px auto 0;align-items:start;}
+.chain-visual{display:flex;flex-direction:column;gap:10px;}
+.chain-blk{background:var(--panel);border:1px solid var(--bord);padding:15px 17px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);transition:all .3s;cursor:pointer;position:relative;}
+.chain-blk:hover{border-color:var(--bord2);box-shadow:var(--glow);}
+.chain-blk::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.chain-conn{display:flex;justify-content:center;height:18px;align-items:center;}
+.chain-conn::before{content:'';width:1px;height:100%;background:linear-gradient(var(--c),rgba(0,229,255,.3));}
+.cb-top2{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+.cb-n{font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;color:var(--c);}
+.cb-t{font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);}
+.cb-hash{font-family:'Share Tech Mono',monospace;font-size:.53rem;color:rgba(0,229,255,.45);margin-bottom:5px;word-break:break-all;}
+.cb-ops{display:flex;gap:7px;flex-wrap:wrap;}
+.cb-op{font-family:'Share Tech Mono',monospace;font-size:.48rem;padding:2px 6px;border:1px solid var(--bord);color:var(--dim);}
+.chain-info{display:flex;flex-direction:column;gap:14px;}
+.ci-c{background:var(--panel);border:1px solid var(--bord);padding:18px 20px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));position:relative;}
+.ci-c::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.ci-name{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:1.5px;margin-bottom:7px;}
+.ci-val{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;}
+.ci-sub{font-size:.7rem;color:var(--steel);margin-top:3px;}
+/* CTA */
+.cta{padding:90px 60px;text-align:center;position:relative;overflow:hidden;background:radial-gradient(ellipse 75% 60% at 50% 50%,rgba(0,30,65,.55) 0%,transparent 70%);}
+.cta::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:48px 48px;}
+.cta-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.4rem,4vw,2.6rem);font-weight:900;color:#def2ff;letter-spacing:3px;margin-bottom:14px;position:relative;}
+.cta-sub{font-size:1rem;color:var(--steel);max-width:500px;margin:0 auto 36px;line-height:1.9;position:relative;}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;}
+/* FORM */
+.form-sec{background:var(--bg2);border-top:1px solid var(--bord);padding:80px 60px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;max-width:1080px;margin:0 auto;}
+.form-blk{margin-top:36px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:3px;color:var(--dim);margin-bottom:7px;}
+.fg input,.fg textarea,.fg select{width:100%;background:rgba(0,229,255,.04);border:1px solid var(--bord);color:var(--text);font-family:'Rajdhani',sans-serif;font-size:.92rem;padding:10px 14px;outline:none;transition:border-color .3s;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--c);background:rgba(0,229,255,.07);}
+.fg textarea{height:100px;resize:vertical;}
+.fg select option{background:var(--bg2);}
+.fg-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn-send{width:100%;padding:13px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:var(--glow);transition:filter .3s;}
+.btn-send:hover{filter:brightness(1.1);}
+.info-side{padding-top:36px;}
+.ii{display:flex;gap:14px;margin-bottom:20px;}
+.ii-ico{width:40px;height:40px;border:1px solid var(--bord);display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;}
+.ii-title{font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;color:var(--c);letter-spacing:1.5px;margin-bottom:5px;}
+.ii-val{font-size:.8rem;color:var(--steel);line-height:1.7;}
+.trial-box{background:rgba(0,229,255,.04);border:1px solid var(--bord2);padding:18px 20px;margin-top:16px;position:relative;}
+.trial-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.trial-title{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;color:var(--c);letter-spacing:2px;margin-bottom:10px;}
+.ti{display:flex;gap:8px;font-size:.8rem;color:var(--steel);margin-bottom:6px;}
+.ti-ck{color:var(--g);}
+footer{text-align:center;padding:36px;border-top:1px solid var(--bord);background:rgba(0,8,18,.98);}
+.ft-logo{font-family:'Orbitron',sans-serif;font-size:.95rem;font-weight:900;letter-spacing:6px;color:var(--c);text-shadow:var(--glow);margin-bottom:7px;}
+.ft-tag{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:4px;color:var(--dim);margin-bottom:8px;}
+.ft-copy{font-size:.7rem;color:var(--dim);}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:2px;}
+@media(max-width:1100px){.hero-wrap{grid-template-columns:1fr;}.hero-right{display:none;}.dash-grid{grid-template-columns:1fr 1fr;}.dw{grid-column:span 2;}.df{grid-column:span 2;}.cat-grid{grid-template-columns:repeat(2,1fr);}.feat-grid{grid-template-columns:1fr 1fr;}.gal-grid{grid-template-columns:1fr 1fr;}.chain-grid{grid-template-columns:1fr;}.strip-inner{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:768px){.sec,.form-sec,.gal-bg,.chain-bg,.cta{padding:60px 24px;}.hero-wrap{padding:0 24px;}.strip{padding:28px 20px;}.strip-inner{grid-template-columns:repeat(2,1fr);}.dash-grid,.feat-grid{grid-template-columns:1fr;}.dw,.df{grid-column:span 1;}.cat-grid{grid-template-columns:1fr 1fr;}.gal-grid{grid-template-columns:1fr;}.form-grid{grid-template-columns:1fr;}.fg-2{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div id="cA"></div><div id="cB"></div>
+
+<nav class="nav">
+  <div class="nl">
+    <a href="../index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><img src="../imagenes/logo.png" alt="DATASYS" style="height:36px;width:36px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 8px rgba(0,229,255,.6));"><div class="n-logo">DATASYS</div></a><div class="n-div"></div>
+    <div class="n-crumb">PLATAFORMA / <span>INVENTARIO VIRTUAL</span></div>
+  </div>
+  <div class="nr">
+    <div class="n-chip"><div class="n-dot"></div><div class="n-chip-txt">BLOCKCHAIN · ACTIVO</div></div>
+    <div class="n-clock" id="navClock">--:--:--</div>
+    <button class="btn-back" onclick="window.location.href='../index.html'">🏠 INICIO</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="h-bg">
+    <img class="h-img" src="../imagenes/inventario_panel.jpg" alt="Inventario Virtual" onerror="this.style.display='none'">
+    <div class="h-ov"></div>
+  </div>
+  <div class="h-grid"></div>
+  <div class="nodes" id="nodeLayer"></div>
+  <div class="hero-wrap">
+    <div class="hero-left">
+      <div class="h-eye">// DATASYS · VIRTUAL INVENTORY MANAGEMENT SYSTEM · v4.2</div>
+      <h1 class="h-title">Gestión de activos<br><em>inteligente</em> con<br>trazabilidad blockchain</h1>
+      <p class="h-desc">Sistema integral de gestión de activos digitales y físicos en tiempo real. Unifica software, hardware, redes y analítica en un único panel inteligente con trazabilidad blockchain inmutable.</p>
+      <div class="h-tags">
+        <div class="htag">ACTIVOS DIGITALES</div><div class="htag">ACTIVOS FÍSICOS</div>
+        <div class="htag">BLOCKCHAIN TRAZABILIDAD</div><div class="htag">PANEL INTELIGENTE</div>
+        <div class="htag">IoT · RFID · QR</div><div class="htag">GEMELO DIGITAL</div><div class="htag">API REST</div>
+      </div>
+      <div class="h-btns">
+        <button class="btn-prime" onclick="document.getElementById('demo-form').scrollIntoView({behavior:'smooth'})">SOLICITAR DEMO GRATUITA →</button>
+        <button class="btn-out" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">VER PLATAFORMA EN VIVO</button>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="lp">
+        <div class="lp-hdr">RESUMEN GLOBAL ACTIVOS <span class="lp-badge">⚡ VIVO</span></div>
+        <div class="lp-row">
+          <div class="lp-kv"><div class="lp-v vc" id="hTotal">124,847</div><div class="lp-l">TOTAL</div></div>
+          <div class="lp-kv"><div class="lp-v vg" id="hOnline">121,203</div><div class="lp-l">EN LÍNEA</div></div>
+          <div class="lp-kv"><div class="lp-v va" id="hAlert">38</div><div class="lp-l">ALERTA</div></div>
+          <div class="lp-kv"><div class="lp-v vr" id="hOff">406</div><div class="lp-l">OFFLINE</div></div>
+        </div>
+        <div class="lp-bar"><div class="lp-fill" id="hBar" style="width:97.1%;background:linear-gradient(90deg,var(--c2),var(--c));"></div></div>
+      </div>
+      <div class="lp">
+        <div class="lp-hdr">VALOR TOTAL DEL INVENTARIO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;color:var(--g);text-shadow:var(--gglow);" id="hValue">$15,230,000</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--dim);margin-top:4px;">↑ +$280,000 este mes · Depreciación incluida</div>
+      </div>
+      <div class="lp">
+        <div class="lp-hdr">ÚLTIMAS TRANSACCIONES BLOCKCHAIN</div>
+        <div id="hTxns"></div>
+      </div>
+      <div class="lp">
+        <div class="lp-hdr">THROUGHPUT · REGISTROS/MIN</div>
+        <div style="height:64px;"><canvas id="heroSparkline" style="display:block;width:100%;height:64px;"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.35;animation:bob2 2.5s ease-in-out infinite;z-index:5;">
+    <span style="font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:4px;color:var(--steel);">EXPLORAR</span>
+    <div style="width:1px;height:28px;background:linear-gradient(var(--c),transparent);"></div>
+  </div>
+</section>
+<style>@keyframes bob2{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}</style>
+
+<!-- STRIP -->
+<div class="strip">
+  <div class="strip-inner">
+    <div class="sm"><div class="sm-n vc">124K+</div><div class="sm-l">ACTIVOS REGISTRADOS</div></div>
+    <div class="sm"><div class="sm-n vg">99.99%</div><div class="sm-l">TRAZABILIDAD COMPLETA</div></div>
+    <div class="sm"><div class="sm-n va">$15.2M</div><div class="sm-l">VALOR GESTIONADO</div></div>
+    <div class="sm"><div class="sm-n" style="color:#a78bfa;">147K</div><div class="sm-l">TXNS BLOCKCHAIN/DÍA</div></div>
+    <div class="sm"><div class="sm-n" style="color:var(--teal);">28</div><div class="sm-l">PAÍSES / UBICACIONES</div></div>
+    <div class="sm"><div class="sm-n vc">&lt;2ms</div><div class="sm-l">LATENCIA TIEMPO REAL</div></div>
+  </div>
+</div>
+
+<!-- LIVE DASHBOARD -->
+<div class="dash-bg" id="dashboard">
+  <div class="dash-inner">
+    <div style="margin-bottom:30px;"><div class="s-eye">// PANEL INTELIGENTE · TIEMPO REAL</div><div class="s-h">Control Total de Activos</div></div>
+    <div class="dash-grid">
+      <!-- WORLD MAP -->
+      <div class="pnl dw"><div class="ca2"></div><div class="cb2"></div>
+        <div class="ph"><div class="pt">MAPA GLOBAL · ACTIVOS POR UBICACIÓN</div><div class="bdg bc">28 NODOS</div></div>
+        <div class="pb">
+          <div class="map-wrap">
+            <svg class="w-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg">
+              <rect width="1000" height="500" fill="rgba(0,15,35,.8)"/>
+              <g stroke="rgba(0,229,255,.07)" stroke-width="0.5">
+                <line x1="0" y1="100" x2="1000" y2="100"/><line x1="0" y1="200" x2="1000" y2="200"/>
+                <line x1="0" y1="300" x2="1000" y2="300"/><line x1="0" y1="400" x2="1000" y2="400"/>
+                <line x1="125" y1="0" x2="125" y2="500"/><line x1="250" y1="0" x2="250" y2="500"/>
+                <line x1="375" y1="0" x2="375" y2="500"/><line x1="500" y1="0" x2="500" y2="500"/>
+                <line x1="625" y1="0" x2="625" y2="500"/><line x1="750" y1="0" x2="750" y2="500"/><line x1="875" y1="0" x2="875" y2="500"/>
+              </g>
+              <path d="M 75 85 L 200 65 L 265 105 L 285 185 L 245 255 L 185 285 L 125 265 L 82 205 Z" fill="rgba(0,229,255,.1)" stroke="rgba(0,229,255,.28)" stroke-width="1"/>
+              <path d="M 225 280 L 285 260 L 315 325 L 295 425 L 242 445 L 202 405 L 198 345 Z" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.22)" stroke-width="1"/>
+              <path d="M 422 72 L 525 62 L 545 115 L 505 145 L 442 155 L 412 124 Z" fill="rgba(0,229,255,.1)" stroke="rgba(0,229,255,.28)" stroke-width="1"/>
+              <path d="M 432 162 L 545 152 L 565 205 L 565 365 L 505 425 L 432 385 L 402 285 L 415 205 Z" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.22)" stroke-width="1"/>
+              <path d="M 545 62 L 805 52 L 855 125 L 825 205 L 755 245 L 655 235 L 572 185 L 545 125 Z" fill="rgba(0,229,255,.1)" stroke="rgba(0,229,255,.28)" stroke-width="1"/>
+              <path d="M 652 202 L 705 215 L 715 305 L 685 345 L 652 305 L 638 245 Z" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.18)" stroke-width="1"/>
+              <path d="M 735 325 L 855 305 L 885 385 L 845 435 L 762 442 L 722 405 L 722 365 Z" fill="rgba(0,229,255,.08)" stroke="rgba(0,229,255,.22)" stroke-width="1"/>
+              <g stroke="rgba(0,229,255,.18)" stroke-width="0.8" stroke-dasharray="4,4">
+                <line x1="172" y1="162" x2="482" y2="96"/><line x1="482" y1="96" x2="705" y2="132"/>
+                <line x1="705" y1="132" x2="792" y2="372"/><line x1="482" y1="96" x2="492" y2="282"/>
+                <line x1="172" y1="162" x2="252" y2="335"/><line x1="705" y1="132" x2="682" y2="272"/>
+              </g>
+            </svg>
+            <div class="mdots" id="mapDots"></div>
+            <div class="map-stat">
+              <div style="color:var(--c);">ACTIVOS EN LÍNEA</div>
+              <div style="font-family:'Orbitron',sans-serif;font-size:.8rem;color:var(--g);" id="mapTotal">121,203</div>
+              <div style="margin-top:4px;color:var(--dim);">LATENCIA: <span style="color:var(--c);">1.8ms</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- DONUT -->
+      <div class="pnl"><div class="ca2"></div><div class="cb2"></div>
+        <div class="ph"><div class="pt">DISTRIBUCIÓN</div><div class="bdg bc">TIPOS</div></div>
+        <div class="pb"><div style="height:195px;"><canvas id="distDonut"     style="display:block;width:100%;height:195px;"></canvas></div></div>
+      </div>
+      <!-- ASSET TABLE -->
+      <div class="pnl dw"><div class="ca2"></div><div class="cb2"></div>
+        <div class="ph"><div class="pt">ACTIVOS · REGISTRO EN TIEMPO REAL</div><div style="display:flex;gap:8px;"><div class="bdg bg" id="liveCount">124,847</div><div class="bdg bc">TOTAL</div></div></div>
+        <div class="pb">
+          <div class="s-bar">
+            <input class="s-input" type="text" placeholder="Buscar por ID, nombre, categoría, ubicación..." id="assetSearch" oninput="filterAssets()">
+            <button class="s-btn" onclick="alert('Exportando CSV...')">⬇ EXPORTAR</button>
+          </div>
+          <div class="f-tabs" id="filterTabs">
+            <button class="ftab on" onclick="setFilter('all',this)">TODOS</button>
+            <button class="ftab" onclick="setFilter('digital',this)">DIGITAL</button>
+            <button class="ftab" onclick="setFilter('fisico',this)">FÍSICO</button>
+            <button class="ftab" onclick="setFilter('network',this)">RED</button>
+            <button class="ftab" onclick="setFilter('vehiculo',this)">FLOTA</button>
+            <button class="ftab" onclick="setFilter('offline',this)">⚠ OFFLINE</button>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="a-table"><thead><tr>
+              <th>ID ACTIVO</th><th>NOMBRE</th><th>CATEGORÍA</th><th>UBICACIÓN</th><th>EST.</th><th>VALOR USD</th><th>ÚLTIMO TX</th>
+            </tr></thead><tbody id="assetTbody"></tbody></table>
+          </div>
+        </div>
+      </div>
+      <!-- BLOCKCHAIN FEED -->
+      <div class="pnl"><div class="ca2"></div><div class="cb2"></div>
+        <div class="ph"><div class="pt">BLOCKCHAIN · FEED</div><div class="bdg bv" id="txnCount">147K HOY</div></div>
+        <div class="pb" id="txnFeed"></div>
+      </div>
+      <!-- TIMESERIES -->
+      <div class="pnl dw"><div class="ca2"></div><div class="cb2"></div>
+        <div class="ph">
+          <div class="pt">ACTIVIDAD · ÚLTIMAS 24H</div>
+          <select id="metricSel" onchange="switchMetric(this.value)" style="background:rgba(0,229,255,.06);border:1px solid var(--bord);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.5rem;padding:3px 8px;outline:none;cursor:pointer;">
+            <option value="act">Activaciones/h</option>
+            <option value="alerts">Alertas detectadas</option>
+            <option value="txns">Txns blockchain</option>
+          </select>
+        </div>
+        <div class="pb"><div style="height:175px;"><canvas id="tsChart"       style="display:block;width:100%;height:175px;"></canvas></div></div>
+      </div>
+      <!-- HEALTH -->
+      <div class="pnl"><div class="ca2"></div><div class="cb2"></div>
+        <div class="ph"><div class="pt">SALUD DEL SISTEMA</div><div class="bdg bg">LIVE</div></div>
+        <div class="pb" id="healthPanel"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div class="sec">
+  <div class="s-eye">// CATEGORÍAS · GESTIÓN DE ACTIVOS</div>
+  <div class="s-h">Todo tu inventario<br>en un solo lugar</div>
+  <div class="cat-grid">
+    <div class="cat"><span class="cat-ico">💻</span><div class="cat-name">SOFTWARE</div><div class="cat-count vc" id="catSW">34,218</div><div class="cat-lbl">Licencias · Instancias · Versiones</div><div class="cat-bar"><div class="cat-fill" style="width:72%;background:linear-gradient(90deg,var(--c2),var(--c));"></div></div></div>
+    <div class="cat"><span class="cat-ico">🖥️</span><div class="cat-name">HARDWARE</div><div class="cat-count vg" id="catHW">28,941</div><div class="cat-lbl">Servidores · Workstations · Periféricos</div><div class="cat-bar"><div class="cat-fill" style="width:61%;background:linear-gradient(90deg,var(--g2),var(--g));"></div></div></div>
+    <div class="cat"><span class="cat-ico">🌐</span><div class="cat-name">RED</div><div class="cat-count" style="color:#a78bfa;" id="catNET">18,472</div><div class="cat-lbl">Switches · Routers · Firewalls · AP</div><div class="cat-bar"><div class="cat-fill" style="width:39%;background:linear-gradient(90deg,#5b21b6,#a78bfa);"></div></div></div>
+    <div class="cat"><span class="cat-ico">☁️</span><div class="cat-name">CLOUD</div><div class="cat-count" style="color:var(--teal);" id="catCLD">22,184</div><div class="cat-lbl">Instancias · Storage · SaaS · IaaS</div><div class="cat-bar"><div class="cat-fill" style="width:47%;background:linear-gradient(90deg,#0d7377,var(--teal));"></div></div></div>
+    <div class="cat"><span class="cat-ico">🚗</span><div class="cat-name">FLOTA</div><div class="cat-count va" id="catFLT">4,832</div><div class="cat-lbl">Vehículos · AGVs · Drones · Robots</div><div class="cat-bar"><div class="cat-fill" style="width:10%;background:linear-gradient(90deg,#b45309,var(--amber));"></div></div></div>
+    <div class="cat"><span class="cat-ico">📡</span><div class="cat-name">IoT / SENSORES</div><div class="cat-count" style="color:#10b981;" id="catIOT">16,200</div><div class="cat-lbl">Sensores · Actuadores · Gateways</div><div class="cat-bar"><div class="cat-fill" style="width:34%;background:linear-gradient(90deg,#065f46,#10b981);"></div></div></div>
+    <div class="cat"><span class="cat-ico">🏗️</span><div class="cat-name">INFRAESTRUCTURA</div><div class="cat-count" style="color:#c4b5fd;" id="catINF">6,840</div><div class="cat-lbl">Data Centers · Racks · UPS · Cooling</div><div class="cat-bar"><div class="cat-fill" style="width:14%;background:linear-gradient(90deg,#7c3aed,#c4b5fd);"></div></div></div>
+    <div class="cat" style="border-color:var(--bord2);"><span class="cat-ico">📦</span><div class="cat-name">INVENTARIO FÍSICO</div><div class="cat-count vr" id="catPHY">3,160</div><div class="cat-lbl">Equipos · Herramientas · Suministros</div><div class="cat-bar"><div class="cat-fill" style="width:7%;background:linear-gradient(90deg,#be123c,var(--rose));"></div></div></div>
+  </div>
+</div>
+
+<!-- GALLERY -->
+<div class="gal-bg">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="s-eye">// VISTAS · INVENTARIO VIRTUAL</div>
+    <div class="s-h">Múltiples perspectivas<br>del mismo sistema</div>
+    <div class="gal-grid">
+      <div class="gal-card">
+        <img class="gal-img" src="../imagenes/inventario_virtual_global.jpg" alt="Vista Global" onerror="this.style.background='var(--bg3)'">
+        <div class="gal-ov"></div>
+        <div class="gal-body"><div class="gal-tag">// VISTA GLOBAL</div><div class="gal-title">INVENTARIO MUNDIAL</div><div class="gal-desc">Mapa global con activos por ubicación, conectividad y estado. 28 países en tiempo real.</div></div>
+      </div>
+      <div class="gal-card">
+        <img class="gal-img" src="../imagenes/inventario_virtual_fabrica.jpg" alt="Vista Fábrica" onerror="this.style.background='var(--bg3)'">
+        <div class="gal-ov"></div>
+        <div class="gal-body"><div class="gal-tag">// GEMELO DIGITAL</div><div class="gal-title">PLANTA INDUSTRIAL 3D</div><div class="gal-desc">Vista isométrica interactiva con posicionamiento exacto de cada activo físico y digital.</div></div>
+      </div>
+      <div class="gal-card">
+        <img class="gal-img" src="../imagenes/inventario_virtual_local.jpg" alt="Vista Local" onerror="this.style.background='var(--bg3)'">
+        <div class="gal-ov"></div>
+        <div class="gal-body"><div class="gal-tag">// PANEL INTELIGENTE</div><div class="gal-title">DASHBOARD UNIFICADO</div><div class="gal-desc">Activos digitales, físicos y blockchain en un único panel ejecutivo con análisis predictivo.</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="sec">
+  <div class="s-eye">// CAPACIDADES · PLATAFORMA DATASYS</div>
+  <div class="s-h">Todo lo que necesitas<br>para gestionar activos</div>
+  <div class="feat-grid">
+    <div class="feat"><div class="feat-ico">⛓️</div><div class="feat-name">BLOCKCHAIN INMUTABLE</div><div class="feat-desc">Cada movimiento de activo registrado en cadena privada. Auditoría completa, imposible de alterar. Cumplimiento ISO 27001 garantizado.</div><div class="feat-chips"><span class="fchip">HYPERLEDGER</span><span class="fchip">PBFT CONSENSUS</span><span class="fchip">AUDIT LOG</span></div></div>
+    <div class="feat"><div class="feat-ico">⚡</div><div class="feat-name">TIEMPO REAL &lt;2ms</div><div class="feat-desc">Sincronización instantánea de todos los activos. Alertas automáticas ante cambios de estado, desconexiones o anomalías detectadas por ML.</div><div class="feat-chips"><span class="fchip">WEBSOCKET</span><span class="fchip">KAFKA</span><span class="fchip">EDGE COMPUTE</span></div></div>
+    <div class="feat"><div class="feat-ico">🧩</div><div class="feat-name">ACTIVOS DIGITALES</div><div class="feat-desc">Licencias, instancias cloud, certificados SSL, dominios y APIs con fechas de vencimiento, alertas automáticas y renovación automatizada.</div><div class="feat-chips"><span class="fchip">SAAS</span><span class="fchip">IAAS</span><span class="fchip">LICENSE MGR</span></div></div>
+    <div class="feat"><div class="feat-ico">🏭</div><div class="feat-name">ACTIVOS FÍSICOS</div><div class="feat-desc">Servidores, equipos de red, vehículos y maquinaria con tracking GPS/RFID, ciclo de vida completo y depreciación automática actualizada.</div><div class="feat-chips"><span class="fchip">GPS · RFID</span><span class="fchip">QR · NFC</span><span class="fchip">DEPRECIATION</span></div></div>
+    <div class="feat"><div class="feat-ico">🌐</div><div class="feat-name">GEMELO DIGITAL</div><div class="feat-desc">Réplica virtual 3D de tu inventario físico. Simula cambios, planifica relocalizaciones y visualiza toda tu infraestructura interactivamente.</div><div class="feat-chips"><span class="fchip">DIGITAL TWIN</span><span class="fchip">BIM · 3D</span><span class="fchip">SIMULATION</span></div></div>
+    <div class="feat"><div class="feat-ico">🤖</div><div class="feat-name">IA PREDICTIVA</div><div class="feat-desc">Detecta activos próximos a fallar, predice reemplazos y optimiza asignación de recursos con modelos ML entrenados en tu historial de activos.</div><div class="feat-chips"><span class="fchip">ANOMALY ML</span><span class="fchip">LIFECYCLE AI</span><span class="fchip">AUTOML</span></div></div>
+    <div class="feat"><div class="feat-ico">🔌</div><div class="feat-name">INTEGRACIÓN UNIVERSAL</div><div class="feat-desc">Conectores nativos para CMDB, SAP, ServiceNow, Jira, AWS, Azure y +200 herramientas. API REST documentada con webhooks en tiempo real.</div><div class="feat-chips"><span class="fchip">SAP</span><span class="fchip">SERVICENOW</span><span class="fchip">REST API</span></div></div>
+    <div class="feat"><div class="feat-ico">📊</div><div class="feat-name">ANALÍTICA TCO</div><div class="feat-desc">Reportes de utilización, costo total de propiedad, proyecciones de reemplazo y análisis de tendencias con dashboards ejecutivos exportables.</div><div class="feat-chips"><span class="fchip">TCO ANALYSIS</span><span class="fchip">BI REPORTS</span><span class="fchip">PDF · EXCEL</span></div></div>
+    <div class="feat"><div class="feat-ico">🔐</div><div class="feat-name">SEGURIDAD ENTERPRISE</div><div class="feat-desc">Acceso granular RBAC, MFA obligatorio, SSO corporativo y auditoría completa. SOC 2 Type II, ISO 27001 y GDPR compliant.</div><div class="feat-chips"><span class="fchip">RBAC</span><span class="fchip">SSO · SAML</span><span class="fchip">SOC 2</span></div></div>
+  </div>
+</div>
+
+<!-- BLOCKCHAIN VISUAL -->
+<div class="chain-bg">
+  <div style="max-width:1200px;margin:0 auto;">
+    <div class="s-eye">// TRAZABILIDAD · BLOCKCHAIN PRIVADA</div>
+    <div class="s-h">Cada cambio, registrado<br>para siempre</div>
+    <div class="chain-grid">
+      <div class="chain-visual" id="chainVisual"></div>
+      <div class="chain-info">
+        <p class="s-p" style="margin-top:0;">Cada operación sobre un activo queda registrada en nuestra cadena de bloques privada con timestamp inmutable. Desde la creación hasta la baja definitiva del activo.</p>
+        <div class="ci-c"><div class="ci-name">BLOQUES TOTALES</div><div class="ci-val vc" id="ciBlocks">8,472,341</div><div class="ci-sub">Desde genesis · Octubre 2021</div></div>
+        <div class="ci-c"><div class="ci-name">TRANSACCIONES HOY</div><div class="ci-val vg" id="ciTxns">147,283</div><div class="ci-sub">Promedio: 1.7 txns/seg · 24/7</div></div>
+        <div class="ci-c"><div class="ci-name">NODOS VALIDADORES</div><div class="ci-val va">12</div><div class="ci-sub">Consensus: Practical Byzantine Fault Tolerance</div></div>
+        <div class="ci-c"><div class="ci-name">TIEMPO CONFIRMACIÓN</div><div class="ci-val vc">&lt;800ms</div><div class="ci-sub">Finalidad garantizada · 0 forks registrados</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <div class="s-eye" style="text-align:center;">// COMIENZA HOY · PRUEBA GRATUITA 30 DÍAS</div>
+  <div class="cta-h">Gestiona todos tus activos<br>desde un único panel</div>
+  <p class="cta-sub">Sin tarjeta de crédito. Importa tu inventario existente y empieza a operar en menos de 2 horas con trazabilidad blockchain desde el día uno.</p>
+  <div class="cta-row">
+    <button class="btn-prime" onclick="document.getElementById('demo-form').scrollIntoView({behavior:'smooth'})">INICIAR PRUEBA GRATIS →</button>
+    <button class="btn-out" onclick="document.getElementById('demo-form').scrollIntoView({behavior:'smooth'})">SOLICITAR DEMO PERSONALIZADA</button>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-sec" id="demo-form">
+  <div class="form-grid">
+    <div>
+      <div class="s-eye">// DEMO · INVENTARIO VIRTUAL</div>
+      <div class="s-h">Agenda tu demo<br>personalizada</div>
+      <div class="info-side">
+        <div class="ii"><div class="ii-ico">⚡</div><div><div class="ii-title">SETUP EN 2 HORAS</div><div class="ii-val">Importamos tu inventario existente (Excel, CMDB, SAP) y tienes el sistema operando el mismo día.</div></div></div>
+        <div class="ii"><div class="ii-ico">🔗</div><div><div class="ii-title">INTEGRACIÓN SIN CÓDIGO</div><div class="ii-val">Conectores nativos para tus sistemas actuales. No se requiere desarrollo adicional para empezar.</div></div></div>
+        <div class="ii"><div class="ii-ico">🛡️</div><div><div class="ii-title">DATOS SEGUROS</div><div class="ii-val">Deploy en tu nube privada o en la nuestra. SOC 2 Type II · ISO 27001 · GDPR compliant.</div></div></div>
+      </div>
+      <div class="trial-box">
+        <div class="trial-title">✓ PRUEBA 30 DÍAS INCLUYE</div>
+        <div class="ti"><span class="ti-ck">✓</span>Hasta 10,000 activos sin costo</div>
+        <div class="ti"><span class="ti-ck">✓</span>Blockchain privada activada desde día 1</div>
+        <div class="ti"><span class="ti-ck">✓</span>Gemelo digital de una ubicación</div>
+        <div class="ti"><span class="ti-ck">✓</span>Importación desde Excel / CSV / CMDB</div>
+        <div class="ti"><span class="ti-ck">✓</span>Soporte dedicado + onboarding guiado</div>
+        <div class="ti"><span class="ti-ck">✓</span>API REST + 5 conectores enterprise</div>
+        <div class="ti"><span class="ti-ck">✓</span>Dashboard de análisis TCO incluido</div>
+      </div>
+    </div>
+    <div class="form-blk">
+      <div class="fg-2">
+        <div class="fg"><label>NOMBRE COMPLETO *</label><input id="cf_name" type="text" placeholder="Tu nombre completo..."></div>
+        <div class="fg"><label>CARGO / ROL</label><input type="text" placeholder="CTO / IT Manager..."></div>
+      </div>
+      <div class="fg"><label>CORREO ELECTRÓNICO *</label><input id="cf_email" type="email" placeholder="tu@empresa.com"></div>
+      <div class="fg-2">
+        <div class="fg"><label>EMPRESA</label><input type="text" placeholder="Nombre..."></div>
+        <div class="fg"><label>TELÉFONO</label><input id="cf_phone" type="tel" placeholder="+52 55 0000 0000"></div>
+      </div>
+      <div class="fg"><label>NÚMERO DE ACTIVOS</label>
+        <select id="cf_service">
+          <option value="">¿Cuántos activos tienes?</option>
+          <option>Menos de 1,000</option><option>1,000 – 10,000</option>
+          <option>10,000 – 50,000</option><option>50,000 – 200,000</option><option>Más de 200,000</option>
+        </select>
+      </div>
+      <div class="fg"><label>TIPO DE ACTIVOS PRINCIPALES</label>
+        <select>
+          <option value="">¿Qué necesitas gestionar?</option>
+          <option>Software / Licencias</option><option>Hardware / Infraestructura IT</option>
+          <option>Red / Telecomunicaciones</option><option>Activos industriales / IoT</option>
+          <option>Flota vehicular / AGVs</option><option>Activos cloud</option><option>Todo lo anterior</option>
+        </select>
+      </div>
+      <div class="fg"><label>SISTEMA ACTUAL</label>
+        <select>
+          <option value="">¿Qué usas hoy?</option>
+          <option>Excel / Hojas de cálculo</option><option>ServiceNow CMDB</option>
+          <option>SAP / Oracle ERP</option><option>Jira / Confluence</option>
+          <option>Otro software</option><option>No tenemos sistema formal</option>
+        </select>
+      </div>
+      <div class="fg"><label>NECESIDADES ESPECÍFICAS</label><textarea id="cf_message" placeholder="¿Qué problema principal quieres resolver? ¿Requerimientos de integración o compliance?..."></textarea></div>
+      <div id="cf_error" style="display:none;font-family:\'Share Tech Mono\',monospace;font-size:.48rem;color:#e05050;padding:8px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.06);margin-bottom:8px;"></div>
+  <button class="btn-send" id="cf_btn" onclick="sendContactForm()">SOLICITAR DEMO PERSONALIZADA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ACUSE DE RECIBO ══ -->
+<div id="acuseModal" style="position:fixed;inset:0;z-index:99100;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.96);backdrop-filter:blur(16px);">
+  <div style="background:#05101e;border:1px solid rgba(0,229,255,.38);max-width:500px;width:94%;padding:0;animation:acuseIn .4s both;position:relative;">
+    <style>@keyframes acuseIn{0%{opacity:0;transform:scale(.93) translateY(18px);}100%{opacity:1;transform:none;}}</style>
+    <div style="padding:16px 22px 12px;border-bottom:1px solid rgba(0,229,255,.13);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">✓ MENSAJE ENVIADO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#00e5ff;letter-spacing:2px;">ACUSE DE RECIBO</div>
+      </div>
+      <button onclick="closeAcuse()" style="background:none;border:none;color:#aaa;font-size:1.4rem;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.13);margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;">FOLIO</span>
+        <span id="acuse_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:#00e5ff;"></span>
+        <span id="acuse_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.5;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">NOMBRE</span><span id="acuse_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">EMAIL</span><span id="acuse_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#00e5ff;font-weight:600;word-break:break-all;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">TELÉFONO</span><span id="acuse_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">SERVICIO</span><span id="acuse_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f5c842;font-weight:600;"></span></div>
+        <div style="padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;display:block;margin-bottom:3px;">MENSAJE</span><span id="acuse_msg" style="font-family:'Rajdhani',sans-serif;font-size:.85rem;color:#fff;line-height:1.6;"></span></div>
+      </div>
+      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.43rem;color:#00ff88;line-height:2;margin-bottom:14px;">
+        Mensaje enviado a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5c3f3332283d3f28331c383d283d2f252f723124">[email&#160;protected]</a><br>
+        Tiempo de respuesta: menos de 24 horas hábiles
+      </div>
+      <button onclick="closeAcuse()" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid #00e5ff;color:#00e5ff;cursor:pointer;">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-logo">DATASYS</div>
+  <div class="ft-tag">INVENTARIO VIRTUAL · BLOCKCHAIN · GEMELO DIGITAL · GESTIÓN DE ACTIVOS</div>
+  <div class="ft-copy">© 2026 DATASYS. Todos los derechos reservados. · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e78488899386849388a783869386949e94c984888a">[email&#160;protected]</a> · +52 (55) 1234-5678</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+/* ══ FORMULARIO REAL — FORMSPREE (meelpnqr) ══ */
+function sendContactForm(){
+  var name    = document.getElementById('cf_name')    ? document.getElementById('cf_name').value.trim()    : '';
+  var email   = document.getElementById('cf_email')   ? document.getElementById('cf_email').value.trim()   : '';
+  var phone   = document.getElementById('cf_phone')   ? document.getElementById('cf_phone').value.trim()   : '';
+  var srvEl   = document.getElementById('cf_service');
+  var service = srvEl ? srvEl.value : '';
+  var msgEl   = document.getElementById('cf_message') || document.getElementById('cf_address');
+  var message = msgEl ? msgEl.value.trim() : '';
+  var errEl   = document.getElementById('cf_error');
+  var btn     = document.getElementById('cf_btn');
+  if(errEl) errEl.style.display = 'none';
+  if(!name){
+    if(errEl){ errEl.textContent='Por favor ingresa tu nombre.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){ errEl.textContent='Por favor ingresa un correo electrónico válido.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!service){
+    if(errEl){ errEl.textContent='Por favor selecciona un servicio.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!message){
+    if(errEl){ errEl.textContent='Por favor escribe tu mensaje.'; errEl.style.display='block'; }
+    return;
+  }
+  var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+  var fecha = new Date().toLocaleString('es-MX', {
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  var origTxt = btn ? btn.textContent : '';
+  if(btn){
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    btn.style.background = 'rgba(0,229,255,.1)';
+    btn.style.color = '#00e5ff';
+  }
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:name, email:email, phone:phone||'N/A',
+      service:service, message:message,
+      folio:folio, fecha:fecha, _replyto:email
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+  .then(function(res){
+    if(res.ok){
+      ['cf_name','cf_email','cf_phone','cf_message','cf_address'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      if(srvEl) srvEl.value = '';
+      var am = document.getElementById('acuseModal');
+      if(am){
+        document.getElementById('acuse_folio').textContent   = folio;
+        document.getElementById('acuse_fecha').textContent   = fecha;
+        document.getElementById('acuse_nombre').textContent  = name;
+        document.getElementById('acuse_email').textContent   = email;
+        document.getElementById('acuse_phone').textContent   = phone || '—';
+        document.getElementById('acuse_service').textContent = service;
+        document.getElementById('acuse_msg').textContent     = message;
+        am.style.display = 'flex';
+      }
+      if(btn){
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'rgba(0,255,136,.1)';
+        btn.style.color = '#00ff88';
+        btn.style.border = '1px solid #00ff88';
+        setTimeout(function(){
+          btn.textContent = origTxt;
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.border = '';
+        }, 8000);
+      }
+    } else {
+      if(errEl){ errEl.textContent='Error al enviar. Por favor intenta de nuevo.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+    }
+  })
+  .catch(function(){
+    if(errEl){ errEl.textContent='Error de conexión. Verifica tu red e intenta de nuevo.'; errEl.style.display='block'; }
+    if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+  });
+}
+function closeAcuse(){
+  var m = document.getElementById('acuseModal');
+  if(m) m.style.display = 'none';
+}
+var sendForm = sendContactForm;
+var sendDemo = sendContactForm;
+function submitForm(btn){ sendContactForm(); }
+function subscribePrint(btn){ sendContactForm(); }
+
+</script><script>
+window.addEventListener("load",function(){
+setTimeout(function(){
+const cA=document.getElementById('cA'),cB=document.getElementById('cB');
+document.addEventListener('mousemove',e=>{cA.style.left=e.clientX+'px';cA.style.top=e.clientY+'px';setTimeout(()=>{cB.style.left=e.clientX+'px';cB.style.top=e.clientY+'px';},70);});
+setInterval(()=>{document.getElementById('navClock').textContent=new Date().toLocaleTimeString('es-MX');},1000);
+const rnd=(a,b)=>Math.random()*(b-a)+a;
+const arr=(n,a,b)=>Array.from({length:n},()=>parseFloat(rnd(a,b).toFixed(1)));
+const fN=n=>Math.round(n).toLocaleString('es-MX');
+const TT={backgroundColor:'rgba(0,8,18,.97)',borderColor:'rgba(0,229,255,.2)',borderWidth:1,titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:10},titleColor:'#00e5ff',bodyColor:'#b8d8e8',padding:10};
+const mkG=(ctx,c1,c2)=>{const g=ctx.createLinearGradient(0,0,0,ctx.canvas.height);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;};
+
+// NODES
+(()=>{const nl=document.getElementById('nodeLayer');for(let i=0;i<28;i++){const n=document.createElement('div');n.className='node';const s=n.style,sz=2+Math.random()*4;s.width=s.height=sz+'px';s.left=Math.random()*100+'%';s.top=Math.random()*100+'%';s.background=Math.random()>.6?'rgba(0,229,255,.6)':'rgba(0,255,170,.5)';s.boxShadow=`0 0 ${sz*2}px currentColor`;s.setProperty('--nd',(4+Math.random()*8)+'s');s.setProperty('--dl',Math.random()*6+'s');s.setProperty('--dx',(Math.random()*30-15)+'px');s.setProperty('--dy',(Math.random()*24-12)+'px');nl.appendChild(n);}})();
+
+// MAP DOTS
+(()=>{
+  const pts=[{x:'17%',y:'32%',c:'#00e5ff'},{x:'25%',y:'36%',c:'#00e5ff'},{x:'14%',y:'22%',c:'#00ffaa'},{x:'23%',y:'65%',c:'#00e5ff'},{x:'45%',y:'20%',c:'#00ffaa'},{x:'50%',y:'24%',c:'#00e5ff'},{x:'55%',y:'22%',c:'#00ffaa'},{x:'67%',y:'28%',c:'#00e5ff'},{x:'72%',y:'28%',c:'#00ffaa'},{x:'80%',y:'26%',c:'#00e5ff'},{x:'82%',y:'42%',c:'#00ffaa'},{x:'68%',y:'18%',c:'#00e5ff'},{x:'44%',y:'48%',c:'#ffb700'},{x:'58%',y:'36%',c:'#00ffaa'}];
+  const md=document.getElementById('mapDots');
+  pts.forEach((p,i)=>{const d=document.createElement('div');d.className='mdot';d.style.cssText=`left:${p.x};top:${p.y};background:${p.c};color:${p.c};box-shadow:0 0 8px ${p.c};animation-delay:${i*.2}s;`;md.appendChild(d);});
+})();
+
+// DONUT
+new Chart(document.getElementById('distDonut').getContext('2d'),{
+  type:'doughnut',
+  data:{labels:['Software','Hardware','Red','Cloud','Flota','IoT','Infra','Físico'],datasets:[{data:[34218,28941,18472,22184,4832,16200,6840,3160],backgroundColor:['rgba(0,229,255,.75)','rgba(0,255,170,.7)','rgba(124,58,237,.7)','rgba(20,184,166,.7)','rgba(255,183,0,.7)','rgba(16,185,129,.65)','rgba(167,139,250,.6)','rgba(255,51,102,.55)'],borderColor:'rgba(0,8,18,.8)',borderWidth:2,hoverOffset:5}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{position:'right',labels:{color:'#6fa8bc',font:{family:'Share Tech Mono',size:8},boxWidth:8,padding:8}},tooltip:{...TT,callbacks:{label:c=>` ${c.label}: ${fN(c.raw)}`}}}}
+});
+
+// ASSETS
+const ASSETS=[
+  {id:'SW-A3-001',name:'Software Unit #A3',cat:'digital',cat2:'SOFTWARE',loc:'CDMX · DataCenter 1',st:'on',val:48200,tx:'hace 2min'},
+  {id:'SR-A4-002',name:'Server Rack #A4',cat:'fisico',cat2:'HARDWARE',loc:'Monterrey · HQ',st:'on',val:124000,tx:'hace 5min'},
+  {id:'RB-A3-003',name:'Robotics Unit #A3',cat:'fisico',cat2:'FLOTA',loc:'Planta Norte · L2',st:'wr',val:380000,tx:'hace 12min'},
+  {id:'FV-7-004', name:'Fleet Vehicle #FV-7',cat:'vehiculo',cat2:'FLOTA',loc:'Arctisng · Depósito',st:'off',val:68000,tx:'hace 1h'},
+  {id:'SW-019',   name:'Adobe Creative Suite',cat:'digital',cat2:'SOFTWARE',loc:'Cloud · Global',st:'on',val:4200,tx:'hace 3min'},
+  {id:'NW-F02',   name:'Cisco Firewall ASA',cat:'network',cat2:'RED',loc:'DMZ · CDMX',st:'on',val:28000,tx:'hace 8min'},
+  {id:'IOT-042',  name:'Sensor Temperatura IoT',cat:'digital',cat2:'IoT',loc:'Planta Sur · L4',st:'on',val:1200,tx:'hace 30s'},
+  {id:'SRV-GPU1', name:'NVIDIA A100 x4 Node',cat:'fisico',cat2:'HARDWARE',loc:'GPU Cluster · DC2',st:'on',val:480000,tx:'hace 4min'},
+  {id:'CLD-AWS01',name:'AWS EC2 m5.4xlarge',cat:'digital',cat2:'CLOUD',loc:'us-east-1',st:'on',val:8400,tx:'hace 1min'},
+  {id:'NW-SW08',  name:'Juniper EX4300',cat:'network',cat2:'RED',loc:'Core Network · HQ',st:'wr',val:18000,tx:'hace 22min'},
+  {id:'VH-AGV3',  name:'AGV Almacén-8',cat:'vehiculo',cat2:'FLOTA',loc:'Almacén Central',st:'on',val:95000,tx:'hace 7min'},
+  {id:'INF-DC3',  name:'UPS Eaton 9355',cat:'fisico',cat2:'INFRA',loc:'DC3 · Guadalajara',st:'on',val:42000,tx:'hace 15min'},
+];
+let filteredAssets=[...ASSETS],filterMode='all';
+function setFilter(mode,btn){filterMode=mode;document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('on'));btn.classList.add('on');filterAssets();}
+function filterAssets(){const q=document.getElementById('assetSearch').value.toLowerCase();filteredAssets=ASSETS.filter(a=>{const mq=!q||a.id.toLowerCase().includes(q)||a.name.toLowerCase().includes(q)||a.loc.toLowerCase().includes(q)||a.cat2.toLowerCase().includes(q);const mf=filterMode==='all'||(filterMode==='digital'&&a.cat==='digital')||(filterMode==='fisico'&&a.cat==='fisico')||(filterMode==='network'&&a.cat==='network')||(filterMode==='vehiculo'&&a.cat==='vehiculo')||(filterMode==='offline'&&a.st==='off');return mq&&mf;});renderTable();}
+function renderTable(){document.getElementById('assetTbody').innerHTML=filteredAssets.map(a=>`<tr><td><div class="td-id">${a.id}</div></td><td style="font-size:.78rem;font-weight:500;">${a.name}</td><td><div class="td-n">${a.cat2}</div></td><td><div class="td-n">${a.loc}</div></td><td style="text-align:center;"><span class="st-dot st-${a.st}"></span></td><td><div class="td-n" style="color:${a.val>100000?'var(--g)':a.val>20000?'var(--c)':'var(--steel)'};">$${fN(a.val)}</div></td><td><div class="td-n">${a.tx}</div></td></tr>`).join('');}
+renderTable();
+
+// TXNS
+const TT2=[{l:'REGISTRADO',c:'var(--g)',b:'rgba(0,255,170,.3)'},{l:'ACTUALIZADO',c:'var(--c)',b:'rgba(0,229,255,.3)'},{l:'REASIGNADO',c:'var(--amber)',b:'rgba(255,183,0,.3)'},{l:'MANTENIMIENTO',c:'#a78bfa',b:'rgba(167,139,250,.3)'},{l:'BAJA',c:'var(--rose)',b:'rgba(255,51,102,.3)'}];
+function gh(){return '0x'+Array.from({length:8},()=>Math.floor(Math.random()*16).toString(16)).join('')+'...';}
+function genFeed(n=5){return Array.from({length:n},()=>{const t=TT2[Math.floor(Math.random()*TT2.length)],a=ASSETS[Math.floor(Math.random()*ASSETS.length)],blk=Math.round(8472000+rnd(100,500));return`<div class="txn"><div class="txn-top"><div class="t-hash">${gh()}</div><div class="t-type" style="color:${t.c};border-color:${t.b};">${t.l}</div></div><div class="t-desc">${a.name} · ${a.loc}</div><div class="t-meta"><div class="t-fld">ID: <span>${a.id}</span></div><div class="t-fld">BLK: <span>#${fN(blk)}</span></div><div class="t-time">hace ${Math.round(rnd(1,90))}min</div></div></div>`;}).join('');}
+document.getElementById('txnFeed').innerHTML=genFeed();
+document.getElementById('hTxns').innerHTML=Array.from({length:3},()=>{const t=TT2[Math.floor(Math.random()*3)];return`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(0,229,255,.05);font-family:'Share Tech Mono',monospace;font-size:.5rem;"><span style="color:var(--c);">${gh()}</span><span style="color:${t.c};">${t.l}</span><span style="color:var(--dim);">hace ${Math.round(rnd(1,10))}min</span></div>`;}).join('');
+
+// TS CHART
+let tsChart=null,tsMode='act';
+const METRICS={act:{min:800,max:4200,col:'rgba(0,229,255,'},alerts:{min:0,max:40,col:'rgba(255,183,0,'},txns:{min:3000,max:12000,col:'rgba(124,58,237,'}};
+let tsData={};const tsL=Array.from({length:24},(_,i)=>`${String(i).padStart(2,'0')}:00`);
+Object.keys(METRICS).forEach(k=>{const m=METRICS[k];tsData[k]=arr(24,m.min*.4,m.max*.85);});
+function buildTs(){const ctx=document.getElementById('tsChart').getContext('2d');const m=METRICS[tsMode];if(tsChart)tsChart.destroy();tsChart=new Chart(ctx,{type:'line',data:{labels:tsL,datasets:[{data:tsData[tsMode],borderColor:m.col+'1)',borderWidth:2,fill:true,backgroundColor:c2=>mkG(c2.chart.ctx,m.col+'.2)',m.col+'0)'),pointRadius:0,tension:.42}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{...TT,mode:'index',intersect:false}},scales:{x:{ticks:{color:'#2a5066',font:{family:'Share Tech Mono',size:9},maxTicksLimit:8},grid:{color:'rgba(0,229,255,.04)'}},y:{position:'right',ticks:{color:'#2a5066',font:{family:'Share Tech Mono',size:9},maxTicksLimit:5},grid:{color:'rgba(0,229,255,.05)'}}},animation:{duration:350}}});}
+function switchMetric(v){tsMode=v;buildTs();}
+buildTs();
+
+// HEALTH
+function renderHealth(){const metrics=[{lbl:'CPU SISTEMA',val:parseFloat(rnd(38,65).toFixed(1)),col:'var(--c)'},{lbl:'MEMORIA RAM',val:parseFloat(rnd(55,78).toFixed(1)),col:'var(--g)'},{lbl:'RED UTILIZ.',val:parseFloat(rnd(22,45).toFixed(1)),col:'var(--amber)'},{lbl:'ACTIVOS SYNC',val:parseFloat(rnd(97,99.9).toFixed(1)),col:'var(--g)',unit:'%',pct:99},{lbl:'LATENCIA AVG',val:parseFloat(rnd(1.2,2.4).toFixed(1)),col:'var(--c)',unit:'ms',pct:25}];document.getElementById('healthPanel').innerHTML=metrics.map(m=>`<div style="margin-bottom:12px;"><div style="display:flex;justify-content:space-between;margin-bottom:5px;"><span style="font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1.5px;color:var(--steel);">${m.lbl}</span><span style="font-family:'Orbitron',sans-serif;font-size:.62rem;color:${m.col};">${m.val}${m.unit||'%'}</span></div><div style="height:3px;background:rgba(0,229,255,.08);border-radius:1px;overflow:hidden;"><div style="width:${m.pct||m.val}%;height:100%;background:${m.col};border-radius:1px;opacity:.8;transition:width 1.5s ease;"></div></div></div>`).join('');}
+renderHealth();
+
+// SPARKLINE
+(()=>{const data=arr(30,1200,4800);const ctx=document.getElementById('heroSparkline').getContext('2d');new Chart(ctx,{type:'line',data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:'rgba(0,229,255,.8)',borderWidth:1.5,fill:true,backgroundColor:ctx2=>mkG(ctx2.chart.ctx,'rgba(0,229,255,.18)','rgba(0,229,255,0)'),pointRadius:0,tension:.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:0}}});})();
+
+// BLOCKCHAIN VISUAL
+document.getElementById('chainVisual').innerHTML=[{num:'#8,472,341',time:'hace 12s',ops:['REGISTRADO','ACTUALIZADO','SYNC']},{num:'#8,472,340',time:'hace 45s',ops:['REASIGNADO','BAJA']},{num:'#8,472,339',time:'hace 1m 12s',ops:['MANTENIMIENTO','REGISTRADO','REGISTRADO']}].map((b,i)=>`${i>0?'<div class="chain-conn"></div>':''}<div class="chain-blk"><div class="cb-top2"><div class="cb-n">BLOQUE ${b.num}</div><div class="cb-t">${b.time}</div></div><div class="cb-hash">${gh().slice(0,28)}...${gh().slice(-8)}</div><div class="cb-ops">${b.ops.map(op=>`<div class="cb-op">${op}</div>`).join('')}</div></div>`).join('');
+
+// LIVE UPDATES
+setInterval(()=>{
+  const tot=124847+Math.round(rnd(-20,40));const on=Math.round(tot*rnd(.968,.973));const al=Math.round(rnd(32,48));const off=tot-on-al;
+  document.getElementById('hTotal').textContent=fN(tot);document.getElementById('hOnline').textContent=fN(on);document.getElementById('hAlert').textContent=al;document.getElementById('hOff').textContent=off;document.getElementById('hBar').style.width=(on/tot*100).toFixed(1)+'%';document.getElementById('mapTotal').textContent=fN(on);document.getElementById('liveCount').textContent=fN(tot);
+  const blks=8472341+Math.round(rnd(0,3));document.getElementById('ciBlocks').textContent=fN(blks);const txns=147283+Math.round(rnd(-50,120));document.getElementById('ciTxns').textContent=fN(txns);document.getElementById('txnCount').textContent=fN(txns)+' HOY';
+  Object.keys(METRICS).forEach(k=>{const m=METRICS[k];const last=tsData[k][tsData[k].length-1];tsData[k].push(Math.max(m.min*.3,Math.min(m.max*1.05,last*(1+rnd(-1,1)*.07))));tsData[k].shift();});
+  if(tsChart){tsChart.data.datasets[0].data=tsData[tsMode];tsChart.update('none');}
+},2000);
+
+},200);
+});
+</script>
+</body>
+</html>

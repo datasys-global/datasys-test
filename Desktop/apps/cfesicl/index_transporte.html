@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+  <!-- ═══ PWA ═══ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CFE·SICL">
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+  <meta name="msapplication-TileColor" content="#060a06">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CFE·SICL — Transportista</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #070b10;
+    --surface: #0e1520;
+    --card: #111c2a;
+    --border: #1e2d40;
+    --accent: #0099ff;
+    --accent2: #00e5a0;
+    --warn: #ff9500;
+    --danger: #ff3355;
+    --text: #dce8f5;
+    --muted: #5a7a9a;
+    --grid: rgba(0,153,255,0.04);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events:none; z-index:0;
+  }
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(7,11,16,0.95);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:0 2rem;
+    display:flex; align-items:center; justify-content:space-between;
+    height:64px;
+  }
+  .logo { font-family:'Bebas Neue',cursive; font-size:1.8rem; letter-spacing:4px; color:var(--accent); }
+  .logo span { color:var(--text); }
+  .logo .cfe { color:#ffe033; }
+  .badge { background:var(--accent); color:var(--black); font-family:'IBM Plex Mono',monospace; font-size:0.65rem; font-weight:600; padding:3px 10px; letter-spacing:2px; }
+  .nav-link { padding:6px 14px; font-size:0.75rem; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--muted); text-decoration:none; border:1px solid transparent; transition:all 0.2s; }
+  .nav-link:hover { color:var(--accent); border-color:var(--accent); }
+
+  /* RPE BAR */
+  #rpeBar {
+    background:rgba(7,11,16,0.97); border-bottom:1px solid var(--border);
+    padding:0.5rem 2rem; display:flex; align-items:center; gap:1rem;
+    font-family:'IBM Plex Mono',monospace; font-size:0.65rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted);
+    position:sticky; top:64px; z-index:90;
+  }
+  #rpeInput {
+    background:var(--surface); border:1px solid var(--border); color:var(--accent);
+    padding:0.3rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.85rem;
+    outline:none; width:160px;
+  }
+  #rpeInput:focus { border-color:var(--accent); }
+  #rpeName { color:var(--text); font-weight:600; min-width:120px; }
+
+  main { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:2rem; display:flex; flex-direction:column; gap:1.5rem; }
+
+  .section { background:var(--card); border:1px solid var(--border); padding:1.5rem; position:relative; overflow:hidden; }
+  .section::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); }
+  .section-title { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* CARDS */
+  .orders-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(340px,1fr)); gap:1rem; }
+  .order-card {
+    background:var(--surface); border:1px solid var(--border);
+    padding:1.25rem; position:relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .order-card:hover { border-color:var(--accent); box-shadow:0 0 20px rgba(0,153,255,0.08); }
+  .order-card-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem; }
+  .order-id { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--accent); font-weight:600; letter-spacing:1px; }
+  .order-date { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:var(--muted); }
+
+  /* CHIP */
+  .chip { display:inline-block; padding:2px 10px; font-family:'IBM Plex Mono',monospace; font-size:0.62rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; }
+  .chip-pending { background:rgba(0,153,255,0.15); color:var(--accent); }
+  .chip-transit { background:rgba(255,149,0,0.15); color:var(--warn); }
+  .chip-done    { background:rgba(0,229,160,0.12); color:var(--accent2); }
+  .chip-zero    { background:rgba(100,100,100,0.2); color:var(--muted); }
+
+  .info-row { display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.5rem; }
+  .info-label { color:var(--muted); font-size:0.72rem; text-transform:uppercase; letter-spacing:1px; font-family:'IBM Plex Mono',monospace; }
+  .info-value { color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:0.82rem; }
+
+  .prods-list { background:rgba(0,0,0,0.2); border:1px solid var(--border); padding:0.75rem; margin:0.75rem 0; }
+  .prod-row { display:flex; justify-content:space-between; font-size:0.82rem; padding:0.3rem 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .prod-row:last-child { border-bottom:none; }
+  .prod-qty { font-family:'IBM Plex Mono',monospace; color:var(--accent2); }
+
+  .zones-row { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.5rem 0; }
+  .zone-tag { padding:3px 10px; background:rgba(0,153,255,0.08); border:1px solid rgba(0,153,255,0.25); color:var(--accent); font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:1px; text-transform:uppercase; }
+
+  .btn { padding:0.65rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s; }
+  .btn-primary { background:var(--accent); color:var(--black); }
+  .btn-primary:hover { background:#33aaff; transform:translateY(-1px); }
+  .btn-secondary { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  .btn-secondary:hover { background:rgba(0,153,255,0.08); }
+  .btn-sm { padding:0.4rem 1rem; font-size:0.68rem; letter-spacing:1.5px; }
+  .btn-done { background:var(--accent2); color:var(--black); }
+  .btn-done:hover { background:#00ffb3; }
+  .btn:disabled { opacity:0.3; cursor:not-allowed; transform:none!important; }
+
+  .empty-state { text-align:center; padding:3rem; color:var(--muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; }
+
+  /* CONFIRM MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:500; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px); }
+  .modal { background:var(--card); border:1px solid var(--border); padding:2rem; max-width:440px; width:90%; position:relative; }
+  .modal::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); }
+  .modal-title { font-family:'Bebas Neue',cursive; font-size:1.6rem; letter-spacing:3px; color:var(--accent); margin-bottom:1rem; }
+  .modal p { font-size:0.88rem; color:var(--muted); margin-bottom:1.5rem; line-height:1.6; }
+  .modal-actions { display:flex; gap:0.75rem; }
+
+  #toast { position:fixed; bottom:2rem; right:2rem; z-index:999; display:flex; flex-direction:column; gap:0.5rem; }
+  .toast-item { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); padding:0.75rem 1.25rem; font-size:0.82rem; font-family:'IBM Plex Mono',monospace; max-width:340px; animation:toastIn 0.3s ease; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+  .toast-item.err { border-left-color:var(--danger); }
+  @keyframes toastIn { from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)} }
+
+  .divider { width:1px; height:20px; background:var(--border); }
+  .counter-bar { display:flex; gap:1.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+  .counter { background:var(--surface); border:1px solid var(--border); padding:0.75rem 1.25rem; }
+  .counter-label { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  .counter-value { font-family:'Bebas Neue',cursive; font-size:1.8rem; color:var(--accent); line-height:1; }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="logo">CFE·<span style="color:#ffe033">SICL</span><span>·TRANSP</span></div>
+    <div class="badge">Transportista</div>
+  </div>
+  <a href="index_clave.html" style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1.5px;color:var(--muted);text-decoration:none;text-transform:uppercase;border:1px solid var(--border);padding:5px 12px;transition:all 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← Portal</a>
+</header>
+
+<div id="rpeBar">
+  <span>RPE:</span>
+  <input id="rpeInput" placeholder="Tu RPE / ID" maxlength="20" />
+  <div class="divider"></div>
+  <div id="rpeName">—</div>
+  <div class="divider"></div>
+  <button class="btn btn-sm btn-secondary" onclick="loadMyOrders()" style="padding:4px 12px;font-size:0.62rem">CARGAR MIS ÓRDENES</button>
+</div>
+
+<main>
+  <div class="section">
+    <div class="section-title">Mis Órdenes de Transporte</div>
+
+    <div class="counter-bar">
+      <div class="counter"><div class="counter-label">Pendientes</div><div class="counter-value" id="cPend">0</div></div>
+      <div class="counter"><div class="counter-label">En Tránsito</div><div class="counter-value" id="cTransit">0</div></div>
+      <div class="counter"><div class="counter-label">Entregadas</div><div class="counter-value" id="cDone">0</div></div>
+    </div>
+
+    <div class="orders-grid" id="ordersGrid">
+      <div class="empty-state">Ingresa tu RPE y carga tus órdenes</div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="confirmModal" style="display:none">
+  <div class="modal">
+    <div class="modal-title">Confirmar Despacho</div>
+    <p id="modalBody"></p>
+    <div class="modal-actions">
+      <button class="btn btn-done btn-sm" id="modalConfirmBtn">✓ CONFIRMAR DESPACHO</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const KEY_INV = 'sicl_inventory';
+const KEY_ORDERS = 'sicl_orders';
+const KEY_LOG = 'sicl_log';
+
+let orders = [];
+let currentRpe = '';
+
+document.getElementById('rpeInput').addEventListener('input', function(){
+  currentRpe = this.value.trim();
+  document.getElementById('rpeName').textContent = currentRpe || '—';
+  localStorage.setItem('sicl_transporte_rpe', currentRpe);
+});
+(function(){
+  const s = localStorage.getItem('sicl_transporte_rpe');
+  if(s){ document.getElementById('rpeInput').value=s; currentRpe=s; document.getElementById('rpeName').textContent=s; }
+})();
+
+function loadMyOrders() {
+  if(!currentRpe){ toast('Ingresa tu RPE primero','err'); return; }
+  orders = JSON.parse(localStorage.getItem(KEY_ORDERS)||'[]');
+  const mine = orders.filter(o =>
+    o.rpeTransportista?.toLowerCase() === currentRpe.toLowerCase() ||
+    o.transportista?.toLowerCase().includes(currentRpe.toLowerCase())
+  );
+  renderOrders(mine);
+}
+
+function renderOrders(list) {
+  const grid = document.getElementById('ordersGrid');
+  const all = list || orders;
+  document.getElementById('cPend').textContent    = all.filter(o=>o.status==='pendiente').length;
+  document.getElementById('cTransit').textContent = all.filter(o=>o.status==='en_transito').length;
+  document.getElementById('cDone').textContent    = all.filter(o=>o.status==='entregado'||o.status==='entregado_faltante').length;
+
+  if(!all.length){ grid.innerHTML='<div class="empty-state">No tienes órdenes asignadas</div>'; return; }
+
+  grid.innerHTML = all.map(o=>{
+    const chipMap  = { pendiente:'chip-pending', en_transito:'chip-transit', parcial:'chip-partial', entregado:'chip-done', entregado_faltante:'chip-transit' };
+    const labelMap = { pendiente:'PENDIENTE', en_transito:'EN TRÁNSITO', parcial:'PARCIAL', entregado:'ENTREGADO', entregado_faltante:'ENTREGADO C/FALTANTE' };
+
+    let btnHTML = '';
+    if(o.status === 'pendiente'){
+      btnHTML = `<button class="btn btn-primary btn-sm" onclick="confirmDispatch('${o.id}')">▶ CONFIRMAR DESPACHO</button>`;
+    } else if(o.status === 'en_transito'){
+      btnHTML = `<span style="font-size:0.72rem;color:var(--warn);font-family:monospace">⏳ En ruta — esperando confirmación de zonas</span>`;
+    } else if(o.status === 'parcial'){
+      const pendientes = o.zonas.filter(z => !o.recepciones?.some(r => r.zona.toUpperCase()===z.toUpperCase()));
+      btnHTML = `<span style="font-size:0.72rem;color:var(--accent2);font-family:monospace">⚡ Parcial — pendiente: ${pendientes.join(', ')}</span>`;
+    } else if(o.status === 'entregado'){
+      btnHTML = `<span style="font-size:0.72rem;color:var(--accent2);font-family:monospace">✓ Todas las zonas confirmaron</span>`;
+    } else if(o.status === 'entregado_faltante'){
+      btnHTML = `<span style="font-size:0.72rem;color:var(--warn);font-family:monospace">✓ Entregado — con faltantes reportados</span>`;
+    }
+
+    // Mostrar estado por zona
+    const zonasStatus = o.zonas.map(z => {
+      const rec = o.recepciones?.find(r => r.zona.toUpperCase()===z.toUpperCase());
+      return `<div style="display:flex;justify-content:space-between;align-items:center;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.78rem">
+        <span style="font-family:monospace">${z}</span>
+        ${rec
+          ? `<span style="color:var(--accent2);font-family:monospace;font-size:0.68rem">✓ ${rec.receptor} · ${new Date(rec.ts).toLocaleTimeString('es-MX')}</span>`
+          : `<span style="color:var(--muted);font-family:monospace;font-size:0.68rem">⏳ pendiente</span>`}
+      </div>`;
+    }).join('');
+
+    return `<div class="order-card">
+      <div class="order-card-header">
+        <div>
+          <div class="order-id">${o.id}</div>
+          <div class="order-date">${new Date(o.fecha).toLocaleString('es-MX')}</div>
+        </div>
+        <span class="chip ${chipMap[o.status]||'chip-pending'}">${labelMap[o.status]||o.status}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="info-label">Transportista</span>
+        <span class="info-value">${o.transportista}</span>
+      </div>
+
+      <div class="info-label" style="margin-bottom:0.4rem">Zonas destino</div>
+      <div class="zones-row">${o.zonas.map(z=>`<span class="zone-tag">${z}</span>`).join('')}</div>
+
+      <div class="info-label" style="margin-bottom:0.4rem">Estado por zona</div>
+      <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:0.5rem 0.75rem;margin-bottom:0.75rem">
+        ${zonasStatus}
+      </div>
+
+      <div class="info-label" style="margin-bottom:0.4rem">Productos</div>
+      <div class="prods-list">
+        ${o.productos.map(p=>`
+          <div class="prod-row">
+            <span>${p.nombre}</span>
+            <span class="prod-qty">${p.cantidad} ${p.unidad}</span>
+          </div>`).join('')}
+      </div>
+
+      ${o.notas ? `<div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.75rem;font-style:italic">"${o.notas}"</div>`:''}
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border)">
+        ${btnHTML}
+        <span style="font-size:0.65rem;color:var(--muted);font-family:monospace">RPE Admin: ${o.rpeAdmin}</span>
+      </div>
+
+      ${o.historial?.length ? `<div style="font-size:0.62rem;color:var(--muted);font-family:monospace;margin-top:0.5rem;border-top:1px solid var(--border);padding-top:0.5rem">${o.historial.map(h=>`${new Date(h.ts).toLocaleTimeString('es-MX')} · ${h.accion} · ${h.rpe}`).join('<br>')}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+let pendingConfirmId = null;
+function confirmDispatch(orderId) {
+  if(!currentRpe){ toast('Ingresa tu RPE para confirmar','err'); return; }
+  const o = orders.find(x=>x.id===orderId);
+  if(!o) return;
+  pendingConfirmId = orderId;
+  document.getElementById('modalBody').innerHTML =
+    `<strong style="color:var(--text)">Orden ${o.id}</strong><br><br>
+    Productos: <strong>${o.productos.map(p=>p.nombre+' ×'+p.cantidad+p.unidad).join(', ')}</strong><br>
+    Zonas: <strong>${o.zonas.join(', ')}</strong><br><br>
+    Al confirmar, la orden cambiará a <span style="color:var(--warn)">EN TRÁNSITO</span> y la zona receptora podrá confirmar la recepción.`;
+  document.getElementById('modalConfirmBtn').onclick = () => doDispatch(orderId);
+  document.getElementById('confirmModal').style.display='flex';
+}
+function closeModal(){ document.getElementById('confirmModal').style.display='none'; pendingConfirmId=null; }
+
+function doDispatch(orderId) {
+  const allOrders = JSON.parse(localStorage.getItem(KEY_ORDERS)||'[]');
+  const idx = allOrders.findIndex(x=>x.id===orderId);
+  if(idx<0){ toast('Orden no encontrada','err'); return; }
+  allOrders[idx].status = 'en_transito';
+  allOrders[idx].historial = allOrders[idx].historial||[];
+  allOrders[idx].historial.push({ ts:new Date().toISOString(), accion:'DESPACHADO', rpe:currentRpe });
+  localStorage.setItem(KEY_ORDERS, JSON.stringify(allOrders));
+  logEvent(`Orden ${orderId} despachada por transportista RPE:${currentRpe}`);
+  toast(`✓ Orden ${orderId} marcada EN TRÁNSITO`);
+  closeModal();
+  loadMyOrders();
+}
+
+function logEvent(msg) {
+  const logs = JSON.parse(localStorage.getItem(KEY_LOG)||'[]');
+  logs.push({ ts:new Date().toISOString(), rpe:currentRpe, msg });
+  localStorage.setItem(KEY_LOG, JSON.stringify(logs));
+}
+
+function toast(msg, type='') {
+  const el = document.createElement('div');
+  el.className='toast-item'+(type==='err'?' err':'');
+  el.textContent=msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// Auto-load if RPE is saved
+if(localStorage.getItem('sicl_transporte_rpe')) loadMyOrders();
+</script>
+
+  <!-- ═══ REGISTRO SERVICE WORKER ═══ -->
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] Service Worker registrado:', reg.scope))
+          .catch(err => console.warn('[PWA] SW error:', err));
+      });
+    }
+
+    // Banner de instalación
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'flex';
+    });
+    window.addEventListener('appinstalled', () => {
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'none';
+      deferredPrompt = null;
+    });
+    function installApp(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        deferredPrompt = null;
+        const banner = document.getElementById('installBanner');
+        if(banner) banner.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chess — Humano vs Máquina</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --board-light: #f0e4c8;
+    --board-dark: #7a8c3a;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --red: #c0392b;
+    --green: #27ae60;
+    --text: #f0e6d3;
+    --text-dim: #8a7a6a;
+    --highlight: rgba(255, 215, 0, 0.45);
+    --valid-move: rgba(50, 200, 100, 0.5);
+    --capture: rgba(200, 50, 50, 0.55);
+    --last-move: rgba(200, 180, 50, 0.3);
+    --check: rgba(220, 50, 50, 0.7);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Text', serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  /* Fondo animado */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at 20% 20%, #1a1025 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 80%, #0d1a0d 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 8px 0 4px;
+  }
+  .header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+  }
+  .header p {
+    font-size: 13px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    margin-top: 2px;
+  }
+
+  /* Player panels */
+  .player-panel {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #2a2a3a;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .player-panel::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--gold);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+    border-radius: 0 2px 2px 0;
+  }
+  .player-panel.active::before { transform: scaleY(1); }
+  .player-panel.active { border-color: var(--gold); background: #1a1a28; }
+  .player-panel.in-check { border-color: var(--red) !important; }
+  .player-panel.in-check::before { background: var(--red); transform: scaleY(1); }
+
+  .player-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    background: #1e1e2e;
+    border: 2px solid #2a2a3a;
+    flex-shrink: 0;
+  }
+  .player-panel.active .player-avatar { border-color: var(--gold); }
+
+  .player-info { flex: 1; }
+  .player-name {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .player-status {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 1px;
+  }
+  .player-panel.in-check .player-status { color: var(--red); font-weight: 600; }
+
+  .captured-pieces {
+    display: flex; flex-wrap: wrap; gap: 1px;
+    max-width: 130px;
+    font-size: 15px;
+    line-height: 1;
+  }
+
+  /* Tablero */
+  .board-container {
+    width: 100%;
+    position: relative;
+  }
+
+  .board-wrapper {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 0 0 3px var(--gold), 0 0 30px rgba(201, 168, 76, 0.3), 0 20px 60px rgba(0,0,0,0.8);
+    position: relative;
+  }
+
+  #board {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .cell {
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s ease;
+  }
+  .cell.light { background: var(--board-light); }
+  .cell.dark  { background: var(--board-dark); }
+  .cell.selected { background: var(--highlight) !important; box-shadow: inset 0 0 0 3px rgba(255,215,0,0.8); }
+  .cell.valid-move::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    border-radius: 50%;
+    background: var(--valid-move);
+    pointer-events: none;
+  }
+  .cell.valid-capture::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    border: 4px solid var(--capture);
+    pointer-events: none;
+  }
+  .cell.last-move { background: var(--last-move) !important; }
+  .cell.king-check { background: var(--check) !important; }
+
+  .piece {
+    font-size: clamp(22px, 6.5vw, 42px);
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.1s ease;
+    position: relative;
+    z-index: 2;
+    user-select: none;
+  }
+  .piece.white-piece {
+    color: #ffffff;
+    filter: drop-shadow(0 0 1.5px #000) drop-shadow(0 0 1.5px #000) drop-shadow(0 1px 2px rgba(0,0,0,0.7));
+  }
+  .piece.black-piece {
+    color: #1a1a1a;
+    filter: drop-shadow(0 0 1px #fff) drop-shadow(0 0 1.5px rgba(255,255,255,0.6)) drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+  }
+  .piece:active { transform: scale(1.2); }
+
+  /* Coordenadas */
+  .coord {
+    position: absolute;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    opacity: 0.5;
+    pointer-events: none;
+    line-height: 1;
+  }
+  .coord-letter { bottom: 2px; right: 3px; }
+  .coord-number { top: 2px; left: 3px; }
+  .cell.light .coord { color: #7a8c3a; }
+  .cell.dark  .coord { color: #f0e4c8; }
+
+  /* Status bar */
+  .status-bar {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-align: center;
+    border: 1px solid #2a2a3a;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    min-height: 42px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .status-bar.thinking { color: var(--gold); }
+  .status-bar.check    { color: var(--red); }
+  .status-bar.normal   { color: var(--text); }
+  .status-bar.mate     { color: var(--gold-light); font-size: 15px; }
+
+  /* Controles */
+  .controls {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+  }
+  .btn {
+    flex: 1;
+    padding: 12px 8px;
+    border-radius: 8px;
+    border: 1px solid #2a2a3a;
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn.primary {
+    background: linear-gradient(135deg, #1a2a1a, #0d1a0d);
+    border-color: var(--green);
+    color: #6be06b;
+  }
+  .btn.danger {
+    background: linear-gradient(135deg, #2a1a1a, #1a0d0d);
+    border-color: var(--red);
+    color: #e06b6b;
+  }
+  .btn.gold {
+    background: linear-gradient(135deg, #2a2010, #1a1508);
+    border-color: var(--gold);
+    color: var(--gold-light);
+  }
+
+  /* Dificultad */
+  .difficulty-row {
+    width: 100%;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .diff-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+  .diff-btn {
+    flex: 1;
+    padding: 7px 4px;
+    border-radius: 6px;
+    border: 1px solid #2a2a3a;
+    background: var(--surface);
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+  }
+  .diff-btn.active {
+    border-color: var(--gold);
+    color: var(--gold-light);
+    background: #1a1508;
+  }
+
+  /* Overlay fin de partida */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .overlay.show { display: flex; }
+  .overlay-card {
+    background: var(--surface);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 32px 28px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(201, 168, 76, 0.3);
+    animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+  .overlay-icon { font-size: 64px; margin-bottom: 12px; }
+  .overlay-title {
+    font-family: 'Cinzel', serif;
+    font-size: 22px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+  }
+  .overlay-subtitle { font-size: 15px; color: var(--text-dim); margin-bottom: 24px; }
+  .overlay .btn { width: 100%; }
+
+  /* Loading spinner IA */
+  .thinking-dots::after {
+    content: '';
+    animation: dots 1.2s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0%  { content: ''; }
+    25% { content: '.'; }
+    50% { content: '..'; }
+    75% { content: '...'; }
+  }
+
+  /* Historial de movimientos */
+  .moves-log {
+    width: 100%;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid #2a2a3a;
+    overflow: hidden;
+  }
+  .moves-header {
+    padding: 8px 14px;
+    border-bottom: 1px solid #2a2a3a;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .moves-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 10px;
+    max-height: 80px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .move-entry { background: #1a1a28; border-radius: 4px; padding: 2px 6px; }
+  .move-entry.white { color: #e8d5b0; }
+  .move-entry.black-move { color: #aaa; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="header">
+    <h1>♛ Chess Royal ♛</h1>
+    <p>Humano vs Máquina</p>
+  </div>
+
+  <!-- Panel IA (negras - arriba) -->
+  <div class="player-panel" id="panel-black">
+    <div class="player-avatar">🤖</div>
+    <div class="player-info">
+      <div class="player-name">Máquina</div>
+      <div class="player-status" id="status-black">Esperando...</div>
+    </div>
+    <div class="captured-pieces" id="captured-white"></div>
+  </div>
+
+  <!-- Tablero -->
+  <div class="board-container">
+    <div class="board-wrapper">
+      <div id="board"></div>
+    </div>
+  </div>
+
+  <!-- Panel Humano (blancas - abajo) -->
+  <div class="player-panel active" id="panel-white">
+    <div class="player-avatar">👤</div>
+    <div class="player-info">
+      <div class="player-name">Tú</div>
+      <div class="player-status" id="status-white">Tu turno</div>
+    </div>
+    <div class="captured-pieces" id="captured-black"></div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar normal" id="status-msg">Selecciona una pieza para comenzar</div>
+
+  <!-- Dificultad -->
+  <div class="difficulty-row">
+    <span class="diff-label">Nivel:</span>
+    <button class="diff-btn active" onclick="setDifficulty(1, this)">Fácil</button>
+    <button class="diff-btn" onclick="setDifficulty(2, this)">Medio</button>
+    <button class="diff-btn" onclick="setDifficulty(3, this)">Difícil</button>
+    <button class="diff-btn" onclick="setDifficulty(4, this)">Experto</button>
+  </div>
+
+  <!-- Controles -->
+  <div class="controls">
+    <button class="btn danger" onclick="newGame()">Nueva Partida</button>
+    <button class="btn gold" onclick="undoMove()">↩ Deshacer</button>
+    <button class="btn primary" onclick="flipBoard()">⇅ Girar</button>
+  </div>
+
+  <!-- Historial -->
+  <div class="moves-log">
+    <div class="moves-header">Historial de movimientos</div>
+    <div class="moves-list" id="moves-list"></div>
+  </div>
+</div>
+
+<!-- Overlay fin de partida -->
+<div class="overlay" id="overlay">
+  <div class="overlay-card">
+    <div class="overlay-icon" id="overlay-icon">🏆</div>
+    <div class="overlay-title" id="overlay-title">¡Jaque Mate!</div>
+    <div class="overlay-subtitle" id="overlay-subtitle">Has ganado la partida</div>
+    <button class="btn primary" onclick="newGame(); closeOverlay();">Jugar de nuevo</button>
+  </div>
+</div>
+
+<script>
+// ========== PIEZAS ==========
+const PIECES = {
+  wK:'♚', wQ:'♛', wR:'♜', wB:'♝', wN:'♞', wP:'♟',
+  bK:'♚', bQ:'♛', bR:'♜', bB:'♝', bN:'♞', bP:'♟'
+};
+
+const PIECE_VALUES = { P:100, N:320, B:330, R:500, Q:900, K:20000 };
+
+// Tablas de posición para heurística
+const PST = {
+  P: [
+    [0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],
+    [5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],
+    [5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]
+  ],
+  N: [
+    [-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],
+    [-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],
+    [-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]
+  ],
+  B: [
+    [-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],
+    [-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],
+    [-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]
+  ],
+  R: [
+    [0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],
+    [-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],
+    [-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]
+  ],
+  Q: [
+    [-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],
+    [-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],
+    [-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]
+  ],
+  K: [
+    [-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],
+    [-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],
+    [-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],
+    [20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]
+  ]
+};
+
+// ========== ESTADO DEL JUEGO ==========
+let board = [];
+let selectedCell = null;
+let validMoves = [];
+let currentTurn = 'w';
+let gameOver = false;
+let flipped = false;
+let depth = 2;
+let history = [];
+let capturedByWhite = [];
+let capturedByBlack = [];
+let moveLog = [];
+let lastMove = null;
+let castleRights = { wK: true, wR_a: true, wR_h: true, bK: true, bR_a: true, bR_h: true };
+let enPassant = null;
+
+function initBoard() {
+  const back = ['R','N','B','Q','K','B','N','R'];
+  board = Array.from({length: 8}, () => Array(8).fill(null));
+  for (let c = 0; c < 8; c++) {
+    board[0][c] = 'b' + back[c];
+    board[1][c] = 'bP';
+    board[6][c] = 'wP';
+    board[7][c] = 'w' + back[c];
+  }
+}
+
+// ========== MOVIMIENTOS LEGALES ==========
+function getPieceMoves(b, r, c, checkCastle = true) {
+  const piece = b[r][c];
+  if (!piece) return [];
+  const color = piece[0];
+  const type = piece[1];
+  const moves = [];
+  const opp = color === 'w' ? 'b' : 'w';
+  const dir = color === 'w' ? -1 : 1;
+
+  const add = (nr, nc) => {
+    if (nr < 0 || nr > 7 || nc < 0 || nc > 7) return false;
+    const target = b[nr][nc];
+    if (target && target[0] === color) return false;
+    moves.push([nr, nc]);
+    return !target;
+  };
+
+  const slide = (dr, dc) => {
+    for (let i = 1; i < 8; i++) {
+      if (!add(r + dr*i, c + dc*i)) break;
+    }
+  };
+
+  if (type === 'P') {
+    const nr = r + dir;
+    if (nr >= 0 && nr <= 7 && !b[nr][c]) {
+      moves.push([nr, c]);
+      const start = color === 'w' ? 6 : 1;
+      if (r === start && !b[r + dir*2][c]) moves.push([r + dir*2, c]);
+    }
+    for (const dc of [-1, 1]) {
+      const nc = c + dc;
+      if (nc >= 0 && nc <= 7 && nr >= 0 && nr <= 7) {
+        if (b[nr][nc] && b[nr][nc][0] === opp) moves.push([nr, nc]);
+        if (enPassant && enPassant[0] === nr && enPassant[1] === nc) moves.push([nr, nc]);
+      }
+    }
+  } else if (type === 'N') {
+    for (const [dr, dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]])
+      add(r+dr, c+dc);
+  } else if (type === 'B') {
+    slide(-1,-1); slide(-1,1); slide(1,-1); slide(1,1);
+  } else if (type === 'R') {
+    slide(-1,0); slide(1,0); slide(0,-1); slide(0,1);
+  } else if (type === 'Q') {
+    slide(-1,-1); slide(-1,1); slide(1,-1); slide(1,1);
+    slide(-1,0); slide(1,0); slide(0,-1); slide(0,1);
+  } else if (type === 'K') {
+    for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]])
+      add(r+dr, c+dc);
+    // Enroque
+    if (checkCastle) {
+      const row = color === 'w' ? 7 : 0;
+      if (r === row && c === 4) {
+        if (color === 'w' ? castleRights.wK && castleRights.wR_h : castleRights.bK && castleRights.bR_h) {
+          if (!b[row][5] && !b[row][6] && b[row][7] === color+'R')
+            if (!isSqAttacked(b, row, 4, opp) && !isSqAttacked(b, row, 5, opp) && !isSqAttacked(b, row, 6, opp))
+              moves.push([row, 6]);
+        }
+        if (color === 'w' ? castleRights.wK && castleRights.wR_a : castleRights.bK && castleRights.bR_a) {
+          if (!b[row][3] && !b[row][2] && !b[row][1] && b[row][0] === color+'R')
+            if (!isSqAttacked(b, row, 4, opp) && !isSqAttacked(b, row, 3, opp) && !isSqAttacked(b, row, 2, opp))
+              moves.push([row, 2]);
+        }
+      }
+    }
+  }
+  return moves;
+}
+
+function isSqAttacked(b, r, c, byColor) {
+  for (let row = 0; row < 8; row++)
+    for (let col = 0; col < 8; col++)
+      if (b[row][col] && b[row][col][0] === byColor) {
+        const ms = getPieceMoves(b, row, col, false);
+        if (ms.some(([mr, mc]) => mr === r && mc === c)) return true;
+      }
+  return false;
+}
+
+function isInCheck(b, color) {
+  for (let r = 0; r < 8; r++)
+    for (let c = 0; c < 8; c++)
+      if (b[r][c] === color+'K') return isSqAttacked(b, r, c, color === 'w' ? 'b' : 'w');
+  return false;
+}
+
+function getLegalMoves(b, r, c) {
+  const piece = b[r][c];
+  if (!piece) return [];
+  const color = piece[0];
+  const pseudo = getPieceMoves(b, r, c);
+  return pseudo.filter(([nr, nc]) => {
+    const nb = applyMove(b, r, c, nr, nc);
+    return !isInCheck(nb, color);
+  });
+}
+
+function applyMove(b, r, c, nr, nc, promote = 'Q') {
+  const nb = b.map(row => [...row]);
+  const piece = nb[r][c];
+  const type = piece[1];
+  const color = piece[0];
+
+  // En passant capture
+  if (type === 'P' && enPassant && nr === enPassant[0] && nc === enPassant[1]) {
+    const capRow = color === 'w' ? nr + 1 : nr - 1;
+    nb[capRow][nc] = null;
+  }
+
+  nb[nr][nc] = piece;
+  nb[r][c] = null;
+
+  // Promotion
+  if (type === 'P' && (nr === 0 || nr === 7)) nb[nr][nc] = color + promote;
+
+  // Enroque
+  if (type === 'K' && Math.abs(nc - c) === 2) {
+    if (nc === 6) { nb[r][5] = nb[r][7]; nb[r][7] = null; }
+    else          { nb[r][3] = nb[r][0]; nb[r][0] = null; }
+  }
+
+  return nb;
+}
+
+// ========== IA (Minimax + Alpha-Beta) ==========
+function evaluate(b) {
+  let score = 0;
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const p = b[r][c];
+      if (!p) continue;
+      const color = p[0], type = p[1];
+      const val = PIECE_VALUES[type];
+      const pstRow = color === 'w' ? r : 7 - r;
+      const pstVal = PST[type] ? PST[type][pstRow][c] : 0;
+      score += color === 'w' ? (val + pstVal) : -(val + pstVal);
+    }
+  }
+  return score;
+}
+
+function getAllMoves(b, color) {
+  const moves = [];
+  for (let r = 0; r < 8; r++)
+    for (let c = 0; c < 8; c++)
+      if (b[r][c] && b[r][c][0] === color)
+        for (const [nr, nc] of getLegalMoves(b, r, c))
+          moves.push([r, c, nr, nc]);
+  // Orden: capturas primero
+  moves.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
+  return moves;
+}
+
+function minimax(b, d, alpha, beta, maximizing, savedEP, savedCR) {
+  const color = maximizing ? 'b' : 'w';
+  const moves = getAllMoves(b, color);
+
+  if (d === 0 || moves.length === 0) {
+    if (moves.length === 0) {
+      if (isInCheck(b, color)) return maximizing ? -50000 : 50000;
+      return 0;
+    }
+    return evaluate(b);
+  }
+
+  if (maximizing) {
+    let best = -Infinity;
+    for (const [r,c,nr,nc] of moves) {
+      const nb = applyMove(b, r, c, nr, nc);
+      best = Math.max(best, minimax(nb, d-1, alpha, beta, false));
+      alpha = Math.max(alpha, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  } else {
+    let best = Infinity;
+    for (const [r,c,nr,nc] of moves) {
+      const nb = applyMove(b, r, c, nr, nc);
+      best = Math.min(best, minimax(nb, d-1, alpha, beta, true));
+      beta = Math.min(beta, best);
+      if (beta <= alpha) break;
+    }
+    return best;
+  }
+}
+
+function getBestMove() {
+  const moves = getAllMoves(board, 'b');
+  if (moves.length === 0) return null;
+
+  // Dificultad 1: movimiento aleatorio
+  if (depth === 1) return moves[Math.floor(Math.random() * moves.length)];
+
+  // Dificultad 2+: con algo de aleatoriedad en niveles bajos
+  let best = -Infinity;
+  let bestMoves = [];
+  for (const [r,c,nr,nc] of moves) {
+    const nb = applyMove(board, r, c, nr, nc);
+    const score = minimax(nb, depth - 1, -Infinity, Infinity, false);
+    if (score > best) { best = score; bestMoves = [[r,c,nr,nc]]; }
+    else if (score === best) bestMoves.push([r,c,nr,nc]);
+  }
+  // En niveles bajos, algo de aleatoriedad
+  if (depth <= 2 && bestMoves.length > 1)
+    return bestMoves[Math.floor(Math.random() * bestMoves.length)];
+  return bestMoves[0];
+}
+
+// ========== RENDERIZADO ==========
+const LETTERS = ['a','b','c','d','e','f','g','h'];
+
+function renderBoard() {
+  const boardEl = document.getElementById('board');
+  boardEl.innerHTML = '';
+
+  for (let r = 0; r < 8; r++) {
+    for (let c = 0; c < 8; c++) {
+      const dr = flipped ? 7 - r : r;
+      const dc = flipped ? 7 - c : c;
+
+      const cell = document.createElement('div');
+      cell.className = 'cell ' + ((dr + dc) % 2 === 0 ? 'light' : 'dark');
+      cell.dataset.r = dr;
+      cell.dataset.c = dc;
+
+      // Coordenadas
+      if (c === 7) {
+        const num = document.createElement('span');
+        num.className = 'coord coord-number';
+        num.textContent = 8 - dr;
+        cell.appendChild(num);
+      }
+      if (r === 7) {
+        const let_ = document.createElement('span');
+        let_.className = 'coord coord-letter';
+        let_.textContent = LETTERS[dc];
+        cell.appendChild(let_);
+      }
+
+      // Último movimiento
+      if (lastMove && ((lastMove[0] === dr && lastMove[1] === dc) || (lastMove[2] === dr && lastMove[3] === dc)))
+        cell.classList.add('last-move');
+
+      // Selección
+      if (selectedCell && selectedCell[0] === dr && selectedCell[1] === dc)
+        cell.classList.add('selected');
+
+      // Movimientos válidos
+      if (validMoves.some(([mr, mc]) => mr === dr && mc === dc)) {
+        if (board[dr][dc]) cell.classList.add('valid-capture');
+        else cell.classList.add('valid-move');
+      }
+
+      // Jaque al rey
+      if (isInCheck(board, currentTurn)) {
+        for (let row = 0; row < 8; row++)
+          for (let col = 0; col < 8; col++)
+            if (board[row][col] === currentTurn + 'K' && row === dr && col === dc)
+              cell.classList.add('king-check');
+      }
+
+      // Pieza
+      const piece = board[dr][dc];
+      if (piece) {
+        const pieceEl = document.createElement('span');
+        const pieceColor = piece[0] === 'w' ? 'white-piece' : 'black-piece';
+        pieceEl.className = 'piece ' + pieceColor;
+        pieceEl.textContent = PIECES[piece];
+        cell.appendChild(pieceEl);
+      }
+
+      cell.addEventListener('click', () => onCellClick(dr, dc));
+      boardEl.appendChild(cell);
+    }
+  }
+
+  updatePanels();
+}
+
+function updatePanels() {
+  const panelW = document.getElementById('panel-white');
+  const panelB = document.getElementById('panel-black');
+  const statusW = document.getElementById('status-white');
+  const statusB = document.getElementById('status-black');
+
+  panelW.classList.toggle('active', currentTurn === 'w');
+  panelB.classList.toggle('active', currentTurn === 'b');
+
+  const wInCheck = isInCheck(board, 'w');
+  const bInCheck = isInCheck(board, 'b');
+  panelW.classList.toggle('in-check', wInCheck);
+  panelB.classList.toggle('in-check', bInCheck);
+
+  statusW.textContent = wInCheck ? '¡En jaque!' : (currentTurn === 'w' ? 'Tu turno' : 'Esperando...');
+  statusB.textContent = bInCheck ? '¡En jaque!' : (currentTurn === 'b' ? 'Pensando...' : 'Esperando...');
+
+  // Piezas capturadas
+  document.getElementById('captured-white').textContent = capturedByWhite.map(p => PIECES['b'+p]).join('');
+  document.getElementById('captured-black').textContent = capturedByBlack.map(p => PIECES['w'+p]).join('');
+}
+
+// ========== LÓGICA DE CLICK ==========
+function onCellClick(r, c) {
+  if (gameOver || currentTurn !== 'w') return;
+
+  if (selectedCell) {
+    const [sr, sc] = selectedCell;
+    const isValid = validMoves.some(([mr, mc]) => mr === r && mc === c);
+
+    if (isValid) {
+      executeMove(sr, sc, r, c, 'w');
+      return;
+    }
+  }
+
+  // Seleccionar pieza blanca
+  const piece = board[r][c];
+  if (piece && piece[0] === 'w') {
+    selectedCell = [r, c];
+    validMoves = getLegalMoves(board, r, c);
+  } else {
+    selectedCell = null;
+    validMoves = [];
+  }
+
+  renderBoard();
+}
+
+function executeMove(r, c, nr, nc, color) {
+  const piece = board[r][c];
+  const captured = board[nr][nc];
+
+  // En passant
+  let epCapture = null;
+  if (piece[1] === 'P' && enPassant && nr === enPassant[0] && nc === enPassant[1]) {
+    const capRow = color === 'w' ? nr + 1 : nr - 1;
+    epCapture = board[capRow][nc];
+  }
+
+  // Guardar estado para deshacer
+  history.push({
+    board: board.map(row => [...row]),
+    castleRights: { ...castleRights },
+    enPassant,
+    capturedByWhite: [...capturedByWhite],
+    capturedByBlack: [...capturedByBlack],
+    lastMove,
+    moveLog: [...moveLog]
+  });
+
+  // Actualizar derechos de enroque
+  if (piece === 'wK') { castleRights.wK = false; }
+  if (piece === 'bK') { castleRights.bK = false; }
+  if (piece === 'wR' && r === 7 && c === 0) castleRights.wR_a = false;
+  if (piece === 'wR' && r === 7 && c === 7) castleRights.wR_h = false;
+  if (piece === 'bR' && r === 0 && c === 0) castleRights.bR_a = false;
+  if (piece === 'bR' && r === 0 && c === 7) castleRights.bR_h = false;
+
+  // Peón doble → habilita en passant
+  if (piece[1] === 'P' && Math.abs(nr - r) === 2) {
+    enPassant = [(r + nr) / 2, c];
+  } else {
+    enPassant = null;
+  }
+
+  board = applyMove(board, r, c, nr, nc);
+  lastMove = [r, c, nr, nc];
+
+  // Registrar capturas
+  if (captured) {
+    if (color === 'w') capturedByWhite.push(captured[1]);
+    else capturedByBlack.push(captured[1]);
+  }
+  if (epCapture) {
+    if (color === 'w') capturedByWhite.push(epCapture[1]);
+    else capturedByBlack.push(epCapture[1]);
+  }
+
+  // Nombre de movimiento
+  const notation = LETTERS[c] + (8-r) + '→' + LETTERS[nc] + (8-nr);
+  moveLog.push({ text: notation, color });
+  renderMoveLog();
+
+  selectedCell = null;
+  validMoves = [];
+  currentTurn = color === 'w' ? 'b' : 'w';
+
+  renderBoard();
+  checkGameStatus();
+
+  if (!gameOver && currentTurn === 'b') {
+    setTimeout(aiMove, 300);
+  }
+}
+
+function aiMove() {
+  setStatus('La máquina está pensando<span class="thinking-dots"></span>', 'thinking');
+
+  setTimeout(() => {
+    const move = getBestMove();
+    if (!move) {
+      // Sin movimientos = ahogado o jaque mate
+      checkGameStatus();
+      return;
+    }
+    const [r, c, nr, nc] = move;
+    executeMove(r, c, nr, nc, 'b');
+    setStatus('Tu turno — selecciona una pieza', 'normal');
+  }, 50);
+}
+
+function checkGameStatus() {
+  const oppColor = currentTurn;
+  const oppMoves = getAllMoves(board, oppColor);
+  const inCheck = isInCheck(board, oppColor);
+
+  if (oppMoves.length === 0) {
+    gameOver = true;
+    if (inCheck) {
+      const winner = oppColor === 'w' ? 'La Máquina' : 'Tú';
+      const icon = oppColor === 'w' ? '🤖' : '🏆';
+      showOverlay(icon, '¡Jaque Mate!', `${winner} ${oppColor === 'b' ? 'has ganado' : 'ha ganado'} la partida`);
+      setStatus('¡JAQUE MATE!', 'mate');
+    } else {
+      showOverlay('🤝', 'Tablas', 'Rey ahogado — empate');
+      setStatus('TABLAS — Rey ahogado', 'normal');
+    }
+  } else if (inCheck) {
+    setStatus(`¡${currentTurn === 'w' ? 'Estás' : 'La máquina está'} en jaque!`, 'check');
+  }
+}
+
+function renderMoveLog() {
+  const list = document.getElementById('moves-list');
+  list.innerHTML = moveLog.map(m =>
+    `<span class="move-entry ${m.color === 'w' ? 'white' : 'black-move'}">${m.text}</span>`
+  ).join('');
+  list.scrollLeft = list.scrollWidth;
+}
+
+function setStatus(msg, type) {
+  const el = document.getElementById('status-msg');
+  el.innerHTML = msg;
+  el.className = 'status-bar ' + type;
+}
+
+function setDifficulty(d, btn) {
+  depth = d;
+  document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function newGame() {
+  initBoard();
+  selectedCell = null;
+  validMoves = [];
+  currentTurn = 'w';
+  gameOver = false;
+  history = [];
+  capturedByWhite = [];
+  capturedByBlack = [];
+  moveLog = [];
+  lastMove = null;
+  enPassant = null;
+  castleRights = { wK: true, wR_a: true, wR_h: true, bK: true, bR_a: true, bR_h: true };
+  setStatus('Tu turno — selecciona una pieza', 'normal');
+  renderBoard();
+}
+
+function undoMove() {
+  if (history.length < 2 || gameOver) return;
+  // Deshacer 2 movimientos (humano + IA)
+  let state = history.pop();
+  if (currentTurn === 'w' && history.length > 0) state = history.pop();
+  board = state.board;
+  castleRights = state.castleRights;
+  enPassant = state.enPassant;
+  capturedByWhite = state.capturedByWhite;
+  capturedByBlack = state.capturedByBlack;
+  lastMove = state.lastMove;
+  moveLog = state.moveLog;
+  currentTurn = 'w';
+  selectedCell = null;
+  validMoves = [];
+  gameOver = false;
+  setStatus('Movimiento deshecho', 'normal');
+  renderBoard();
+  renderMoveLog();
+}
+
+function flipBoard() {
+  flipped = !flipped;
+  renderBoard();
+}
+
+function showOverlay(icon, title, subtitle) {
+  document.getElementById('overlay-icon').textContent = icon;
+  document.getElementById('overlay-title').textContent = title;
+  document.getElementById('overlay-subtitle').textContent = subtitle;
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+// ========== INICIO ==========
+initBoard();
+renderBoard();
+setStatus('Tu turno — selecciona una pieza blanca', 'normal');
+</script>
+</body>
+</html>

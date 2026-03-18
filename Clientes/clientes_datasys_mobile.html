@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="tracker.js"></script>
+<title>DATASYS · Clientes</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --cyan:#00e5ff;--cyan2:#00b8d9;--dark:#030d18;--dark2:#060f1c;--dark3:#0a1828;
+  --silver:#8eb8cc;--white:#dff0f8;--gold:#f0c040;--red:#c8282a;--green:#3d8c6e;
+  --glow-sm:0 0 12px rgba(0,229,255,0.4);
+  --glow-md:0 0 24px rgba(0,229,255,0.5),0 0 48px rgba(0,229,255,0.2);
+  --nav-h:56px;--bottom-h:64px;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Rajdhani',sans-serif;background:var(--dark);color:var(--white);overflow:hidden;touch-action:pan-y;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,.009) 3px,rgba(0,229,255,.009) 4px);pointer-events:none;z-index:9990;}
+
+/* GRID BG */
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.035) 1px,transparent 1px);background-size:44px 44px;animation:gridDrift 28s linear infinite;pointer-events:none;z-index:0;}
+@keyframes gridDrift{0%{background-position:0 0;}100%{background-position:44px 44px;}}
+.ambient{position:fixed;inset:0;background:radial-gradient(ellipse 100% 55% at 50% 20%,rgba(0,30,60,.55) 0%,transparent 70%);pointer-events:none;z-index:0;}
+
+/* ══════════════ TOP NAV ══════════════ */
+#topNav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);z-index:800;background:rgba(3,13,24,.97);border-bottom:1px solid rgba(0,229,255,.15);display:flex;align-items:center;justify-content:space-between;padding:0 16px;backdrop-filter:blur(18px);}
+#topNav::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.35;}
+.tn-left{display:flex;align-items:center;gap:10px;}
+.tn-menu{width:36px;height:36px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.18);cursor:pointer;transition:all .25s;}
+.tn-menu span{width:18px;height:1.5px;background:var(--cyan);display:block;transition:all .3s;}
+.tn-menu.open span:nth-child(1){transform:rotate(45deg) translate(4.5px,4.5px);}
+.tn-menu.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+.tn-menu.open span:nth-child(3){transform:rotate(-45deg) translate(4.5px,-4.5px);}
+.tn-logo{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:4px;color:var(--cyan);text-shadow:var(--glow-sm);}
+.tn-right{display:flex;align-items:center;gap:8px;}
+.tn-avatar{width:32px;height:32px;background:rgba(0,229,255,.1);border:1.5px solid rgba(0,229,255,.3);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:900;color:var(--cyan);cursor:pointer;}
+.tn-notif{width:32px;height:32px;display:flex;align-items:center;justify-content:center;position:relative;cursor:pointer;}
+.tn-notif-dot{position:absolute;top:4px;right:4px;width:8px;height:8px;background:var(--red);border-radius:50%;border:2px solid var(--dark);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+/* ══════════════ DRAWER ══════════════ */
+#drawer{position:fixed;top:0;left:0;bottom:0;width:280px;z-index:900;background:rgba(3,10,22,.99);border-right:1px solid rgba(0,229,255,.14);transform:translateX(-100%);transition:transform .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding-bottom:80px;}
+#drawer.open{transform:translateX(0);}
+#drawerOverlay{position:fixed;inset:0;z-index:850;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);display:none;opacity:0;transition:opacity .3s;}
+#drawerOverlay.show{display:block;opacity:1;}
+.dr-head{padding:60px 20px 20px;border-bottom:1px solid rgba(0,229,255,.08);}
+.dr-avatar{width:52px;height:52px;background:rgba(0,229,255,.1);border:1.5px solid rgba(0,229,255,.3);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;color:var(--cyan);margin-bottom:12px;text-shadow:var(--glow-sm);}
+.dr-name{font-family:'Orbitron',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:2px;color:var(--white);}
+.dr-role{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;margin-top:5px;padding:2px 8px;display:inline-block;}
+.role-admin{color:var(--gold);border:1px solid rgba(240,192,64,.3);background:rgba(240,192,64,.06);}
+.role-client{color:var(--cyan);border:1px solid rgba(0,229,255,.25);background:rgba(0,229,255,.05);}
+.role-viewer{color:var(--silver);border:1px solid rgba(142,184,204,.2);background:rgba(142,184,204,.04);}
+.dr-status{display:flex;align-items:center;gap:6px;margin-top:8px;}
+.dr-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);}
+.dr-status-lbl{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--silver);opacity:.55;}
+.dr-section{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:4px;color:var(--silver);opacity:.3;padding:14px 20px 6px;text-transform:uppercase;}
+.dr-item{display:flex;align-items:center;gap:12px;padding:13px 20px;cursor:pointer;transition:all .2s;border-left:2px solid transparent;}
+.dr-item:hover,.dr-item:active{background:rgba(0,229,255,.05);}
+.dr-item.active{color:var(--cyan);background:rgba(0,229,255,.07);border-left-color:var(--cyan);}
+.dr-item-ico{font-size:.95rem;width:20px;text-align:center;}
+.dr-item-lbl{font-family:'Rajdhani',sans-serif;font-size:.92rem;font-weight:500;letter-spacing:1px;color:var(--silver);}
+.dr-item.active .dr-item-lbl{color:var(--cyan);}
+.dr-badge{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:.42rem;padding:2px 6px;font-weight:700;}
+.db-cyan{background:var(--cyan);color:var(--dark);}
+.db-red{background:var(--red);color:#fff;}
+.db-gold{background:var(--gold);color:var(--dark);}
+.admin-only{display:none;}
+.dr-logout{margin:16px 20px 0;width:calc(100% - 40px);padding:11px;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2px;color:var(--silver);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);cursor:pointer;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s;}
+.dr-logout:hover{color:#e05050;border-color:rgba(200,40,42,.3);}
+
+/* ══════════════ BOTTOM NAV ══════════════ */
+#bottomNav{position:fixed;bottom:0;left:0;right:0;height:var(--bottom-h);z-index:800;background:rgba(3,13,24,.97);border-top:1px solid rgba(0,229,255,.12);display:flex;align-items:center;justify-content:space-around;padding:0 4px;padding-bottom:env(safe-area-inset-bottom);}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;transition:all .25s;position:relative;min-width:52px;}
+.bn-item.active .bn-ico{color:var(--cyan);text-shadow:var(--glow-sm);}
+.bn-item.active .bn-lbl{color:var(--cyan);}
+.bn-item.active::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:28px;height:2px;background:var(--cyan);box-shadow:var(--glow-sm);}
+.bn-ico{font-size:1.1rem;color:var(--silver);transition:all .25s;}
+.bn-lbl{font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:1.5px;color:var(--silver);transition:all .25s;}
+.bn-badge{position:absolute;top:2px;right:6px;width:16px;height:16px;border-radius:50%;background:var(--red);border:2px solid var(--dark);font-family:'Orbitron',sans-serif;font-size:.38rem;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;}
+
+/* ══════════════ SCROLL CONTAINER ══════════════ */
+#appScroll{position:fixed;top:var(--nav-h);left:0;right:0;bottom:var(--bottom-h);overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;z-index:1;}
+#appScroll::-webkit-scrollbar{display:none;}
+
+/* ══════════════ LOGIN SCREEN ══════════════ */
+#loginScreen{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 20px;position:relative;z-index:2;}
+.login-badge{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:4px;color:var(--cyan);opacity:.55;text-align:center;margin-bottom:14px;animation:fadeUp .7s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.login-card{background:rgba(6,15,28,.97);border:1px solid rgba(0,229,255,.18);padding:32px 24px;width:100%;max-width:380px;animation:fadeUp .8s ease .1s both;position:relative;overflow:hidden;clip-path:polygon(16px 0,100% 0,100% calc(100% - 16px),calc(100% - 16px) 100%,0 100%,0 16px);}
+.login-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.login-card::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 45% at 50% 0%,rgba(0,229,255,.05),transparent);pointer-events:none;}
+.login-icon{width:56px;height:56px;margin:0 auto 20px;border:1.5px solid rgba(0,229,255,.35);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%);display:flex;align-items:center;justify-content:center;background:rgba(0,229,255,.06);box-shadow:var(--glow-sm);font-size:1.4rem;animation:iconPulse 3s ease-in-out infinite;}
+@keyframes iconPulse{0%,100%{box-shadow:var(--glow-sm);}50%{box-shadow:var(--glow-md);}}
+.login-title{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:3px;color:var(--cyan);text-align:center;text-shadow:var(--glow-sm);margin-bottom:4px;}
+.login-sub{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:3px;color:var(--silver);text-align:center;margin-bottom:28px;opacity:.6;}
+.field-wrap{margin-bottom:16px;position:relative;}
+.field-label{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:3px;color:var(--cyan);opacity:.65;margin-bottom:7px;display:block;}
+.field-input{width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:1.05rem;font-weight:500;padding:13px 16px;outline:none;transition:all .3s;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);}
+.field-input:focus{border-color:rgba(0,229,255,.5);background:rgba(0,229,255,.07);}
+.field-eye{position:absolute;right:14px;bottom:13px;cursor:pointer;color:var(--silver);opacity:.5;font-size:.9rem;background:none;border:none;padding:4px;}
+.login-opts{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.check-wrap{display:flex;align-items:center;gap:8px;cursor:pointer;}
+.check-box{width:16px;height:16px;border:1px solid rgba(0,229,255,.3);background:rgba(0,229,255,.04);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.check-box.active{background:rgba(0,229,255,.15);border-color:var(--cyan);}
+.check-box.active::after{content:'✓';font-size:.62rem;color:var(--cyan);}
+.check-lbl{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1.5px;color:var(--silver);}
+.forgot-link{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1.5px;color:var(--cyan);opacity:.6;cursor:pointer;}
+.login-btn{width:100%;padding:15px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:4px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:var(--glow-sm);transition:all .3s;}
+.login-btn:active{transform:scale(.98);}
+.login-btn.loading{opacity:.7;pointer-events:none;}
+.login-err{display:none;margin-top:12px;padding:10px 14px;background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.3);font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1.5px;color:#e05050;text-align:center;}
+.login-err.show{display:block;}
+.login-divider{display:flex;align-items:center;gap:12px;margin:20px 0;opacity:.28;}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:rgba(0,229,255,.3);}
+.login-divider span{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:3px;color:var(--silver);}
+.demo-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.demo-btn{padding:10px 6px;font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;color:var(--silver);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);cursor:pointer;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);transition:all .2s;text-align:center;}
+.demo-btn:active{background:rgba(0,229,255,.08);}
+.demo-btn .db-role{font-size:.44rem;color:var(--cyan);opacity:.6;display:block;margin-top:2px;}
+.login-footer{margin-top:16px;text-align:center;}
+.login-footer span{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;color:var(--silver);opacity:.28;}
+
+/* ══════════════ DASHBOARD ══════════════ */
+#dashboard{display:none;min-height:100%;padding:16px 14px 24px;position:relative;z-index:1;}
+
+/* PAGE HEADER */
+.page-head{margin-bottom:18px;}
+.ph-pre{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:4px;color:var(--cyan);opacity:.55;margin-bottom:5px;}
+.ph-title{font-family:'Orbitron',sans-serif;font-size:1.15rem;font-weight:900;letter-spacing:3px;color:var(--white);}
+.ph-sub{font-family:'Rajdhani',sans-serif;font-size:.85rem;color:var(--silver);margin-top:3px;opacity:.65;}
+.ph-row{display:flex;align-items:flex-start;justify-content:space-between;}
+.ph-clock{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:1.5px;color:var(--cyan);opacity:.65;text-align:right;}
+.ph-date{font-size:.44rem;letter-spacing:1.5px;color:var(--silver);opacity:.4;margin-top:2px;}
+
+/* KPI SWIPE ROW */
+.kpi-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;scrollbar-width:none;}
+.kpi-scroll::-webkit-scrollbar{display:none;}
+.kpi-card{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:14px 16px;min-width:130px;flex-shrink:0;position:relative;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1.5px;}
+.kc-cyan::before{background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.kc-gold::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.kc-green::before{background:linear-gradient(90deg,transparent,var(--green),transparent);}
+.kc-red::before{background:linear-gradient(90deg,transparent,var(--red),transparent);}
+.kpi-ico{font-size:1rem;margin-bottom:7px;}
+.kpi-val{font-family:'Orbitron',sans-serif;font-size:1.2rem;font-weight:900;}
+.kc-cyan .kpi-val{color:var(--cyan);text-shadow:var(--glow-sm);}
+.kc-gold .kpi-val{color:var(--gold);}
+.kc-green .kpi-val{color:var(--green);}
+.kc-red .kpi-val{color:#e05050;}
+.kpi-lbl{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;color:var(--silver);opacity:.55;margin-top:3px;line-height:1.4;}
+.kpi-delta{font-family:'Share Tech Mono',monospace;font-size:.4rem;margin-top:6px;padding:2px 6px;display:inline-block;}
+.delta-up{background:rgba(61,140,110,.12);border:1px solid rgba(61,140,110,.25);color:var(--green);}
+.delta-dn{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.22);color:#e05050;}
+
+/* PANEL CARD */
+.panel{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:18px 16px;margin-bottom:14px;position:relative;overflow:hidden;}
+.panel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.2),transparent);}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.panel-title{font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:2.5px;color:var(--cyan);}
+.panel-badge{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;padding:2px 7px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.16);color:var(--cyan);}
+
+/* SERVICE ROWS */
+.srv-row{display:flex;align-items:center;gap:12px;padding:11px 12px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.06);margin-bottom:8px;transition:background .2s;}
+.srv-row:last-child{margin-bottom:0;}
+.srv-row:active{background:rgba(0,229,255,.07);}
+.srv-ico{font-size:1rem;width:28px;text-align:center;flex-shrink:0;}
+.srv-info{flex:1;min-width:0;}
+.srv-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.88rem;letter-spacing:.5px;color:var(--white);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.srv-meta{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1px;color:var(--silver);opacity:.5;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.srv-status{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1px;padding:2px 7px;flex-shrink:0;}
+.s-active{background:rgba(61,140,110,.1);border:1px solid rgba(61,140,110,.25);color:var(--green);}
+.s-pend{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.s-new{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.2);color:var(--cyan);}
+
+/* ACTIVITY */
+.act-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,229,255,.05);}
+.act-item:last-child{border-bottom:none;}
+.act-dot{width:7px;height:7px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.ad-cyan{background:var(--cyan);box-shadow:var(--glow-sm);}
+.ad-gold{background:var(--gold);}
+.ad-green{background:var(--green);}
+.ad-silver{background:var(--silver);opacity:.4;}
+.act-msg{font-family:'Rajdhani',sans-serif;font-size:.86rem;color:var(--white);font-weight:500;line-height:1.4;}
+.act-time{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1px;color:var(--silver);opacity:.45;margin-top:3px;}
+
+/* TICKETS */
+.ticket{padding:12px 14px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.07);margin-bottom:10px;position:relative;}
+.ticket:last-child{margin-bottom:0;}
+.ticket:active{background:rgba(0,229,255,.06);}
+.ticket-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ticket-id{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--cyan);opacity:.6;}
+.ticket-pri{font-family:'Share Tech Mono',monospace;font-size:.42rem;padding:2px 7px;}
+.pri-high{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;}
+.pri-med{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.pri-low{background:rgba(61,140,110,.08);border:1px solid rgba(61,140,110,.2);color:var(--green);}
+.ticket-title{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:600;color:var(--white);line-height:1.3;margin-bottom:3px;}
+.ticket-meta{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1px;color:var(--silver);opacity:.42;}
+
+/* ACTION BTN */
+.action-btn{width:100%;padding:12px;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2.5px;color:var(--cyan);background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.16);cursor:pointer;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);transition:all .25s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;}
+.action-btn:active{background:rgba(0,229,255,.1);}
+.action-btn.primary{background:var(--cyan);color:var(--dark);font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:3px;border:none;box-shadow:var(--glow-sm);}
+.action-btn.gold{background:var(--gold);color:var(--dark);border:none;}
+
+/* QUICK ACCESS GRID */
+.qa-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.qa-card{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.07);cursor:pointer;transition:all .25s;text-decoration:none;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
+.qa-card:active{background:rgba(0,229,255,.08);}
+.qa-ico{font-size:1.2rem;}
+.qa-lbl{font-family:'Orbitron',sans-serif;font-size:.4rem;letter-spacing:1.5px;color:var(--cyan);text-align:center;line-height:1.4;}
+
+/* BILLING */
+.billing-tabs{display:flex;border-bottom:1px solid rgba(0,229,255,.1);margin-bottom:16px;overflow-x:auto;scrollbar-width:none;}
+.billing-tabs::-webkit-scrollbar{display:none;}
+.bt{padding:10px 16px;font-family:'Orbitron',sans-serif;font-size:.48rem;letter-spacing:2px;color:var(--silver);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .25s;margin-bottom:-1px;flex-shrink:0;}
+.bt.bt-active{color:var(--cyan);border-bottom-color:var(--cyan);}
+.pill{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;padding:2px 7px;}
+.pill-paid{background:rgba(61,140,110,.1);border:1px solid rgba(61,140,110,.25);color:var(--green);}
+.pill-pend{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.22);color:var(--gold);}
+.pill-over{background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;}
+
+/* INVOICE CARDS (mobile-friendly instead of table) */
+.inv-card{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.07);padding:14px 14px;margin-bottom:10px;transition:background .2s;}
+.inv-card:active{background:rgba(0,229,255,.06);}
+.inv-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.inv-num{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--cyan);letter-spacing:1px;}
+.inv-amount{font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;}
+.inv-amount.paid{color:var(--green);}
+.inv-amount.pend{color:var(--gold);}
+.inv-desc{font-family:'Rajdhani',sans-serif;font-size:.86rem;color:var(--white);margin-bottom:6px;line-height:1.3;}
+.inv-meta{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1px;color:var(--silver);opacity:.5;margin-bottom:10px;}
+.inv-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.iact{padding:5px 11px;font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;border:1px solid rgba(0,229,255,.2);color:var(--cyan);background:rgba(0,229,255,.04);cursor:pointer;clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%);transition:all .2s;}
+.iact:active{background:rgba(0,229,255,.12);}
+.iact.pay{background:rgba(61,140,110,.1);border-color:rgba(61,140,110,.3);color:var(--green);}
+
+/* CHECKOUT CARDS */
+.co-card{background:rgba(6,15,28,.92);border:1px solid rgba(0,229,255,.1);padding:20px 18px;margin-bottom:14px;position:relative;overflow:hidden;}
+.co-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);}
+.co-card.co-gold{border-color:rgba(240,192,64,.15);}
+.co-card.co-gold::before{background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+.co-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;padding:2px 8px;background:var(--cyan);color:var(--dark);font-weight:700;margin-bottom:10px;}
+.co-badge.gold{background:var(--gold);}
+.co-header{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.co-ico{font-size:1.6rem;}
+.co-name{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:2px;color:var(--cyan);}
+.co-gold .co-name{color:var(--gold);}
+.co-desc{font-family:'Rajdhani',sans-serif;font-size:.86rem;color:var(--silver);line-height:1.6;margin-bottom:12px;}
+.co-price-row{display:flex;align-items:baseline;gap:6px;margin-bottom:12px;}
+.co-amount{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;color:var(--white);}
+.co-cur{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--silver);opacity:.6;}
+.co-period{font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--silver);opacity:.45;margin-left:4px;}
+.co-features{list-style:none;margin-bottom:14px;display:flex;flex-direction:column;gap:4px;}
+.co-features li{font-family:'Rajdhani',sans-serif;font-size:.82rem;color:var(--silver);display:flex;align-items:center;gap:8px;}
+.co-features li::before{content:'◈';color:var(--cyan);font-size:.52rem;flex-shrink:0;}
+.co-gold .co-features li::before{color:var(--gold);}
+.co-btn{width:100%;padding:12px;font-family:'Orbitron',sans-serif;font-size:.55rem;letter-spacing:3px;color:var(--dark);background:var(--cyan);border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);box-shadow:var(--glow-sm);transition:all .25s;}
+.co-btn:active{transform:scale(.98);}
+.co-gold .co-btn{background:var(--gold);}
+
+/* SUB ROWS */
+.sub-row{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.07);padding:14px 14px;margin-bottom:10px;}
+.sub-row-top{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.sub-ico{font-size:1rem;flex-shrink:0;}
+.sub-info .sub-name{font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.9rem;color:var(--white);}
+.sub-info .sub-meta{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1px;color:var(--silver);opacity:.5;margin-top:2px;}
+.sub-price-col{margin-left:auto;font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;color:var(--cyan);text-align:right;flex-shrink:0;}
+.sub-price-col .sp-period{display:block;font-family:'Share Tech Mono',monospace;font-size:.4rem;color:var(--silver);opacity:.5;font-weight:400;margin-top:1px;}
+.sub-progress{height:2px;background:rgba(0,229,255,.08);margin-bottom:10px;}
+.sub-progress-fill{height:100%;background:linear-gradient(90deg,var(--cyan),var(--cyan2));}
+.sub-actions{display:flex;gap:8px;}
+
+/* FORM FIELDS */
+.modal-field{margin-bottom:14px;}
+.modal-label{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2px;color:var(--cyan);opacity:.65;margin-bottom:6px;display:block;}
+.modal-input{width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.14);color:var(--white);font-family:'Rajdhani',sans-serif;font-size:1rem;padding:12px 14px;outline:none;transition:all .3s;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);}
+.modal-input:focus{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.06);}
+.modal-input::placeholder{color:rgba(142,184,204,.3);}
+.modal-select{appearance:none;cursor:pointer;}
+.modal-textarea{resize:vertical;min-height:70px;font-family:'Rajdhani',sans-serif;}
+
+/* BKPI ROW */
+.bkpi-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;scrollbar-width:none;}
+.bkpi-row::-webkit-scrollbar{display:none;}
+.bkpi{background:rgba(6,15,28,.9);border:1px solid rgba(0,229,255,.1);padding:14px 16px;min-width:120px;flex-shrink:0;position:relative;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);}
+.bkpi::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,229,255,.3),transparent);}
+.bkpi-ico{font-size:.9rem;margin-bottom:6px;}
+.bkpi-val{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;color:var(--cyan);}
+.bkpi-val.gold{color:var(--gold);}
+.bkpi-val.green{color:var(--green);}
+.bkpi-val.red{color:#e05050;}
+.bkpi-lbl{font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:1.5px;color:var(--silver);opacity:.52;margin-top:3px;line-height:1.4;}
+
+/* PAY METHODS */
+.pm-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px;}
+.pm-card{background:rgba(6,15,28,.9);border:2px solid rgba(0,229,255,.1);padding:16px;cursor:pointer;transition:all .25s;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);display:flex;align-items:center;gap:14px;}
+.pm-card.pm-sel{border-color:var(--cyan);background:rgba(0,229,255,.07);}
+.pm-card:active{border-color:rgba(0,229,255,.3);}
+.pm-ico{font-size:1.3rem;flex-shrink:0;}
+.pm-body{flex:1;}
+.pm-name{font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:2px;color:var(--white);}
+.pm-desc{font-family:'Share Tech Mono',monospace;font-size:.46rem;color:var(--silver);opacity:.5;margin-top:3px;}
+.pm-tag{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:.4rem;padding:2px 6px;margin-top:5px;}
+.pm-soon{background:rgba(240,192,64,.08);border:1px solid rgba(240,192,64,.2);color:var(--gold);}
+.pm-ready{background:rgba(61,140,110,.08);border:1px solid rgba(61,140,110,.2);color:var(--green);}
+.pm-check{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(0,229,255,.25);display:flex;align-items:center;justify-content:center;font-size:.6rem;flex-shrink:0;}
+.pm-card.pm-sel .pm-check{background:var(--cyan);border-color:var(--cyan);color:var(--dark);}
+
+/* ORDER SUMMARY */
+.order-summary{background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);padding:14px 16px;margin-bottom:16px;}
+.os-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(0,229,255,.05);}
+.os-row:last-child{border-bottom:none;padding-top:10px;margin-top:4px;}
+.os-label{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:1.5px;color:var(--silver);opacity:.6;}
+.os-val{font-family:'Rajdhani',sans-serif;font-size:.88rem;font-weight:600;color:var(--white);}
+.os-total-label{font-family:'Orbitron',sans-serif;font-size:.5rem;letter-spacing:2px;color:var(--cyan);}
+.os-total-val{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;color:var(--cyan);text-shadow:var(--glow-sm);}
+
+/* STEPS */
+.steps{display:flex;align-items:center;margin-bottom:20px;}
+.step{display:flex;align-items:center;gap:6px;flex:1;}
+.step-num{width:22px;height:22px;border-radius:50%;border:1.5px solid rgba(0,229,255,.22);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:.48rem;color:var(--silver);flex-shrink:0;}
+.step.s-active .step-num{border-color:var(--cyan);color:var(--cyan);box-shadow:var(--glow-sm);}
+.step.s-done .step-num{background:var(--cyan);border-color:var(--cyan);color:var(--dark);}
+.step-lbl{font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:1px;color:var(--silver);opacity:.45;}
+.step.s-active .step-lbl{color:var(--cyan);opacity:1;}
+.step.s-done .step-lbl{color:var(--green);opacity:.8;}
+.step-line{flex:1;height:1px;background:rgba(0,229,255,.1);margin:0 4px;}
+
+/* CARD FORM */
+.card-form{display:flex;flex-direction:column;gap:12px;margin-bottom:16px;}
+.cf-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.cf-label{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--cyan);opacity:.65;margin-bottom:5px;display:block;}
+.cf-input{width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);color:var(--white);font-family:'Share Tech Mono',monospace;font-size:.68rem;letter-spacing:2px;padding:11px 12px;outline:none;transition:all .3s;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);}
+.cf-input:focus{border-color:rgba(0,229,255,.45);background:rgba(0,229,255,.06);}
+.cf-input::placeholder{opacity:.3;}
+
+/* GATEWAY SEL */
+.gateway-sel{display:flex;gap:8px;margin-bottom:16px;}
+.gw{flex:1;padding:10px 6px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.1);cursor:pointer;text-align:center;transition:all .25s;clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);}
+.gw:active,.gw.gw-sel{border-color:rgba(0,229,255,.35);background:rgba(0,229,255,.08);}
+.gw-ico{font-size:1rem;margin-bottom:3px;}
+.gw-name{font-family:'Orbitron',sans-serif;font-size:.44rem;letter-spacing:1.5px;color:var(--silver);}
+.gw.gw-sel .gw-name{color:var(--cyan);}
+
+/* BOTTOM SHEETS (modals) */
+.sheet-overlay{position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;opacity:0;transition:opacity .3s;}
+.sheet-overlay.show{display:block;opacity:1;}
+.bottom-sheet{position:fixed;left:0;right:0;bottom:0;z-index:1300;background:rgba(4,11,22,.99);border-top:1px solid rgba(0,229,255,.2);border-radius:0;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom);}
+.bottom-sheet.show{transform:translateY(0);}
+.sheet-handle{width:36px;height:4px;background:rgba(0,229,255,.25);border-radius:2px;margin:12px auto 0;}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid rgba(0,229,255,.1);}
+.sheet-title{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:2.5px;color:var(--cyan);}
+.sheet-close{background:none;border:none;color:var(--silver);font-size:1rem;cursor:pointer;opacity:.6;padding:4px;}
+.sheet-body{padding:20px;}
+
+/* TOAST */
+#toast{position:fixed;top:calc(var(--nav-h) + 10px);left:50%;transform:translateX(-50%) translateY(-10px);z-index:3000;font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:1.5px;padding:12px 18px;background:rgba(61,140,110,.15);border:1px solid rgba(61,140,110,.4);color:var(--green);clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PAY SUCCESS */
+#paySuccess{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.95);backdrop-filter:blur(12px);}
+#paySuccess.show{display:flex;}
+.pay-ok-box{text-align:center;padding:0 24px;animation:fadeUp .4s ease both;}
+.pay-ok-ico{font-size:3.5rem;margin-bottom:16px;display:block;animation:successPop .6s cubic-bezier(.175,.885,.32,1.275) .2s both;}
+@keyframes successPop{from{transform:scale(0);}to{transform:scale(1);}}
+.pay-ok-title{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:var(--green);letter-spacing:4px;text-shadow:0 0 24px rgba(61,140,110,.6);margin-bottom:8px;}
+.pay-ok-sub{font-family:'Share Tech Mono',monospace;font-size:.56rem;letter-spacing:2px;color:var(--silver);margin-bottom:6px;}
+.pay-ok-folio{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:2px;color:var(--cyan);margin-bottom:24px;}
+.pay-ok-close{padding:13px 28px;font-family:'Orbitron',sans-serif;font-size:.58rem;letter-spacing:3px;color:var(--dark);background:var(--green);border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);}
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="ambient"></div>
+
+<!-- TOP NAV -->
+<nav id="topNav">
+  <div class="tn-left">
+    <div class="tn-menu" id="menuBtn" onclick="toggleDrawer()">
+      <span></span><span></span><span></span>
+    </div>
+    <div class="tn-logo">DATASYS</div>
+  </div>
+  <div class="tn-right">
+    <a href="../index_mobile.html" style="display:flex;align-items:center;gap:5px;padding:6px 12px;font-family:'Orbitron',sans-serif;font-size:.5rem;font-weight:700;letter-spacing:2px;color:var(--dark);background:var(--cyan);text-decoration:none;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);box-shadow:var(--glow-sm);flex-shrink:0;" onclick="">⌂ INICIO</a>
+    <div class="tn-notif" onclick="showToast('🔔 2 NOTIFICACIONES PENDIENTES')">
+      <span style="font-size:1.1rem;">🔔</span>
+      <div class="tn-notif-dot"></div>
+    </div>
+    <div class="tn-avatar" id="tnAvatar" onclick="switchPanel('profile')">DS</div>
+  </div>
+</nav>
+
+<!-- DRAWER OVERLAY -->
+<div id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- DRAWER -->
+<div id="drawer">
+  <div class="dr-head">
+    <div class="dr-avatar" id="drAvatar">DS</div>
+    <div class="dr-name" id="drName">USUARIO</div>
+    <div class="dr-role" id="drRole">CLIENTE</div>
+    <div class="dr-status">
+      <div class="dr-dot"></div>
+      <span class="dr-status-lbl">SESIÓN ACTIVA</span>
+    </div>
+  </div>
+
+  <div class="dr-section">PRINCIPAL</div>
+  <div class="dr-item active" onclick="navTo('overview',this)"><span class="dr-item-ico">⬡</span><span class="dr-item-lbl">RESUMEN</span></div>
+  <div class="dr-item" onclick="navTo('services',this)"><span class="dr-item-ico">◈</span><span class="dr-item-lbl">MIS SERVICIOS</span><span class="dr-badge db-cyan">3</span></div>
+  <div class="dr-item" onclick="navTo('tickets',this)"><span class="dr-item-ico">◻</span><span class="dr-item-lbl">SOPORTE</span><span class="dr-badge db-red">2</span></div>
+
+  <div class="dr-section">FINANZAS</div>
+  <div class="dr-item" onclick="navTo('billing',this)"><span class="dr-item-ico">◇</span><span class="dr-item-lbl">FACTURACIÓN</span><span class="dr-badge db-gold">1</span></div>
+  <div class="dr-item" onclick="navTo('checkout',this)"><span class="dr-item-ico">◈</span><span class="dr-item-lbl">CONTRATAR</span></div>
+
+  <div class="dr-section">REPORTES</div>
+  <div class="dr-item" onclick="navTo('reports',this)"><span class="dr-item-ico">📊</span><span class="dr-item-lbl">ANALÍTICA</span></div>
+  <div class="dr-item" onclick="navTo('docs',this)"><span class="dr-item-ico">📄</span><span class="dr-item-lbl">DOCUMENTOS</span><span class="dr-badge db-gold">5</span></div>
+
+  <div class="dr-section admin-only">ADMINISTRACIÓN</div>
+  <div class="dr-item admin-only" onclick="navTo('users',this)"><span class="dr-item-ico">👥</span><span class="dr-item-lbl">USUARIOS</span></div>
+  <div class="dr-item admin-only" onclick="navTo('cobros',this)"><span class="dr-item-ico">⬡</span><span class="dr-item-lbl">COBROS ADMIN</span></div>
+  <div class="dr-item admin-only" onclick="navTo('crm',this)"><span class="dr-item-ico">🗄</span><span class="dr-item-lbl">CRM</span></div>
+
+  <div class="dr-section">CUENTA</div>
+  <div class="dr-item" onclick="navTo('profile',this)"><span class="dr-item-ico">⬟</span><span class="dr-item-lbl">MI PERFIL</span></div>
+
+  <button class="dr-logout" onclick="logout()">⏻ &nbsp;CERRAR SESIÓN</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav id="bottomNav" style="display:none;">
+  <div class="bn-item active" id="bn-overview" onclick="switchPanel('overview')">
+    <div class="bn-ico">⬡</div>
+    <div class="bn-lbl">INICIO</div>
+  </div>
+  <div class="bn-item" id="bn-services" onclick="switchPanel('services')">
+    <div class="bn-ico">◈</div>
+    <div class="bn-lbl">SERVICIOS</div>
+  </div>
+  <div class="bn-item" id="bn-tickets" onclick="switchPanel('tickets')">
+    <div class="bn-ico">◻</div>
+    <div class="bn-lbl">SOPORTE</div>
+    <div class="bn-badge">2</div>
+  </div>
+  <div class="bn-item" id="bn-billing" onclick="switchPanel('billing')">
+    <div class="bn-ico">◇</div>
+    <div class="bn-lbl">PAGOS</div>
+  </div>
+  <div class="bn-item" id="bn-more" onclick="toggleDrawer()">
+    <div class="bn-ico">⋯</div>
+    <div class="bn-lbl">MÁS</div>
+  </div>
+</nav>
+
+<!-- SCROLL CONTAINER -->
+<div id="appScroll">
+
+  <!-- ══ LOGIN ══ -->
+  <div id="loginScreen">
+    <div class="login-badge">// ACCESO SEGURO · DATASYS PORTAL //</div>
+    <div class="login-card">
+      <div class="login-icon">🔐</div>
+      <div class="login-title">ÁREA DE CLIENTES</div>
+      <div class="login-sub">AUTENTICACIÓN REQUERIDA</div>
+      <div class="field-wrap">
+        <label class="field-label">USUARIO / EMAIL</label>
+        <input type="text" class="field-input" id="loginUser" placeholder="usuario@empresa.com" autocomplete="username" autocapitalize="none">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">CONTRASEÑA</label>
+        <input type="password" class="field-input" id="loginPass" placeholder="••••••••" autocomplete="current-password">
+        <button class="field-eye" onclick="toggleEye()">👁</button>
+      </div>
+      <div class="login-opts">
+        <div class="check-wrap" onclick="toggleRemember()">
+          <div class="check-box" id="rememberBox"></div>
+          <span class="check-lbl">RECORDAR</span>
+        </div>
+        <span class="forgot-link" onclick="showToast('📧 REVISA TU EMAIL')">¿OLVIDASTE TU ACCESO?</span>
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">▶ INICIAR SESIÓN</button>
+      <div class="login-err" id="loginErr">⚠ CREDENCIALES INCORRECTAS</div>
+      <div class="login-divider"><span>ACCESO DEMO</span></div>
+      <div class="demo-btns">
+        <button class="demo-btn" onclick="demoLogin('admin')">⬡ ADMIN<span class="db-role">ACCESO TOTAL</span></button>
+        <button class="demo-btn" onclick="demoLogin('client')">◈ CLIENTE<span class="db-role">VISTA PERSONAL</span></button>
+      </div>
+    </div>
+    <div class="login-footer"><span>DATASYS TECHNOLOGY · TLS 1.3 ENCRIPTADO</span></div>
+  </div>
+
+  <!-- ══ DASHBOARD ══ -->
+  <div id="dashboard">
+
+    <!-- OVERVIEW -->
+    <div id="panel-overview">
+      <div class="page-head">
+        <div class="ph-row">
+          <div><div class="ph-pre">// PANEL DE CONTROL //</div><div class="ph-title">RESUMEN</div><div class="ph-sub" id="dashWelcome">Bienvenido de vuelta</div></div>
+          <div><div class="ph-clock" id="dashClock">--:--</div><div class="ph-date" id="dashDate">---</div></div>
+        </div>
+      </div>
+      <!-- KPIs horizontal scroll -->
+      <div class="kpi-scroll">
+        <div class="kpi-card kc-cyan"><div class="kpi-ico">◈</div><div class="kpi-val">3</div><div class="kpi-lbl">SERVICIOS ACTIVOS</div><div class="kpi-delta delta-up">↑ +1</div></div>
+        <div class="kpi-card kc-gold"><div class="kpi-ico">◻</div><div class="kpi-val">2</div><div class="kpi-lbl">TICKETS ABIERTOS</div><div class="kpi-delta delta-dn">⏱ 4H</div></div>
+        <div class="kpi-card kc-green"><div class="kpi-ico">📄</div><div class="kpi-val">5</div><div class="kpi-lbl">DOCS PENDIENTES</div><div class="kpi-delta delta-up">↑ 2 NUEVOS</div></div>
+        <div class="kpi-card kc-red"><div class="kpi-ico">◇</div><div class="kpi-val">28</div><div class="kpi-lbl">DÍAS PROX. FACTURA</div><div class="kpi-delta delta-up">✓ AL DÍA</div></div>
+      </div>
+      <!-- SERVICIOS -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">MIS SERVICIOS</div><div class="panel-badge">3 ACTIVOS</div></div>
+        <div class="srv-row"><div class="srv-ico">📊</div><div class="srv-info"><div class="srv-name">ANÁLISIS DE DATOS</div><div class="srv-meta">PLAN PRO · REN: 15/04/2026</div></div><div class="srv-status s-active">ACTIVO</div></div>
+        <div class="srv-row"><div class="srv-ico">🔐</div><div class="srv-info"><div class="srv-name">CIBERSEGURIDAD</div><div class="srv-meta">ENTERPRISE · REN: 01/06/2026</div></div><div class="srv-status s-active">ACTIVO</div></div>
+        <div class="srv-row"><div class="srv-ico">📦</div><div class="srv-info"><div class="srv-name">INVENTARIO VIRTUAL</div><div class="srv-meta">STARTER · CONFIGURANDO</div></div><div class="srv-status s-pend">PENDIENTE</div></div>
+      </div>
+      <!-- ACTIVIDAD -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">ACTIVIDAD RECIENTE</div><div class="panel-badge">ÚLTIMAS 24H</div></div>
+        <div class="act-item"><div class="act-dot ad-cyan"></div><div><div class="act-msg">Reporte mensual de analítica generado</div><div class="act-time">HOY · 09:42 AM</div></div></div>
+        <div class="act-item"><div class="act-dot ad-green"></div><div><div class="act-msg">Ticket #DS-0041 respondido por soporte</div><div class="act-time">HOY · 08:15 AM</div></div></div>
+        <div class="act-item"><div class="act-dot ad-gold"></div><div><div class="act-msg">Documento contractual firmado y subido</div><div class="act-time">AYER · 05:30 PM</div></div></div>
+        <div class="act-item"><div class="act-dot ad-silver"></div><div><div class="act-msg">Inicio de sesión desde México City, MX</div><div class="act-time">AYER · 09:00 AM</div></div></div>
+      </div>
+      <!-- QUICK ACCESS -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">ACCESO RÁPIDO</div></div>
+        <div class="qa-grid">
+          <a class="qa-card" href="analisis_datos_datasys_mobile.html"><div class="qa-ico">📊</div><div class="qa-lbl">ANALÍTICA</div></a>
+          <a class="qa-card" href="automatizacion_datasys_mobile.html"><div class="qa-ico">🤖</div><div class="qa-lbl">AUTOM.</div></a>
+          <a class="qa-card" href="ciberseguridad_datasys_mobile.html"><div class="qa-ico">🔐</div><div class="qa-lbl">CIBER</div></a>
+          <a class="qa-card" href="inventario_virtual_datasys_mobile.html"><div class="qa-ico">📦</div><div class="qa-lbl">INVENTARIO</div></a>
+          <a class="qa-card" href="revista_datasys_mobile.html"><div class="qa-ico">📰</div><div class="qa-lbl">REVISTA</div></a>
+          <a class="qa-card" href="../index_mobile.html"><div class="qa-ico">🏠</div><div class="qa-lbl">INICIO</div></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div id="panel-services" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// CONTRATADOS //</div><div class="ph-title">MIS SERVICIOS</div></div>
+      <div class="panel">
+        <div class="srv-row"><div class="srv-ico">📊</div><div class="srv-info"><div class="srv-name">ANÁLISIS DE DATOS — PRO</div><div class="srv-meta">INICIO: 15/01/2026 · REN: 15/04/2026 · $4,500/MES</div></div><div class="srv-status s-active">ACTIVO</div></div>
+        <div class="srv-row"><div class="srv-ico">🔐</div><div class="srv-info"><div class="srv-name">CIBERSEGURIDAD — ENTERPRISE</div><div class="srv-meta">INICIO: 01/12/2025 · REN: 01/06/2026 · $12,000/MES</div></div><div class="srv-status s-active">ACTIVO</div></div>
+        <div class="srv-row"><div class="srv-ico">📦</div><div class="srv-info"><div class="srv-name">INVENTARIO VIRTUAL — STARTER</div><div class="srv-meta">INICIO: 01/03/2026 · REN: 01/04/2026 · $1,800/MES</div></div><div class="srv-status s-pend">CONFIGURANDO</div></div>
+        <button class="action-btn" onclick="switchPanel('checkout')">◈ AGREGAR SERVICIO</button>
+      </div>
+    </div>
+
+    <!-- TICKETS -->
+    <div id="panel-tickets" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// SOPORTE //</div><div class="ph-title">TICKETS</div></div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">ABIERTOS</div><div class="panel-badge">2</div></div>
+        <div class="ticket"><div class="ticket-top"><span class="ticket-id">#DS-0043</span><span class="ticket-pri pri-high">ALTA</span></div><div class="ticket-title">Error de sincronización en dashboard de analítica</div><div class="ticket-meta">HOY · EN PROGRESO · EQUIPO DATASYS DATA</div></div>
+        <div class="ticket"><div class="ticket-top"><span class="ticket-id">#DS-0041</span><span class="ticket-pri pri-med">MEDIA</span></div><div class="ticket-title">Solicitud de acceso para usuario adicional</div><div class="ticket-meta">HACE 2 DÍAS · EN REVISIÓN</div></div>
+        <div class="ticket" style="opacity:.5;"><div class="ticket-top"><span class="ticket-id">#DS-0038</span><span class="ticket-pri pri-low">BAJA</span></div><div class="ticket-title">Configuración inicial de módulo de reportes</div><div class="ticket-meta">CERRADO · 28/02/2026 · RESUELTO EN 6H</div></div>
+        <button class="action-btn" onclick="openSheet('ticketSheet')">+ ABRIR NUEVO TICKET</button>
+      </div>
+    </div>
+
+    <!-- BILLING -->
+    <div id="panel-billing" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// SISTEMA DE COBRO //</div><div class="ph-title">FACTURACIÓN</div></div>
+      <div class="bkpi-row">
+        <div class="bkpi"><div class="bkpi-ico">◇</div><div class="bkpi-val gold">$18,300</div><div class="bkpi-lbl">PRÓXIMA FACTURA</div></div>
+        <div class="bkpi"><div class="bkpi-ico">◈</div><div class="bkpi-val green">$33,000</div><div class="bkpi-lbl">PAGADO EN 2026</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⬡</div><div class="bkpi-val green">AL DÍA</div><div class="bkpi-lbl">ESTADO CUENTA</div></div>
+      </div>
+      <div class="billing-tabs">
+        <button class="bt bt-active" onclick="billTab('facturas',this)">◇ FACTURAS</button>
+        <button class="bt" onclick="billTab('metodos',this)">◈ MÉTODOS DE PAGO</button>
+      </div>
+      <div id="btab-facturas">
+        <div class="inv-card">
+          <div class="inv-card-top"><span class="inv-num">#INV-2026-03</span><span class="pill pill-pend">PENDIENTE</span></div>
+          <div class="inv-desc">Análisis de Datos PRO + Ciberseguridad Ent. + Inventario Starter</div>
+          <div class="inv-meta">01/03/2026 · VENCE: 15/03/2026 · 3 SERVICIOS</div>
+          <div class="inv-amount pend" style="margin-bottom:10px;">$18,300 MXN</div>
+          <div class="inv-actions">
+            <button class="iact pay" onclick="openCheckout('INV-2026-03','18300','Factura Marzo 2026')">▶ PAGAR</button>
+            <button class="iact" onclick="showToast('📄 DESCARGANDO PDF...')">⬇ PDF</button>
+          </div>
+        </div>
+        <div class="inv-card">
+          <div class="inv-card-top"><span class="inv-num">#INV-2026-02</span><span class="pill pill-paid">PAGADO</span></div>
+          <div class="inv-desc">Análisis de Datos PRO + Ciberseguridad Enterprise</div>
+          <div class="inv-meta">01/02/2026 · PAGADO: 10/02/2026</div>
+          <div class="inv-amount paid" style="margin-bottom:10px;">$16,500 MXN</div>
+          <div class="inv-actions">
+            <button class="iact" onclick="showToast('📄 DESCARGANDO PDF...')">⬇ PDF</button>
+            <button class="iact" onclick="showToast('📧 FACTURA ENVIADA')">✉ EMAIL</button>
+          </div>
+        </div>
+        <div class="inv-card">
+          <div class="inv-card-top"><span class="inv-num">#INV-2026-01</span><span class="pill pill-paid">PAGADO</span></div>
+          <div class="inv-desc">Análisis de Datos PRO + Ciberseguridad Enterprise</div>
+          <div class="inv-meta">01/01/2026 · PAGADO: 12/01/2026</div>
+          <div class="inv-amount paid" style="margin-bottom:10px;">$16,500 MXN</div>
+          <div class="inv-actions">
+            <button class="iact" onclick="showToast('📄 DESCARGANDO PDF...')">⬇ PDF</button>
+          </div>
+        </div>
+      </div>
+      <div id="btab-metodos" style="display:none;">
+        <div class="pm-list">
+          <div class="pm-card pm-sel" onclick="selPM(this)"><div class="pm-ico">💳</div><div class="pm-body"><div class="pm-name">TARJETA</div><div class="pm-desc">VISA · MASTERCARD · AMEX</div><span class="pm-tag pm-ready">LISTO PARA CONECTAR</span></div><div class="pm-check">✓</div></div>
+          <div class="pm-card" onclick="selPM(this)"><div class="pm-ico">🔶</div><div class="pm-body"><div class="pm-name">STRIPE</div><div class="pm-desc">PAGOS INTERNACIONALES</div><span class="pm-tag pm-soon">PRÓXIMAMENTE</span></div><div class="pm-check"></div></div>
+          <div class="pm-card" onclick="selPM(this)"><div class="pm-ico">🏦</div><div class="pm-body"><div class="pm-name">TRANSFERENCIA SPEI</div><div class="pm-desc">CLABE INTERBANCARIA</div><span class="pm-tag pm-ready">DISPONIBLE</span></div><div class="pm-check"></div></div>
+        </div>
+        <div class="order-summary">
+          <div class="os-row"><span class="os-label">BANCO</span><span class="os-val">BBVA México</span></div>
+          <div class="os-row"><span class="os-label">CLABE</span><span class="os-val" style="font-family:Share Tech Mono,monospace;font-size:.7rem;letter-spacing:1.5px;">012345678901234567</span></div>
+          <div class="os-row"><span class="os-label">BENEFICIARIO</span><span class="os-val">DATASYS TECHNOLOGY</span></div>
+          <div class="os-row"><span class="os-total-label">REFERENCIA</span><span class="os-total-val" style="font-size:.75rem;">TU FOLIO</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHECKOUT -->
+    <div id="panel-checkout" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// NUEVOS SERVICIOS //</div><div class="ph-title">CONTRATAR</div></div>
+      <!-- Suscripciones activas -->
+      <div class="panel" style="margin-bottom:14px;">
+        <div class="panel-header"><div class="panel-title">SUSCRIPCIONES ACTIVAS</div></div>
+        <div class="sub-row">
+          <div class="sub-row-top"><div class="sub-ico">📊</div><div class="sub-info"><div class="sub-name">ANÁLISIS DE DATOS — PRO</div><div class="sub-meta">REN: 15/04/2026 · MENSUAL</div></div><div class="sub-price-col">$4,500<span class="sp-period">/MES</span></div></div>
+          <div class="sub-progress"><div class="sub-progress-fill" style="width:62%"></div></div>
+          <div class="sub-actions"><button class="iact" onclick="showToast('↑ CONTACTA A TU ASESOR')">UPGRADE</button></div>
+        </div>
+        <div class="sub-row">
+          <div class="sub-row-top"><div class="sub-ico">🔐</div><div class="sub-info"><div class="sub-name">CIBERSEGURIDAD — ENTERPRISE</div><div class="sub-meta">REN: 01/06/2026 · MENSUAL</div></div><div class="sub-price-col">$12,000<span class="sp-period">/MES</span></div></div>
+          <div class="sub-progress"><div class="sub-progress-fill" style="width:20%"></div></div>
+        </div>
+        <div class="sub-row">
+          <div class="sub-row-top"><div class="sub-ico">📦</div><div class="sub-info"><div class="sub-name">INVENTARIO VIRTUAL — STARTER</div><div class="sub-meta">REN: 01/04/2026 · MENSUAL</div></div><div class="sub-price-col">$1,800<span class="sp-period">/MES</span></div></div>
+          <div class="sub-progress"><div class="sub-progress-fill" style="width:10%"></div></div>
+          <div class="sub-actions"><button class="iact" onclick="openCheckout('UPGRADE-INV','3200','Inventario Virtual PRO')">UPGRADE</button></div>
+        </div>
+      </div>
+      <!-- Catálogo -->
+      <div class="co-card">
+        <div class="co-header"><div class="co-ico">🤖</div><div><div class="co-name">AUTOMATIZACIÓN</div></div></div>
+        <div class="co-desc">Robótica e IA para manufactura, logística y operaciones industriales.</div>
+        <div class="co-price-row"><span class="co-amount">8,500</span><span class="co-cur">MXN</span><span class="co-period">/ MES</span></div>
+        <ul class="co-features"><li>Hasta 3 líneas automatizadas</li><li>Monitoreo IoT en tiempo real</li><li>Soporte 24/5</li></ul>
+        <button class="co-btn" onclick="openCheckout('AUTO-STD','8500','Automatización Estándar')">▶ CONTRATAR</button>
+      </div>
+      <div class="co-card co-gold">
+        <div class="co-badge gold">MÁS POPULAR</div>
+        <div class="co-header"><div class="co-ico">📱</div><div><div class="co-name">DESARROLLO APPS</div></div></div>
+        <div class="co-desc">Apps móviles iOS/Android y web con IA integrada a medida.</div>
+        <div class="co-price-row"><span class="co-amount">15,000</span><span class="co-cur">MXN</span><span class="co-period">/ PROYECTO</span></div>
+        <ul class="co-features"><li>App iOS + Android nativa</li><li>Panel de administración web</li><li>IA integrada en flujo</li><li>3 meses de soporte incluido</li></ul>
+        <button class="co-btn" onclick="openCheckout('APPS-PRO','15000','Desarrollo Apps Mobile')">▶ SOLICITAR COTIZACIÓN</button>
+      </div>
+      <div class="co-card">
+        <div class="co-header"><div class="co-ico">🎤</div><div><div class="co-name">CONSULTORÍA</div></div></div>
+        <div class="co-desc">Transformación digital estratégica y conferencias.</div>
+        <div class="co-price-row"><span class="co-amount">6,000</span><span class="co-cur">MXN</span><span class="co-period">/ SESIÓN 4H</span></div>
+        <ul class="co-features"><li>Diagnóstico empresarial</li><li>Roadmap de transformación</li><li>Keynote disponible</li></ul>
+        <button class="co-btn" onclick="openCheckout('CONS-SES','6000','Consultoría — Sesión 4hrs')">▶ AGENDAR</button>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="panel-reports" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// DATOS //</div><div class="ph-title">ANALÍTICA</div></div>
+      <div class="panel">
+        <div class="srv-row"><div class="srv-ico">📈</div><div class="srv-info"><div class="srv-name">REPORTE MENSUAL FEB 2026</div><div class="srv-meta">GENERADO: 01/03/2026 · PDF · 2.4MB</div></div><div class="srv-status s-new">NUEVO</div></div>
+        <div class="srv-row"><div class="srv-ico">📈</div><div class="srv-info"><div class="srv-name">REPORTE MENSUAL ENE 2026</div><div class="srv-meta">GENERADO: 01/02/2026 · PDF · 2.1MB</div></div><div class="srv-status s-active">LISTO</div></div>
+        <div class="srv-row"><div class="srv-ico">🔐</div><div class="srv-info"><div class="srv-name">ANÁLISIS SEGURIDAD Q1 2026</div><div class="srv-meta">GENERADO: 28/02/2026 · PDF · 3.8MB</div></div><div class="srv-status s-new">NUEVO</div></div>
+      </div>
+    </div>
+
+    <!-- DOCS -->
+    <div id="panel-docs" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// ARCHIVOS //</div><div class="ph-title">DOCUMENTOS</div></div>
+      <div class="panel">
+        <div class="srv-row"><div class="srv-ico">📋</div><div class="srv-info"><div class="srv-name">CONTRATO INVENTARIO VIRTUAL</div><div class="srv-meta">ENVIADO: 03/03/2026 · PENDIENTE TU FIRMA</div></div><div class="srv-status s-pend">FIRMAR</div></div>
+        <div class="srv-row"><div class="srv-ico">📋</div><div class="srv-info"><div class="srv-name">ADENDA CIBERSEGURIDAD 2026</div><div class="srv-meta">ENVIADO: 01/03/2026 · PENDIENTE TU FIRMA</div></div><div class="srv-status s-pend">FIRMAR</div></div>
+        <div class="srv-row"><div class="srv-ico">✅</div><div class="srv-info"><div class="srv-name">CONTRATO ANÁLISIS DE DATOS</div><div class="srv-meta">FIRMADO: 15/01/2026</div></div><div class="srv-status s-active">FIRMADO</div></div>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <div id="panel-profile" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// CONFIGURACIÓN //</div><div class="ph-title">MI PERFIL</div></div>
+      <div class="panel">
+        <div class="modal-field"><label class="modal-label">NOMBRE</label><input class="modal-input" id="profName" placeholder="Tu nombre"></div>
+        <div class="modal-field"><label class="modal-label">EMPRESA</label><input class="modal-input" placeholder="Tu empresa"></div>
+        <div class="modal-field"><label class="modal-label">EMAIL</label><input class="modal-input" id="profEmail" placeholder="email@empresa.com" type="email"></div>
+        <div class="modal-field"><label class="modal-label">TELÉFONO</label><input class="modal-input" placeholder="+52 55 0000 0000" type="tel"></div>
+        <button class="action-btn primary" onclick="showToast('✓ PERFIL ACTUALIZADO')">GUARDAR CAMBIOS</button>
+        <button class="action-btn" style="margin-top:8px;color:#e05050;border-color:rgba(200,40,42,.2);" onclick="logout()">⏻ CERRAR SESIÓN</button>
+      </div>
+    </div>
+
+    <!-- USERS (ADMIN) -->
+    <div id="panel-users" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// ADMIN //</div><div class="ph-title">USUARIOS</div></div>
+      <div class="panel">
+        <div class="srv-row"><div class="srv-ico">👑</div><div class="srv-info"><div class="srv-name">ADMINISTRADOR DATASYS</div><div class="srv-meta"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="19787d747077597d786d786a606a376d7c7a71">[email&#160;protected]</a> · ACCESO TOTAL</div></div><div class="srv-status s-active">ADMIN</div></div>
+        <div class="srv-row"><div class="srv-ico">👤</div><div class="srv-info"><div class="srv-name">CLIENTE DEMO</div><div class="srv-meta"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3d5e5154585349587d58504d4f584e5c135e5250">[email&#160;protected]</a> · ENTERPRISE</div></div><div class="srv-status s-active">CLIENTE</div></div>
+        <div class="srv-row"><div class="srv-ico">👁</div><div class="srv-info"><div class="srv-name">VISITANTE / VIEWER</div><div class="srv-meta"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="5b2d323e2c3e291b3e362b293e283a75383436">[email&#160;protected]</a></div></div><div class="srv-status s-new">VIEWER</div></div>
+        <button class="action-btn" onclick="showToast('✓ EN DESARROLLO')">+ AÑADIR USUARIO</button>
+      </div>
+    </div>
+
+    <!-- COBROS ADMIN -->
+    <div id="panel-cobros" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// ADMINISTRACIÓN //</div><div class="ph-title">COBROS ADMIN</div></div>
+      <div class="bkpi-row">
+        <div class="bkpi"><div class="bkpi-ico">📋</div><div class="bkpi-val">12</div><div class="bkpi-lbl">FACTURAS MES</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⬡</div><div class="bkpi-val green">$186K</div><div class="bkpi-lbl">COBRADO MXN</div></div>
+        <div class="bkpi"><div class="bkpi-ico">⏱</div><div class="bkpi-val gold">$34K</div><div class="bkpi-lbl">PENDIENTE</div></div>
+        <div class="bkpi"><div class="bkpi-ico">🔴</div><div class="bkpi-val red">$8.5K</div><div class="bkpi-lbl">VENCIDO</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">GENERAR FACTURA</div></div>
+        <div class="modal-field"><label class="modal-label">CLIENTE</label><select class="modal-input modal-select"><option>— SELECCIONAR —</option><option>CLIENTE DEMO</option><option>ACME Corp</option><option>TechStart MX</option></select></div>
+        <div class="modal-field"><label class="modal-label">SERVICIO</label><select class="modal-input modal-select"><option>Análisis de Datos PRO</option><option>Ciberseguridad Enterprise</option><option>Automatización</option></select></div>
+        <div class="modal-field"><label class="modal-label">MONTO (MXN)</label><input class="modal-input" type="number" placeholder="0.00"></div>
+        <div class="modal-field"><label class="modal-label">VENCIMIENTO</label><input class="modal-input" type="date" value="2026-03-31"></div>
+        <button class="action-btn primary" onclick="showToast('✓ FACTURA GENERADA Y ENVIADA')">⬡ GENERAR Y ENVIAR</button>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">CUENTAS POR COBRAR</div><div class="panel-badge">4 PENDIENTES</div></div>
+        <div class="srv-row"><div class="srv-ico">⏱</div><div class="srv-info"><div class="srv-name">ACME CORP #INV-2026-03</div><div class="srv-meta">VENCE: 10/03/2026 · $12,000 MXN</div></div><div class="srv-status s-pend">PEND</div></div>
+        <div class="srv-row"><div class="srv-ico">🔴</div><div class="srv-info"><div class="srv-name">TECHSTART MX #INV-2026-02</div><div class="srv-meta">VENCIÓ: 28/02 · $8,500 · +5 DÍAS</div></div><div class="srv-status" style="background:rgba(200,40,42,.1);border:1px solid rgba(200,40,42,.25);color:#e05050;font-family:Share Tech Mono,monospace;font-size:.42rem;padding:2px 7px;">VENCIDO</div></div>
+        <button class="action-btn" onclick="showToast('📧 RECORDATORIOS ENVIADOS')">✉ ENVIAR RECORDATORIOS</button>
+      </div>
+    </div>
+
+    <!-- CRM -->
+    <div id="panel-crm" style="display:none;">
+      <div class="page-head"><div class="ph-pre">// BASE DE DATOS //</div><div class="ph-title">CRM</div></div>
+      <div class="panel">
+        <p style="font-family:Rajdhani,sans-serif;color:var(--silver);margin-bottom:20px;line-height:1.8;font-size:.95rem;">Panel completo de CRM con todos los registros de leads, clientes y métricas de conversión.</p>
+        <a href="crm.html" class="action-btn primary" style="text-decoration:none;">▶ ABRIR CRM DASHBOARD</a>
+      </div>
+    </div>
+
+  </div><!-- /dashboard -->
+</div><!-- /appScroll -->
+
+<!-- ══ BOTTOM SHEETS ══ -->
+
+<!-- Ticket Sheet -->
+<div class="sheet-overlay" id="ticketSheetOverlay" onclick="closeSheet('ticketSheet')"></div>
+<div class="bottom-sheet" id="ticketSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title">◻ NUEVO TICKET</div>
+    <button class="sheet-close" onclick="closeSheet('ticketSheet')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="modal-field"><label class="modal-label">ASUNTO</label><input type="text" class="modal-input" id="tSubject" placeholder="Describe el problema"></div>
+    <div class="modal-field"><label class="modal-label">SERVICIO</label><select class="modal-input modal-select" id="tService"><option>— SELECCIONAR —</option><option>Análisis de Datos</option><option>Ciberseguridad</option><option>Inventario Virtual</option><option>Otro</option></select></div>
+    <div class="modal-field"><label class="modal-label">PRIORIDAD</label><select class="modal-input modal-select"><option>BAJA</option><option selected>MEDIA</option><option>ALTA</option><option>URGENTE</option></select></div>
+    <div class="modal-field"><label class="modal-label">DESCRIPCIÓN</label><textarea class="modal-input modal-textarea" id="tDesc" placeholder="Detalla el problema..."></textarea></div>
+    <button class="action-btn primary" onclick="sendTicket()">▶ ENVIAR TICKET</button>
+  </div>
+</div>
+
+<!-- Checkout Sheet -->
+<div class="sheet-overlay" id="checkoutSheetOverlay" onclick="closeSheet('checkoutSheet')"></div>
+<div class="bottom-sheet" id="checkoutSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <div class="sheet-title" id="coSheetTitle">◈ CHECKOUT</div>
+    <button class="sheet-close" onclick="closeSheet('checkoutSheet')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="steps">
+      <div class="step s-active" id="step1"><div class="step-num">1</div><div class="step-lbl">RESUMEN</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="step2"><div class="step-num">2</div><div class="step-lbl">MÉTODO</div></div>
+      <div class="step-line"></div>
+      <div class="step" id="step3"><div class="step-num">3</div><div class="step-lbl">CONFIRMAR</div></div>
+    </div>
+    <!-- Step 1 -->
+    <div id="coStep1">
+      <div class="order-summary">
+        <div class="os-row"><span class="os-label">SERVICIO</span><span class="os-val" id="coServiceName">—</span></div>
+        <div class="os-row"><span class="os-label">REFERENCIA</span><span class="os-val" id="coRef" style="font-family:Share Tech Mono,monospace;font-size:.62rem;color:var(--cyan);">—</span></div>
+        <div class="os-row"><span class="os-label">SUBTOTAL</span><span class="os-val" id="coSub">—</span></div>
+        <div class="os-row"><span class="os-label">IVA (16%)</span><span class="os-val" id="coIva">—</span></div>
+        <div class="os-row"><span class="os-total-label">TOTAL</span><span class="os-total-val" id="coTotal">—</span></div>
+      </div>
+      <button class="action-btn primary" onclick="coNext(2)">CONTINUAR → MÉTODO</button>
+    </div>
+    <!-- Step 2 -->
+    <div id="coStep2" style="display:none;">
+      <div class="gateway-sel">
+        <div class="gw gw-sel" onclick="selGW(this,'card')"><div class="gw-ico">💳</div><div class="gw-name">TARJETA</div></div>
+        <div class="gw" onclick="selGW(this,'transfer')"><div class="gw-ico">🏦</div><div class="gw-name">SPEI</div></div>
+        <div class="gw" onclick="selGW(this,'stripe')"><div class="gw-ico">🔶</div><div class="gw-name">STRIPE</div></div>
+      </div>
+      <div id="gw-card">
+        <div class="card-form">
+          <div><label class="cf-label">NÚMERO DE TARJETA</label><input class="cf-input" placeholder="•••• •••• •••• ••••" maxlength="19" oninput="fmtCard(this)" inputmode="numeric"></div>
+          <div><label class="cf-label">TITULAR</label><input class="cf-input" placeholder="NOMBRE EN TARJETA" style="font-family:Rajdhani,sans-serif;font-size:.9rem;letter-spacing:1px;" autocapitalize="characters"></div>
+          <div class="cf-row">
+            <div><label class="cf-label">VENCIMIENTO</label><input class="cf-input" placeholder="MM / AA" maxlength="7" oninput="fmtExp(this)" inputmode="numeric"></div>
+            <div><label class="cf-label">CVV</label><input class="cf-input" placeholder="•••" maxlength="4" type="password" inputmode="numeric"></div>
+          </div>
+        </div>
+      </div>
+      <div id="gw-transfer" style="display:none;">
+        <div class="order-summary">
+          <div class="os-row"><span class="os-label">BANCO</span><span class="os-val">BBVA México</span></div>
+          <div class="os-row"><span class="os-label">CLABE</span><span class="os-val" style="font-family:Share Tech Mono,monospace;font-size:.62rem;letter-spacing:1.5px;">012345678901234567</span></div>
+          <div class="os-row"><span class="os-label">REFERENCIA</span><span class="os-val" id="coSpeiRef" style="color:var(--cyan);font-family:Share Tech Mono,monospace;font-size:.65rem;">—</span></div>
+          <div class="os-row"><span class="os-total-label">MONTO EXACTO</span><span class="os-total-val" id="coSpeiTotal">—</span></div>
+        </div>
+      </div>
+      <div id="gw-stripe" style="display:none;">
+        <div style="text-align:center;padding:20px 0;">
+          <div style="font-size:1.8rem;margin-bottom:10px;">🔶</div>
+          <div style="font-family:Orbitron,sans-serif;font-size:.6rem;letter-spacing:3px;color:var(--gold);margin-bottom:6px;">STRIPE — PRÓXIMAMENTE</div>
+          <div style="font-family:Share Tech Mono,monospace;font-size:.48rem;letter-spacing:2px;color:var(--silver);opacity:.5;">INTEGRACIÓN EN DESARROLLO</div>
+        </div>
+      </div>
+      <button class="action-btn primary" onclick="coNext(3)">CONTINUAR → CONFIRMAR</button>
+      <button class="action-btn" style="margin-top:8px;" onclick="coNext(1)">← ATRÁS</button>
+    </div>
+    <!-- Step 3 -->
+    <div id="coStep3" style="display:none;">
+      <div class="order-summary">
+        <div class="os-row"><span class="os-label">SERVICIO</span><span class="os-val" id="coConfService">—</span></div>
+        <div class="os-row"><span class="os-label">MÉTODO</span><span class="os-val" id="coConfMethod">Tarjeta</span></div>
+        <div class="os-row"><span class="os-total-label">TOTAL A COBRAR</span><span class="os-total-val" id="coConfTotal">—</span></div>
+      </div>
+      <p style="font-family:Share Tech Mono,monospace;font-size:.46rem;letter-spacing:1px;color:var(--silver);opacity:.4;margin-bottom:14px;line-height:1.8;">Al confirmar autorizas el cobro. Recibirás comprobante en tu email.</p>
+      <button class="action-btn gold" onclick="processPayment()">⬡ CONFIRMAR Y PAGAR</button>
+      <button class="action-btn" style="margin-top:8px;" onclick="coNext(2)">← ATRÁS</button>
+    </div>
+  </div>
+</div>
+
+<!-- Pay Success -->
+<div id="paySuccess">
+  <div class="pay-ok-box">
+    <span class="pay-ok-ico">✅</span>
+    <div class="pay-ok-title">PAGO PROCESADO</div>
+    <div class="pay-ok-sub">TRANSACCIÓN COMPLETADA</div>
+    <div class="pay-ok-folio" id="payFolio">FOLIO: #TXN-000000</div>
+    <button class="pay-ok-close" onclick="closeSuccess()">▶ CONTINUAR</button>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ══ USERS DB ══ */
+var USERS={
+  'admin@datasys.tech':{pass:'datasys2026',role:'admin',name:'ADMINISTRADOR',initials:'AD'},
+  'admin':{pass:'datasys2026',role:'admin',name:'ADMINISTRADOR',initials:'AD'},
+  'cliente@empresa.com':{pass:'cliente123',role:'client',name:'CLIENTE DEMO',initials:'CD'},
+  'cliente':{pass:'cliente123',role:'client',name:'CLIENTE DEMO',initials:'CD'},
+  'viewer@empresa.com':{pass:'viewer123',role:'viewer',name:'VISITANTE',initials:'VI'}
+};
+var currentUser=null, rememberMe=false, selGateway='card';
+
+/* ══ CLOCK ══ */
+function updateClock(){
+  var now=new Date();
+  var cl=document.getElementById('dashClock');
+  var dl=document.getElementById('dashDate');
+  if(cl) cl.textContent=now.toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false});
+  if(dl) dl.textContent=now.toLocaleDateString('es-MX',{day:'2-digit',month:'short'}).toUpperCase();
+}
+setInterval(updateClock,1000); updateClock();
+
+/* ══ LOGIN ══ */
+function demoLogin(role){
+  document.getElementById('loginUser').value=role==='admin'?'admin':'cliente';
+  document.getElementById('loginPass').value=role==='admin'?'datasys2026':'cliente123';
+  doLogin();
+}
+function doLogin(){
+  var u=document.getElementById('loginUser').value.trim().toLowerCase();
+  var p=document.getElementById('loginPass').value;
+  var err=document.getElementById('loginErr');
+  var btn=document.getElementById('loginBtn');
+  if(!u||!p){err.textContent='⚠ INGRESA USUARIO Y CONTRASEÑA';err.classList.add('show');return;}
+  btn.textContent='VERIFICANDO...';btn.classList.add('loading');err.classList.remove('show');
+  setTimeout(function(){
+    var user=USERS[u];
+    if(user&&user.pass===p){
+      currentUser={...user,username:u};
+      enterDashboard();
+    } else {
+      err.textContent='⚠ CREDENCIALES INCORRECTAS';err.classList.add('show');
+      btn.textContent='▶ INICIAR SESIÓN';btn.classList.remove('loading');
+      document.getElementById('loginPass').value='';
+    }
+  },800);
+}
+function enterDashboard(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('bottomNav').style.display='flex';
+  document.getElementById('tnAvatar').textContent=currentUser.initials;
+  document.getElementById('drAvatar').textContent=currentUser.initials;
+  document.getElementById('drName').textContent=currentUser.name;
+  document.getElementById('dashWelcome').textContent='Hola, '+currentUser.name;
+  var roleEl=document.getElementById('drRole');
+  if(currentUser.role==='admin'){roleEl.textContent='ADMINISTRADOR';roleEl.className='dr-role role-admin';}
+  else if(currentUser.role==='client'){roleEl.textContent='CLIENTE';roleEl.className='dr-role role-client';}
+  else{roleEl.textContent='VIEWER';roleEl.className='dr-role role-viewer';}
+  var adminEls=document.querySelectorAll('.admin-only');
+  adminEls.forEach(function(el){el.style.display=currentUser.role==='admin'?'flex':'none';});
+  document.querySelectorAll('.admin-only.dr-section').forEach(function(el){el.style.display=currentUser.role==='admin'?'block':'none';});
+  document.getElementById('profName').value=currentUser.name;
+  document.getElementById('profEmail').value=currentUser.username;
+  document.getElementById('appScroll').scrollTop=0;
+}
+function logout(){
+  currentUser=null;
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('bottomNav').style.display='none';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginBtn').textContent='▶ INICIAR SESIÓN';
+  document.getElementById('loginBtn').classList.remove('loading');
+  document.getElementById('loginErr').classList.remove('show');
+  closeDrawer();
+}
+function toggleEye(){
+  var inp=document.getElementById('loginPass');
+  inp.type=inp.type==='password'?'text':'password';
+}
+function toggleRemember(){
+  rememberMe=!rememberMe;
+  document.getElementById('rememberBox').classList.toggle('active',rememberMe);
+}
+
+/* ══ PANEL SWITCH ══ */
+var allPanels=['overview','services','tickets','billing','checkout','reports','docs','profile','users','cobros','crm'];
+var bnMap={overview:'overview',services:'services',tickets:'tickets',billing:'billing'};
+function switchPanel(id){
+  allPanels.forEach(function(p){
+    var el=document.getElementById('panel-'+p);
+    if(el) el.style.display=(p===id)?'block':'none';
+  });
+  document.querySelectorAll('.bn-item').forEach(function(b){b.classList.remove('active');});
+  var bn=document.getElementById('bn-'+id);
+  if(bn) bn.classList.add('active');
+  document.getElementById('appScroll').scrollTop=0;
+  closeDrawer();
+}
+function navTo(id, el){
+  switchPanel(id);
+  document.querySelectorAll('.dr-item').forEach(function(i){i.classList.remove('active');});
+  if(el) el.classList.add('active');
+}
+
+/* ══ DRAWER ══ */
+function toggleDrawer(){
+  var d=document.getElementById('drawer');
+  var o=document.getElementById('drawerOverlay');
+  var m=document.getElementById('menuBtn');
+  var open=d.classList.contains('open');
+  if(open){closeDrawer();}
+  else{d.classList.add('open');o.classList.add('show');m.classList.add('open');}
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('show');
+  document.getElementById('menuBtn').classList.remove('open');
+}
+
+/* ══ BOTTOM SHEETS ══ */
+function openSheet(id){
+  document.getElementById(id+'Overlay').classList.add('show');
+  document.getElementById(id).classList.add('show');
+}
+function closeSheet(id){
+  document.getElementById(id+'Overlay').classList.remove('show');
+  document.getElementById(id).classList.remove('show');
+}
+
+/* ══ TICKET ══ */
+function sendTicket(){
+  var s=document.getElementById('tSubject').value;
+  var d=document.getElementById('tDesc').value;
+  if(!s||!d){showToast('⚠ COMPLETA ASUNTO Y DESCRIPCIÓN');return;}
+  closeSheet('ticketSheet');
+  showToast('✓ TICKET ENVIADO — FOLIO #DS-0044');
+  document.getElementById('tSubject').value='';
+  document.getElementById('tDesc').value='';
+}
+
+/* ══ BILLING TABS ══ */
+function billTab(id,btn){
+  ['facturas','metodos'].forEach(function(t){
+    var el=document.getElementById('btab-'+t);
+    if(el) el.style.display=(t===id)?'block':'none';
+  });
+  document.querySelectorAll('.bt').forEach(function(b){b.classList.remove('bt-active');});
+  if(btn) btn.classList.add('bt-active');
+}
+function selPM(el){
+  document.querySelectorAll('.pm-card').forEach(function(c){c.classList.remove('pm-sel');c.querySelector('.pm-check').textContent='';});
+  el.classList.add('pm-sel');el.querySelector('.pm-check').textContent='✓';
+}
+
+/* ══ CHECKOUT ══ */
+var coData={};
+function openCheckout(ref,amount,service){
+  coData={ref:ref,amount:amount,service:service};
+  var raw=parseFloat(amount)||0;
+  var iva=raw*0.16;
+  var total=raw+iva;
+  var fmt=function(n){return '$'+n.toLocaleString('es-MX',{minimumFractionDigits:2})+' MXN';};
+  document.getElementById('coSheetTitle').textContent='◈ '+service.toUpperCase().substring(0,20);
+  document.getElementById('coServiceName').textContent=service;
+  document.getElementById('coRef').textContent=ref;
+  document.getElementById('coSub').textContent=fmt(raw);
+  document.getElementById('coIva').textContent=fmt(iva);
+  document.getElementById('coTotal').textContent=fmt(total);
+  document.getElementById('coSpeiRef').textContent=ref;
+  document.getElementById('coSpeiTotal').textContent=fmt(total);
+  document.getElementById('coConfService').textContent=service;
+  document.getElementById('coConfTotal').textContent=fmt(total);
+  coData.totalFmt=fmt(total);
+  coNext(1);
+  openSheet('checkoutSheet');
+}
+function coNext(step){
+  [1,2,3].forEach(function(s){
+    var el=document.getElementById('coStep'+s);
+    if(el) el.style.display=(s===step)?'block':'none';
+    var st=document.getElementById('step'+s);
+    if(st){st.classList.remove('s-active','s-done');if(s<step)st.classList.add('s-done');else if(s===step)st.classList.add('s-active');}
+  });
+  document.getElementById('checkoutSheet').scrollTop=0;
+}
+function selGW(el,gw){
+  document.querySelectorAll('.gw').forEach(function(g){g.classList.remove('gw-sel');});
+  el.classList.add('gw-sel');
+  selGateway=gw;
+  ['card','transfer','stripe'].forEach(function(g){
+    var d=document.getElementById('gw-'+g);
+    if(d) d.style.display=(g===gw)?'block':'none';
+  });
+  var m={'card':'Tarjeta de crédito/débito','transfer':'Transferencia SPEI','stripe':'Stripe'};
+  document.getElementById('coConfMethod').textContent=m[gw]||gw;
+}
+function fmtCard(el){var v=el.value.replace(/\D/g,'').substring(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();}
+function fmtExp(el){var v=el.value.replace(/\D/g,'');if(v.length>=2)v=v.substring(0,2)+' / '+v.substring(2,4);el.value=v;}
+function processPayment(){
+  if(selGateway==='stripe'){showToast('⚠ STRIPE EN DESARROLLO');return;}
+  closeSheet('checkoutSheet');
+  var folio='TXN-'+Date.now().toString().slice(-6);
+  document.getElementById('payFolio').textContent='FOLIO: #'+folio;
+  document.getElementById('paySuccess').classList.add('show');
+}
+function closeSuccess(){
+  document.getElementById('paySuccess').classList.remove('show');
+  showToast('✓ COMPROBANTE ENVIADO A TU EMAIL');
+}
+
+/* ══ TOAST ══ */
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},3000);
+}
+
+/* ══ KEYBOARD ══ */
+document.addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&document.getElementById('loginScreen').style.display!=='none') doLogin();
+  if(e.key==='Escape'){
+    closeDrawer();
+    ['ticketSheet','checkoutSheet'].forEach(function(id){closeSheet(id);});
+  }
+});
+
+</script>
+</body>
+</html>

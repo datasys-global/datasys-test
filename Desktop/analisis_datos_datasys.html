@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS · Data Intelligence — Análisis de Datos</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════
+   VARIABLES & RESET
+═══════════════════════════════════════ */
+:root {
+  --ink:    #010a14;
+  --ink2:   #020d1a;
+  --ink3:   #030f1e;
+  --panel:  rgba(2,12,22,.97);
+  --c:      #00e5ff;
+  --c2:     #0099b8;
+  --c3:     rgba(0,229,255,.08);
+  --g:      #00ffb3;
+  --g2:     #00cc8f;
+  --amber:  #ffb300;
+  --rose:   #ff4d6d;
+  --violet: #9b59ff;
+  --border: rgba(0,229,255,.12);
+  --bord2:  rgba(0,229,255,.25);
+  --text:   #c2dce8;
+  --dim:    #3e6478;
+  --silver: #7aaabb;
+  --glow:   0 0 22px rgba(0,229,255,.32);
+  --glow2:  0 0 44px rgba(0,229,255,.48);
+}
+*,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'DM Sans',sans-serif;
+  background:var(--ink);
+  color:var(--text);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* scanlines */
+body::after {
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:9998;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.005) 2px,rgba(0,229,255,.005) 3px);
+}
+
+/* ── CURSOR ── */
+#cA { width:18px; height:18px; border:1.5px solid var(--c); border-radius:50%;
+  position:fixed; z-index:99999; pointer-events:none; transform:translate(-50%,-50%);
+  transition:width .15s, height .15s; mix-blend-mode:screen; }
+#cB { width:4px; height:4px; background:var(--c); border-radius:50%;
+  position:fixed; z-index:99998; pointer-events:none; transform:translate(-50%,-50%);
+  box-shadow:0 0 8px var(--c); transition:left .08s, top .08s; }
+
+/* ── NAVBAR ── */
+.nav {
+  position:fixed; top:0; left:0; right:0; height:60px; z-index:1000;
+  display:flex; align-items:center; justify-content:space-between; padding:0 36px;
+  background:rgba(1,10,20,.96); border-bottom:1px solid var(--border);
+  backdrop-filter:blur(20px);
+}
+.nav::after {
+  content:''; position:absolute; bottom:0; left:6%; right:6%; height:1px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent); opacity:.4;
+}
+.nav-brand { display:flex; align-items:center; gap:14px; }
+.nav-logo { font-family:'Orbitron',sans-serif; font-size:.95rem; font-weight:900;
+  color:var(--c); letter-spacing:5px; text-shadow:var(--glow); }
+.nav-pipe { width:1px; height:26px; background:var(--bord2); }
+.nav-crumb { font-family:'Share Tech Mono',monospace; font-size:.6rem; letter-spacing:2px; color:var(--dim); }
+.nav-crumb span { color:var(--c); }
+.nav-right { display:flex; align-items:center; gap:12px; }
+.nav-status { display:flex; align-items:center; gap:7px; padding:5px 13px;
+  border:1px solid rgba(0,255,179,.2); background:rgba(0,255,179,.04); }
+.nav-dot { width:6px; height:6px; border-radius:50%; background:var(--g);
+  box-shadow:0 0 8px var(--g); animation:blink 1.4s ease-in-out infinite; }
+@keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.25;} }
+.nav-status-txt { font-family:'Share Tech Mono',monospace; font-size:.58rem;
+  letter-spacing:2px; color:var(--g); }
+.nav-time { font-family:'Share Tech Mono',monospace; font-size:.65rem; color:var(--dim); }
+.btn-back {
+  padding:7px 18px; font-family:'Orbitron',sans-serif; font-size:.55rem;
+  font-weight:700; letter-spacing:2px; color:var(--ink); background:var(--c);
+  border:none; cursor:pointer; clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+  box-shadow:var(--glow); transition:filter .2s;
+}
+.btn-back:hover { filter:brightness(1.15); }
+
+/* ── HERO SECTION ── */
+.hero {
+  position:relative; min-height:100vh; display:flex; align-items:center;
+  overflow:hidden; padding-top:60px;
+}
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+}
+.hero-img {
+  width:100%; height:100%; object-fit:cover;
+  filter:brightness(.22) saturate(.7) hue-rotate(5deg);
+}
+.hero-grad {
+  position:absolute; inset:0;
+  background:
+    linear-gradient(180deg, rgba(1,10,20,.6) 0%, transparent 30%, transparent 60%, var(--ink) 100%),
+    linear-gradient(90deg, var(--ink) 0%, transparent 40%, transparent 65%, var(--ink) 100%),
+    radial-gradient(ellipse 60% 70% at 72% 45%, rgba(0,60,100,.35) 0%, transparent 70%);
+}
+/* animated grid overlay */
+.hero-grid {
+  position:absolute; inset:0; z-index:1;
+  background-image:
+    linear-gradient(rgba(0,229,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  animation:gridMove 30s linear infinite;
+}
+@keyframes gridMove { 0%{background-position:0 0;} 100%{background-position:60px 60px;} }
+/* particles canvas */
+.hero-particles { position:absolute; inset:0; z-index:2; pointer-events:none; }
+.pt {
+  position:absolute; border-radius:50%; background:var(--c);
+  animation:ptRise var(--d,8s) ease-in-out infinite var(--dl,0s);
+  opacity:0;
+}
+@keyframes ptRise {
+  0%{opacity:0;transform:translateY(0) scale(.4);}
+  40%{opacity:.6;}80%{opacity:.1;}
+  100%{opacity:0;transform:translateY(-80px) translateX(var(--tx,0px)) scale(1);}
+}
+
+.hero-content {
+  position:relative; z-index:5; max-width:660px; padding:0 72px;
+  animation:heroIn 1.2s cubic-bezier(.2,.8,.3,1) forwards;
+}
+@keyframes heroIn { 0%{opacity:0;transform:translateX(-30px);} 100%{opacity:1;transform:translateX(0);} }
+
+.hero-pre {
+  font-family:'Share Tech Mono',monospace; font-size:.68rem; letter-spacing:5px;
+  color:var(--c); opacity:.7; margin-bottom:18px;
+}
+.hero-title {
+  font-family:'Orbitron',sans-serif; font-size:clamp(2rem,5.5vw,4rem);
+  font-weight:900; line-height:1.05; letter-spacing:2px; color:#e8f6ff;
+  text-shadow:0 0 60px rgba(0,229,255,.25); margin-bottom:20px;
+}
+.hero-title em { font-style:normal; color:var(--c); text-shadow:var(--glow2); }
+.hero-desc {
+  font-size:1.05rem; line-height:1.85; color:var(--silver); font-weight:300;
+  margin-bottom:36px; max-width:520px;
+}
+.hero-tags { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:40px; }
+.tag {
+  padding:6px 16px; font-family:'Share Tech Mono',monospace; font-size:.6rem;
+  letter-spacing:2px; border:1px solid var(--border); color:var(--dim);
+  background:var(--c3); transition:all .3s;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.tag:hover { border-color:var(--c); color:var(--c); background:rgba(0,229,255,.1); }
+.hero-ctas { display:flex; gap:14px; flex-wrap:wrap; }
+.cta-primary {
+  padding:13px 36px; font-family:'Orbitron',sans-serif; font-size:.65rem;
+  font-weight:700; letter-spacing:3px; color:var(--ink); background:var(--c);
+  border:none; cursor:pointer; box-shadow:var(--glow2);
+  clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  transition:filter .3s, box-shadow .3s; animation:ctaPulse 3s ease-in-out infinite;
+}
+@keyframes ctaPulse { 0%,100%{box-shadow:var(--glow);} 50%{box-shadow:var(--glow2);} }
+.cta-primary:hover { filter:brightness(1.1); }
+.cta-secondary {
+  padding:12px 34px; font-family:'Orbitron',sans-serif; font-size:.65rem;
+  font-weight:700; letter-spacing:3px; color:var(--c); background:transparent;
+  border:1px solid var(--c); cursor:pointer;
+  clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  transition:all .3s;
+}
+.cta-secondary:hover { background:rgba(0,229,255,.08); box-shadow:var(--glow); }
+
+/* live stat pills on hero */
+.hero-stats {
+  position:absolute; right:60px; bottom:80px; z-index:5;
+  display:flex; flex-direction:column; gap:12px;
+  animation:statsIn 1.4s ease .5s both;
+}
+@keyframes statsIn { 0%{opacity:0;transform:translateX(20px);} 100%{opacity:1;transform:translateX(0);} }
+.hs-card {
+  background:rgba(2,12,22,.88); border:1px solid var(--border);
+  backdrop-filter:blur(16px); padding:14px 20px; min-width:180px;
+  clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+  position:relative; overflow:hidden;
+}
+.hs-card::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent);
+}
+.hs-label { font-family:'Share Tech Mono',monospace; font-size:.52rem; letter-spacing:3px; color:var(--dim); margin-bottom:6px; }
+.hs-value { font-family:'Orbitron',sans-serif; font-size:1.4rem; font-weight:900; color:var(--c); text-shadow:var(--glow); }
+.hs-sub { font-size:.65rem; color:var(--silver); margin-top:3px; }
+.hs-bar { height:2px; background:rgba(0,229,255,.12); margin-top:8px; border-radius:1px; overflow:hidden; }
+.hs-bar-fill { height:100%; background:linear-gradient(90deg,var(--c2),var(--c)); border-radius:1px; transition:width 2s ease; }
+
+/* scroll hint */
+.scroll-hint {
+  position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+  opacity:.4; animation:bounce 2.5s ease-in-out infinite; z-index:5;
+}
+@keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0);} 50%{transform:translateX(-50%) translateY(8px);} }
+.scroll-hint span { font-family:'Share Tech Mono',monospace; font-size:.55rem; letter-spacing:4px; color:var(--silver); }
+.scroll-line { width:1px; height:32px; background:linear-gradient(var(--c),transparent); }
+
+/* ── SECTION SHARED ── */
+.section { padding:80px 60px; max-width:1400px; margin:0 auto; }
+.sec-pre { font-family:'Share Tech Mono',monospace; font-size:.62rem; letter-spacing:5px; color:var(--c); opacity:.65; margin-bottom:10px; }
+.sec-title {
+  font-family:'Orbitron',sans-serif; font-size:clamp(1.6rem,3.5vw,2.6rem);
+  font-weight:900; color:#e0f0f8; letter-spacing:3px; margin-bottom:14px;
+  position:relative; display:inline-block;
+}
+.sec-title::after {
+  content:''; position:absolute; bottom:-10px; left:0; width:55%; height:2px;
+  background:linear-gradient(90deg,var(--c),transparent);
+}
+.sec-sub { font-size:1rem; color:var(--silver); line-height:1.9; font-weight:300; max-width:580px; margin-top:24px; }
+
+/* ── LIVE DASHBOARD ── */
+.dashboard-bg {
+  background:linear-gradient(180deg, var(--ink) 0%, var(--ink2) 50%, var(--ink) 100%);
+  padding:80px 0;
+}
+.db-grid {
+  max-width:1380px; margin:0 auto; padding:0 40px;
+  display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px;
+}
+.db-wide { grid-column:span 2; }
+.panel {
+  background:var(--panel); border:1px solid var(--border);
+  position:relative; overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));
+}
+.panel::before {
+  content:''; position:absolute; top:0; left:0; right:0; height:1px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent);
+}
+.ca-tr { position:absolute; top:0; right:0; width:20px; height:20px; border-top:1px solid var(--c); border-right:1px solid var(--c); }
+.ca-bl { position:absolute; bottom:0; left:0; width:20px; height:20px; border-bottom:1px solid rgba(0,229,255,.25); border-left:1px solid rgba(0,229,255,.25); }
+.panel-header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:16px 20px 10px; border-bottom:1px solid var(--border);
+}
+.ph-title { font-family:'Orbitron',sans-serif; font-size:.7rem; font-weight:700; color:var(--c); letter-spacing:2px; }
+.ph-badge {
+  font-family:'Share Tech Mono',monospace; font-size:.52rem; letter-spacing:2px;
+  padding:3px 10px; border:1px solid rgba(0,255,179,.3); color:var(--g); background:rgba(0,255,179,.05);
+}
+.panel-body { padding:16px 20px 20px; }
+.chart-wrap { position:relative; }
+
+/* KPI ROW */
+.kpi-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.kpi {
+  background:var(--panel); border:1px solid var(--border); padding:18px 20px;
+  position:relative; overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);
+  transition:transform .3s, border-color .3s;
+}
+.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:1px; background:linear-gradient(90deg,transparent,var(--c),transparent); }
+.kpi:hover { transform:translateY(-4px); border-color:var(--bord2); }
+.kpi-label { font-family:'Share Tech Mono',monospace; font-size:.52rem; letter-spacing:3px; color:var(--dim); margin-bottom:8px; }
+.kpi-value { font-family:'Orbitron',sans-serif; font-size:1.7rem; font-weight:900; line-height:1; }
+.kpi-delta { font-family:'Share Tech Mono',monospace; font-size:.62rem; margin-top:5px; }
+.kpi-spark { height:32px; margin-top:10px; }
+.kv-c { color:var(--c); text-shadow:var(--glow); }
+.kv-g { color:var(--g); text-shadow:0 0 16px rgba(0,255,179,.4); }
+.kv-a { color:var(--amber); text-shadow:0 0 16px rgba(255,179,0,.35); }
+.kv-v { color:var(--violet); text-shadow:0 0 16px rgba(155,89,255,.4); }
+.delta-up { color:var(--g); } .delta-dn { color:var(--rose); }
+
+/* ML MODEL PANEL */
+.ml-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.ml-model {
+  background:rgba(0,229,255,.03); border:1px solid var(--border); padding:16px;
+  transition:all .3s; cursor:pointer;
+}
+.ml-model:hover { background:rgba(0,229,255,.07); border-color:var(--bord2); }
+.mm-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+.mm-name { font-family:'Orbitron',sans-serif; font-size:.65rem; font-weight:700; color:var(--c); letter-spacing:1.5px; }
+.mm-acc { font-family:'Share Tech Mono',monospace; font-size:.7rem; color:var(--g); }
+.mm-bar { height:4px; background:rgba(0,229,255,.1); border-radius:2px; overflow:hidden; margin-bottom:10px; }
+.mm-fill { height:100%; background:linear-gradient(90deg,var(--c2),var(--g)); border-radius:2px; transition:width 1.5s ease; }
+.mm-meta { font-size:.65rem; color:var(--dim); line-height:1.7; }
+.mm-meta b { color:var(--silver); font-weight:500; }
+
+/* INSIGHTS FEED */
+.insight-item {
+  display:flex; gap:14px; padding:12px 0;
+  border-bottom:1px solid rgba(0,229,255,.06); cursor:pointer; transition:all .2s;
+}
+.insight-item:hover { padding-left:8px; }
+.insight-item:last-child { border-bottom:none; }
+.ii-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.ii-high { background:var(--rose); box-shadow:0 0 8px var(--rose); }
+.ii-med  { background:var(--amber); box-shadow:0 0 8px var(--amber); }
+.ii-low  { background:var(--g); box-shadow:0 0 8px var(--g); }
+.ii-title { font-size:.8rem; font-weight:500; color:var(--text); line-height:1.5; }
+.ii-meta { display:flex; gap:10px; margin-top:4px; }
+.ii-tag { font-family:'Share Tech Mono',monospace; font-size:.52rem; letter-spacing:1.5px; }
+.ii-time { font-family:'Share Tech Mono',monospace; font-size:.52rem; color:var(--dim); }
+
+/* PIPELINE SECTION */
+.pipeline-wrap {
+  background:var(--ink3);
+  border-top:1px solid var(--border); border-bottom:1px solid var(--border);
+  padding:80px 60px;
+}
+.pipeline { display:grid; grid-template-columns:repeat(5,1fr); gap:0; max-width:1200px; margin:40px auto 0; position:relative; }
+.pipeline::before {
+  content:''; position:absolute; top:30px; left:10%; right:10%; height:1px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent); opacity:.3;
+}
+.pipe-step { text-align:center; padding:0 16px; position:relative; }
+.pipe-icon {
+  width:60px; height:60px; border:1px solid var(--border); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; margin:0 auto 18px;
+  font-size:1.5rem; background:var(--panel); position:relative;
+  transition:all .4s; cursor:default;
+}
+.pipe-icon::after {
+  content:''; position:absolute; inset:-6px; border-radius:50%;
+  border:1px solid rgba(0,229,255,.15); animation:ringPulse 3s ease-in-out infinite;
+}
+@keyframes ringPulse { 0%,100%{transform:scale(1);opacity:.5;} 50%{transform:scale(1.08);opacity:1;} }
+.pipe-step:hover .pipe-icon { border-color:var(--c); box-shadow:var(--glow); background:rgba(0,229,255,.08); }
+.pipe-num { font-family:'Share Tech Mono',monospace; font-size:.5rem; letter-spacing:3px; color:var(--dim); margin-bottom:8px; }
+.pipe-name { font-family:'Orbitron',sans-serif; font-size:.65rem; font-weight:700; color:var(--c); letter-spacing:1px; margin-bottom:8px; }
+.pipe-desc { font-size:.72rem; color:var(--silver); line-height:1.7; font-weight:300; }
+
+/* SERVICES GRID */
+.srv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:48px; }
+.srv-card {
+  background:var(--panel); border:1px solid var(--border); padding:32px 28px;
+  cursor:pointer; position:relative; overflow:hidden;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));
+  transition:all .4s;
+}
+.srv-card::before {
+  content:''; position:absolute; top:0; left:-100%; width:100%; height:1px;
+  background:linear-gradient(90deg,transparent,var(--c),transparent);
+  transition:left .6s;
+}
+.srv-card:hover::before { left:100%; }
+.srv-card:hover { border-color:var(--bord2); transform:translateY(-6px); box-shadow:0 20px 60px rgba(0,0,0,.5); }
+.srv-ico { font-size:2rem; margin-bottom:18px; display:block; }
+.srv-name { font-family:'Orbitron',sans-serif; font-size:.8rem; font-weight:700; color:var(--c); letter-spacing:2px; margin-bottom:12px; }
+.srv-desc { font-size:.88rem; color:var(--silver); line-height:1.85; font-weight:300; }
+.srv-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:16px; }
+.srv-tag { font-family:'Share Tech Mono',monospace; font-size:.52rem; letter-spacing:1.5px; color:var(--dim); border:1px solid var(--border); padding:3px 9px; }
+
+/* CTA SECTION */
+.cta-section {
+  text-align:center; padding:100px 40px;
+  background:radial-gradient(ellipse 70% 60% at 50% 50%, rgba(0,40,70,.5) 0%, transparent 70%);
+  position:relative; overflow:hidden;
+}
+.cta-section::before {
+  content:''; position:absolute; inset:0;
+  background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
+  background-size:50px 50px;
+}
+.cta-title { font-family:'Orbitron',sans-serif; font-size:clamp(1.5rem,4vw,2.8rem); font-weight:900; color:#e0f0f8; letter-spacing:3px; margin-bottom:20px; }
+.cta-sub { font-size:1rem; color:var(--silver); font-weight:300; max-width:520px; margin:0 auto 40px; line-height:1.9; }
+.cta-group { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; }
+
+/* FORM */
+.form-section { background:var(--ink2); border-top:1px solid var(--border); padding:80px 60px; }
+.form-grid { display:grid; grid-template-columns:1fr 1fr; gap:60px; max-width:1100px; margin:0 auto; }
+.form-wrap { margin-top:36px; }
+.fg { margin-bottom:20px; }
+.fg label { display:block; font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:3px; color:var(--dim); margin-bottom:8px; }
+.fg input, .fg textarea, .fg select {
+  width:100%; background:rgba(0,229,255,.04); border:1px solid var(--border);
+  color:var(--text); font-family:'DM Sans',sans-serif; font-size:.9rem;
+  padding:11px 16px; outline:none; transition:border-color .3s;
+  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
+}
+.fg input:focus, .fg textarea:focus, .fg select:focus { border-color:var(--c); background:rgba(0,229,255,.07); }
+.fg textarea { height:110px; resize:vertical; }
+.fg select option { background:var(--ink2); }
+.btn-submit {
+  width:100%; padding:14px; font-family:'Orbitron',sans-serif; font-size:.65rem;
+  font-weight:700; letter-spacing:3px; color:var(--ink); background:var(--c);
+  border:none; cursor:pointer; box-shadow:var(--glow);
+  clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+  transition:filter .3s, box-shadow .3s;
+}
+.btn-submit:hover { filter:brightness(1.1); box-shadow:var(--glow2); }
+.form-info { padding-top:36px; }
+.fi-item { display:flex; gap:14px; margin-bottom:24px; }
+.fi-ico { width:40px; height:40px; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; }
+.fi-title { font-family:'Orbitron',sans-serif; font-size:.65rem; font-weight:700; color:var(--c); letter-spacing:1px; margin-bottom:6px; }
+.fi-desc { font-size:.82rem; color:var(--silver); line-height:1.7; font-weight:300; }
+
+/* FOOTER */
+footer {
+  text-align:center; padding:40px; border-top:1px solid var(--border);
+  background:rgba(1,10,20,.9);
+}
+.ft-logo { font-family:'Orbitron',sans-serif; font-size:1.1rem; font-weight:900; letter-spacing:6px; color:var(--c); text-shadow:var(--glow); margin-bottom:8px; }
+.ft-tag { font-family:'Share Tech Mono',monospace; font-size:.58rem; letter-spacing:4px; color:var(--dim); margin-bottom:10px; }
+.ft-copy { font-size:.75rem; color:var(--dim); }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(0,229,255,.2); border-radius:2px; }
+
+@media(max-width:1100px) {
+  .db-grid { grid-template-columns:1fr 1fr; }
+  .db-wide { grid-column:span 2; }
+  .kpi-row { grid-template-columns:repeat(2,1fr); }
+  .srv-grid { grid-template-columns:1fr 1fr; }
+  .pipeline { grid-template-columns:repeat(3,1fr); }
+}
+@media(max-width:768px) {
+  .section { padding:60px 24px; }
+  .hero-content { padding:0 28px; }
+  .hero-stats { display:none; }
+  .db-grid { grid-template-columns:1fr; padding:0 20px; }
+  .db-wide { grid-column:span 1; }
+  .ml-grid { grid-template-columns:1fr; }
+  .pipeline { grid-template-columns:1fr 1fr; }
+  .srv-grid { grid-template-columns:1fr; }
+  .form-grid { grid-template-columns:1fr; gap:30px; }
+  .pipeline-wrap { padding:60px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div id="cA"></div><div id="cB"></div>
+
+<!-- ═══════════════════════════ NAVBAR ═══════════════════════════ -->
+<nav class="nav">
+  <div class="nav-brand">
+    <a href="../index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><img src="../imagenes/logo.png" alt="DATASYS" style="height:36px;width:36px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 8px rgba(0,229,255,.6));"><div class="nav-logo">DATASYS</div></a>
+    <div class="nav-pipe"></div>
+    <div class="nav-crumb">PLATAFORMA / <span>ANÁLISIS DE DATOS</span></div>
+  </div>
+  <div class="nav-right">
+    <div class="nav-status"><div class="nav-dot"></div><div class="nav-status-txt">SISTEMA ACTIVO</div></div>
+    <div class="nav-time" id="navTime">--:--:--</div>
+    <button class="btn-back" onclick="window.location.href='../index.html'">🏠 INICIO</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
+<section class="hero">
+  <div class="hero-bg">
+    <img class="hero-img" src="../imagenes/analisis_de_datos.jpeg" alt="Data Intelligence" onerror="this.style.display='none'">
+    <div class="hero-grad"></div>
+  </div>
+  <div class="hero-grid"></div>
+  <div class="hero-particles" id="hPart"></div>
+
+  <div class="hero-content">
+    <div class="hero-pre">// DATA INTELLIGENCE · DATASYS PLATFORM</div>
+    <h1 class="hero-title">
+      Transforma tus datos<br>en <em>decisiones</em><br>de impacto
+    </h1>
+    <p class="hero-desc">
+      Transformamos grandes volúmenes de datos en insights accionables. Plataforma Data Intelligence con análisis en tiempo real, dashboards interactivos y modelos predictivos de ML que impulsan decisiones estratégicas.
+    </p>
+    <div class="hero-tags">
+      <div class="tag">REAL-TIME ANALYTICS</div>
+      <div class="tag">MACHINE LEARNING</div>
+      <div class="tag">PREDICTIVE MODELS</div>
+      <div class="tag">NLP · COMPUTER VISION</div>
+      <div class="tag">DATA PIPELINE</div>
+    </div>
+    <div class="hero-ctas">
+      <button class="cta-primary" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">VER DASHBOARD EN VIVO →</button>
+      <button class="cta-secondary" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">SOLICITAR CONSULTA</button>
+    </div>
+  </div>
+
+  <!-- LIVE STATS -->
+  <div class="hero-stats">
+    <div class="hs-card">
+      <div class="hs-label">REGISTROS PROCESADOS / SEG</div>
+      <div class="hs-value kv-c" id="heroRec">2,847,391</div>
+      <div class="hs-sub">↑ +18.4% vs ayer</div>
+      <div class="hs-bar"><div class="hs-bar-fill" id="heroRecBar" style="width:74%"></div></div>
+    </div>
+    <div class="hs-card">
+      <div class="hs-label">MODELOS ML ACTIVOS</div>
+      <div class="hs-value kv-g">24</div>
+      <div class="hs-sub">Precisión promedio 94.7%</div>
+      <div class="hs-bar"><div class="hs-bar-fill" style="width:94%;background:linear-gradient(90deg,var(--g2),var(--g))"></div></div>
+    </div>
+    <div class="hs-card">
+      <div class="hs-label">LATENCIA PIPELINE</div>
+      <div class="hs-value kv-a" id="heroLatency">1.2ms</div>
+      <div class="hs-sub">P99 · 99.97% uptime</div>
+      <div class="hs-bar"><div class="hs-bar-fill" style="width:99%;background:linear-gradient(90deg,var(--amber),#ffcc40)"></div></div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>EXPLORAR</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ KPIs ═══════════════════════════ -->
+<div style="background:var(--ink2);padding:50px 60px;">
+  <div class="kpi-row" style="max-width:1300px;margin:0 auto;">
+    <div class="kpi">
+      <div class="kpi-label">VOLUMEN DATOS · HOY</div>
+      <div class="kpi-value kv-c" id="kpi1">847 TB</div>
+      <div class="kpi-delta delta-up">▲ +23.1% vs ayer</div>
+      <div class="kpi-spark"><canvas id="spark1"></canvas></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">INSIGHTS GENERADOS</div>
+      <div class="kpi-value kv-g" id="kpi2">12,483</div>
+      <div class="kpi-delta delta-up">▲ +8.7% esta semana</div>
+      <div class="kpi-spark"><canvas id="spark2"></canvas></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">ANOMALÍAS DETECTADAS</div>
+      <div class="kpi-value kv-a" id="kpi3">37</div>
+      <div class="kpi-delta delta-dn">▼ -12% vs promedio</div>
+      <div class="kpi-spark"><canvas id="spark3"></canvas></div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">PRECISIÓN MODELOS ML</div>
+      <div class="kpi-value kv-v" id="kpi4">94.7%</div>
+      <div class="kpi-delta delta-up">▲ +0.3 puntos</div>
+      <div class="kpi-spark"><canvas id="spark4"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ LIVE DASHBOARD ═══════════════════════════ -->
+<div class="dashboard-bg" id="dashboard">
+  <div style="max-width:1380px;margin:0 auto;padding:0 40px;">
+    <div style="margin-bottom:32px;">
+      <div class="sec-pre">// DASHBOARD · TIEMPO REAL</div>
+      <div class="sec-title">Data Intelligence<br>en Vivo</div>
+    </div>
+  </div>
+
+  <div class="db-grid">
+
+    <!-- MAIN TIMESERIES CHART -->
+    <div class="panel db-wide">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">FLUJO DE DATOS · SERIES TEMPORALES</div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="ph-badge">⚡ EN VIVO</div>
+          <select id="metricSel" onchange="switchMetric(this.value)" style="background:rgba(0,229,255,.06);border:1px solid var(--border);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.55rem;padding:4px 10px;letter-spacing:1px;outline:none;cursor:pointer;">
+            <option value="requests">Requests/s</option>
+            <option value="throughput">Throughput GB/h</option>
+            <option value="accuracy">Precisión ML %</option>
+            <option value="latency">Latencia ms</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap" style="height:240px;"><canvas id="mainTs"></canvas></div>
+      </div>
+    </div>
+
+    <!-- DISTRIBUTION CHART -->
+    <div class="panel">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">DISTRIBUCIÓN · FUENTES</div>
+        <div class="ph-badge">DONUT</div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap" style="height:200px;"><canvas id="donutChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- HEATMAP -->
+    <div class="panel db-wide">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">MAPA DE CALOR · ACTIVIDAD POR HORA / DÍA</div>
+        <div class="ph-badge">7 DÍAS</div>
+      </div>
+      <div class="panel-body" id="heatmapBody"></div>
+    </div>
+
+    <!-- ML ACCURACY BAR -->
+    <div class="panel">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">RENDIMIENTO MODELOS</div>
+        <div class="ph-badge">ML</div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap" style="height:200px;"><canvas id="barModels"></canvas></div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS FEED -->
+    <div class="panel">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">INSIGHTS AUTOMÁTICOS</div>
+        <div class="ph-badge" id="insightCount">12 NUEVOS</div>
+      </div>
+      <div class="panel-body" id="insightFeed"></div>
+    </div>
+
+    <!-- SCATTER CLUSTERS -->
+    <div class="panel">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">CLUSTERING · SEGMENTOS</div>
+        <div class="ph-badge">K-MEANS</div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap" style="height:200px;"><canvas id="scatterChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- PREDICTION CHART -->
+    <div class="panel db-wide">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">MODELO PREDICTIVO · FORECAST 30 DÍAS</div>
+        <div class="ph-badge">LSTM · ARIMA</div>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap" style="height:220px;"><canvas id="forecastChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- ML MODELS -->
+    <div class="panel">
+      <div class="ca-tr"></div><div class="ca-bl"></div>
+      <div class="panel-header">
+        <div class="ph-title">MODELOS ML ACTIVOS</div>
+        <div class="ph-badge">24 MODELOS</div>
+      </div>
+      <div class="panel-body">
+        <div class="ml-grid" id="mlModels"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════ PIPELINE ═══════════════════════════ -->
+<div class="pipeline-wrap">
+  <div style="text-align:center;">
+    <div class="sec-pre" style="text-align:center;">// ARQUITECTURA · DATA PIPELINE</div>
+    <div class="sec-title" style="display:block;text-align:center;">Cómo procesamos<br>tus datos</div>
+  </div>
+  <div class="pipeline">
+    <div class="pipe-step">
+      <div class="pipe-icon" style="animation-delay:0s;">🔌</div>
+      <div class="pipe-num">// 01</div>
+      <div class="pipe-name">INGESTA</div>
+      <div class="pipe-desc">Conectores nativos para 150+ fuentes: SQL, APIs REST, Kafka, S3, IoT, ERP/CRM</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon" style="animation-delay:.5s;">⚙️</div>
+      <div class="pipe-num">// 02</div>
+      <div class="pipe-name">PROCESAMIENTO</div>
+      <div class="pipe-desc">ETL/ELT en tiempo real con Apache Spark. Limpieza, enriquecimiento y validación automática</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon" style="animation-delay:1s;">🧠</div>
+      <div class="pipe-num">// 03</div>
+      <div class="pipe-name">MODELOS ML</div>
+      <div class="pipe-desc">AutoML, Random Forest, LSTM, Transformers. Entrenamiento continuo y auto-reentrenamiento</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon" style="animation-delay:1.5s;">📊</div>
+      <div class="pipe-num">// 04</div>
+      <div class="pipe-name">VISUALIZACIÓN</div>
+      <div class="pipe-desc">Dashboards interactivos, alertas en tiempo real y reportes ejecutivos automatizados</div>
+    </div>
+    <div class="pipe-step">
+      <div class="pipe-icon" style="animation-delay:2s;">🚀</div>
+      <div class="pipe-num">// 05</div>
+      <div class="pipe-name">ACCIÓN</div>
+      <div class="pipe-desc">Insights accionables, integraciones automáticas y toma de decisiones data-driven</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ SERVICES ═══════════════════════════ -->
+<div class="section">
+  <div class="sec-pre">// CAPACIDADES · PLATAFORMA</div>
+  <div class="sec-title">Soluciones de<br>Análisis Avanzado</div>
+  <div class="srv-grid">
+    <div class="srv-card">
+      <span class="srv-ico">⚡</span>
+      <div class="srv-name">ANÁLISIS EN TIEMPO REAL</div>
+      <div class="srv-desc">Procesamiento de streams con latencia sub-milisegundo. Alertas instantáneas ante anomalías y cambios críticos en tus datos.</div>
+      <div class="srv-tags"><span class="srv-tag">APACHE KAFKA</span><span class="srv-tag">FLINK</span><span class="srv-tag">SPARK STREAMING</span></div>
+    </div>
+    <div class="srv-card">
+      <span class="srv-ico">🧠</span>
+      <div class="srv-name">MODELOS PREDICTIVOS ML</div>
+      <div class="srv-desc">Forecasting, clasificación y detección de anomalías con modelos de última generación. AutoML para deployment sin código.</div>
+      <div class="srv-tags"><span class="srv-tag">LSTM</span><span class="srv-tag">XGBOOST</span><span class="srv-tag">TRANSFORMERS</span></div>
+    </div>
+    <div class="srv-card">
+      <span class="srv-ico">📊</span>
+      <div class="srv-name">DASHBOARDS INTERACTIVOS</div>
+      <div class="srv-desc">Visualizaciones personalizadas y self-service analytics. Comparte insights con toda la organización con un clic.</div>
+      <div class="srv-tags"><span class="srv-tag">BI AVANZADO</span><span class="srv-tag">DRILL-DOWN</span><span class="srv-tag">EMBEDS</span></div>
+    </div>
+    <div class="srv-card">
+      <span class="srv-ico">🔍</span>
+      <div class="srv-name">NLP & TEXT ANALYTICS</div>
+      <div class="srv-desc">Análisis de sentimiento, extracción de entidades y clasificación de texto. Convierte datos no estructurados en insights.</div>
+      <div class="srv-tags"><span class="srv-tag">BERT</span><span class="srv-tag">GPT FINE-TUNING</span><span class="srv-tag">NER</span></div>
+    </div>
+    <div class="srv-card">
+      <span class="srv-ico">👁️</span>
+      <div class="srv-name">COMPUTER VISION</div>
+      <div class="srv-desc">Detección de objetos, control de calidad visual y análisis de imágenes industriales con precisión superior al 98%.</div>
+      <div class="srv-tags"><span class="srv-tag">YOLO</span><span class="srv-tag">CNN</span><span class="srv-tag">EDGE DEPLOY</span></div>
+    </div>
+    <div class="srv-card">
+      <span class="srv-ico">🔐</span>
+      <div class="srv-name">DATA GOVERNANCE</div>
+      <div class="srv-desc">Linaje de datos, control de acceso granular y cumplimiento regulatorio. GDPR, HIPAA y SOC 2 Type II certificado.</div>
+      <div class="srv-tags"><span class="srv-tag">GDPR</span><span class="srv-tag">HIPAA</span><span class="srv-tag">SOC 2</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ CTA ═══════════════════════════ -->
+<div class="cta-section">
+  <div class="sec-pre" style="text-align:center;">// ¿LISTO PARA TRANSFORMAR TUS DATOS?</div>
+  <div class="cta-title">Tu inteligencia de negocio,<br>potenciada por IA</div>
+  <p class="cta-sub">Más de 500 empresas ya transforman sus datos con DATASYS. Implementación en 2 semanas. Demo personalizada sin costo.</p>
+  <div class="cta-group">
+    <button class="cta-primary" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">SOLICITAR DEMO GRATIS →</button>
+    <button class="cta-secondary" onclick="document.getElementById('contacto').scrollIntoView({behavior:'smooth'})">HABLAR CON EXPERTO</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════ CONTACT ═══════════════════════════ -->
+<div class="form-section" id="contacto">
+  <div class="form-grid">
+    <div>
+      <div class="sec-pre">// CONSULTA · ANÁLISIS DE DATOS</div>
+      <div class="sec-title">Solicita tu<br>consulta gratuita</div>
+      <div class="sec-sub">Nuestros data scientists analizan tu caso y te presentan un plan personalizado en 24h.</div>
+      <div class="form-info" style="margin-top:36px;">
+        <div class="fi-item">
+          <div class="fi-ico">⚡</div>
+          <div><div class="fi-title">RESPUESTA EN 24 HORAS</div><div class="fi-desc">Un especialista te contacta con una propuesta personalizada para tu caso de uso.</div></div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-ico">🎯</div>
+          <div><div class="fi-title">DEMO PERSONALIZADA</div><div class="fi-desc">Mostramos la plataforma con datos de tu industria y KPIs relevantes para tu negocio.</div></div>
+        </div>
+        <div class="fi-item">
+          <div class="fi-ico">🔐</div>
+          <div><div class="fi-title">CONFIDENCIALIDAD TOTAL</div><div class="fi-desc">NDA disponible. Tus datos y requerimientos se tratan con máxima discreción.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-wrap">
+      <div class="fg"><label>NOMBRE COMPLETO *</label><input id="cf_name" type="text" placeholder="Tu nombre completo..."></div>
+      <div class="fg"><label>CORREO ELECTRÓNICO *</label><input id="cf_email" type="email" placeholder="tu@empresa.com"></div>
+  <div class="fg"><label>TELÉFONO</label><input id="cf_phone" type="tel" placeholder="+52 55 0000 0000"></div>
+      <div class="fg"><label>EMPRESA / ORGANIZACIÓN</label><input type="text" placeholder="Nombre de tu empresa..."></div>
+      <div class="fg">
+        <label>ÁREA DE INTERÉS</label>
+        <select id="cf_service">
+          <option value="">Seleccionar servicio...</option>
+          <option>Análisis en Tiempo Real</option>
+          <option>Modelos Predictivos ML</option>
+          <option>Dashboards Interactivos</option>
+          <option>NLP y Text Analytics</option>
+          <option>Computer Vision</option>
+          <option>Data Governance</option>
+          <option>Consultoría Estratégica de Datos</option>
+        </select>
+      </div>
+      <div class="fg"><label>VOLUMEN DE DATOS ESTIMADO</label>
+        <select>
+          <option value="">¿Cuántos datos manejas?</option>
+          <option>Menos de 1 TB</option><option>1 TB – 10 TB</option>
+          <option>10 TB – 100 TB</option><option>Más de 100 TB</option><option>No lo sé aún</option>
+        </select>
+      </div>
+      <div class="fg"><label>DESCRIBE TU CASO DE USO</label><textarea id="cf_message" placeholder="¿Qué problema quieres resolver con análisis de datos?..."></textarea></div>
+      <div id="cf_error" style="display:none;font-family:\'Share Tech Mono\',monospace;font-size:.48rem;color:#e05050;padding:8px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.06);margin-bottom:8px;"></div>
+  <button class="btn-submit" id="cf_btn" onclick="sendContactForm()">ENVIAR SOLICITUD ⟶</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<!-- ══ MODAL ACUSE DE RECIBO ══ -->
+<div id="acuseModal" style="position:fixed;inset:0;z-index:99100;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.96);backdrop-filter:blur(16px);">
+  <div style="background:#05101e;border:1px solid rgba(0,229,255,.38);max-width:500px;width:94%;padding:0;animation:acuseIn .4s both;position:relative;">
+    <style>@keyframes acuseIn{0%{opacity:0;transform:scale(.93) translateY(18px);}100%{opacity:1;transform:none;}}</style>
+    <div style="padding:16px 22px 12px;border-bottom:1px solid rgba(0,229,255,.13);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">✓ MENSAJE ENVIADO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#00e5ff;letter-spacing:2px;">ACUSE DE RECIBO</div>
+      </div>
+      <button onclick="closeAcuse()" style="background:none;border:none;color:#aaa;font-size:1.4rem;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.13);margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;">FOLIO</span>
+        <span id="acuse_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:#00e5ff;"></span>
+        <span id="acuse_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.5;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">NOMBRE</span><span id="acuse_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">EMAIL</span><span id="acuse_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#00e5ff;font-weight:600;word-break:break-all;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">TELÉFONO</span><span id="acuse_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">SERVICIO</span><span id="acuse_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f5c842;font-weight:600;"></span></div>
+        <div style="padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;display:block;margin-bottom:3px;">MENSAJE</span><span id="acuse_msg" style="font-family:'Rajdhani',sans-serif;font-size:.85rem;color:#fff;line-height:1.6;"></span></div>
+      </div>
+      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.43rem;color:#00ff88;line-height:2;margin-bottom:14px;">
+        Mensaje enviado a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="8deee2e3f9eceef9e2cde9ecf9ecfef4fea3e0f5">[email&#160;protected]</a><br>
+        Tiempo de respuesta: menos de 24 horas hábiles
+      </div>
+      <button onclick="closeAcuse()" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid #00e5ff;color:#00e5ff;cursor:pointer;">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-logo">DATASYS</div>
+  <div class="ft-tag">DATA INTELLIGENCE · INNOVATE · INTEGRATE · AUTOMATE</div>
+  <div class="ft-copy">© 2026 DATASYS. Todos los derechos reservados. · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6c0f0302180d0f18032c080d180d1f151f420f0301">[email&#160;protected]</a> · +52 (55) 1234-5678</div>
+</footer>
+
+<!-- ═══════════════════════════ SCRIPTS ═══════════════════════════ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+/* ══ FORMULARIO REAL — FORMSPREE (meelpnqr) ══ */
+function sendContactForm(){
+  var name    = document.getElementById('cf_name')    ? document.getElementById('cf_name').value.trim()    : '';
+  var email   = document.getElementById('cf_email')   ? document.getElementById('cf_email').value.trim()   : '';
+  var phone   = document.getElementById('cf_phone')   ? document.getElementById('cf_phone').value.trim()   : '';
+  var srvEl   = document.getElementById('cf_service');
+  var service = srvEl ? srvEl.value : '';
+  var msgEl   = document.getElementById('cf_message') || document.getElementById('cf_address');
+  var message = msgEl ? msgEl.value.trim() : '';
+  var errEl   = document.getElementById('cf_error');
+  var btn     = document.getElementById('cf_btn');
+  if(errEl) errEl.style.display = 'none';
+  if(!name){
+    if(errEl){ errEl.textContent='Por favor ingresa tu nombre.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){ errEl.textContent='Por favor ingresa un correo electrónico válido.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!service){
+    if(errEl){ errEl.textContent='Por favor selecciona un servicio.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!message){
+    if(errEl){ errEl.textContent='Por favor escribe tu mensaje.'; errEl.style.display='block'; }
+    return;
+  }
+  var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+  var fecha = new Date().toLocaleString('es-MX', {
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  var origTxt = btn ? btn.textContent : '';
+  if(btn){
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    btn.style.background = 'rgba(0,229,255,.1)';
+    btn.style.color = '#00e5ff';
+  }
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:name, email:email, phone:phone||'N/A',
+      service:service, message:message,
+      folio:folio, fecha:fecha, _replyto:email
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+  .then(function(res){
+    if(res.ok){
+      ['cf_name','cf_email','cf_phone','cf_message','cf_address'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      if(srvEl) srvEl.value = '';
+      var am = document.getElementById('acuseModal');
+      if(am){
+        document.getElementById('acuse_folio').textContent   = folio;
+        document.getElementById('acuse_fecha').textContent   = fecha;
+        document.getElementById('acuse_nombre').textContent  = name;
+        document.getElementById('acuse_email').textContent   = email;
+        document.getElementById('acuse_phone').textContent   = phone || '—';
+        document.getElementById('acuse_service').textContent = service;
+        document.getElementById('acuse_msg').textContent     = message;
+        am.style.display = 'flex';
+      }
+      if(btn){
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'rgba(0,255,136,.1)';
+        btn.style.color = '#00ff88';
+        btn.style.border = '1px solid #00ff88';
+        setTimeout(function(){
+          btn.textContent = origTxt;
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.border = '';
+        }, 8000);
+      }
+    } else {
+      if(errEl){ errEl.textContent='Error al enviar. Por favor intenta de nuevo.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+    }
+  })
+  .catch(function(){
+    if(errEl){ errEl.textContent='Error de conexión. Verifica tu red e intenta de nuevo.'; errEl.style.display='block'; }
+    if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+  });
+}
+function closeAcuse(){
+  var m = document.getElementById('acuseModal');
+  if(m) m.style.display = 'none';
+}
+var sendForm = sendContactForm;
+var sendDemo = sendContactForm;
+function submitForm(btn){ sendContactForm(); }
+function subscribePrint(btn){ sendContactForm(); }
+
+</script><script>
+window.addEventListener("load",function(){
+// ── CURSOR ──
+const cA=document.getElementById('cA'),cB=document.getElementById('cB');
+document.addEventListener('mousemove',e=>{
+  cA.style.left=e.clientX+'px'; cA.style.top=e.clientY+'px';
+  setTimeout(()=>{cB.style.left=e.clientX+'px';cB.style.top=e.clientY+'px';},70);
+});
+
+// ── CLOCK ──
+function updateClock(){
+  document.getElementById('navTime').textContent=new Date().toLocaleTimeString('es-MX');
+}
+setInterval(updateClock,1000);updateClock();
+
+// ── PARTICLES ──
+(()=>{
+  const c=document.getElementById('hPart');
+  for(let i=0;i<55;i++){
+    const d=document.createElement('div'); d.className='pt';
+    const s=d.style;
+    s.left=Math.random()*100+'%'; s.top=Math.random()*100+'%';
+    s.width=s.height=(1+Math.random()*2.5)+'px';
+    s.setProperty('--d',(5+Math.random()*10)+'s');
+    s.setProperty('--dl',Math.random()*12+'s');
+    s.setProperty('--tx',(Math.random()*60-30)+'px');
+    c.appendChild(d);
+  }
+})();
+
+// ── HELPERS ──
+const rnd=(min,max)=>Math.random()*(max-min)+min;
+const genArr=(n,min,max)=>Array.from({length:n},()=>parseFloat(rnd(min,max).toFixed(2)));
+const CYAN='rgba(0,229,255,', GREEN='rgba(0,255,179,', AMBER='rgba(255,179,0,', VIOLET='rgba(155,89,255,', ROSE='rgba(255,77,109,';
+const makeGrad=(ctx,colorRgba,alpha1=.22,alpha2=0)=>{
+  const g=ctx.createLinearGradient(0,0,0,ctx.canvas.height||200);
+  g.addColorStop(0,colorRgba+alpha1+')'); g.addColorStop(1,colorRgba+alpha2+')'); return g;
+};
+const baseOpts=(yMin,yMax,yLabel='',tension=.42)=>({
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{
+    backgroundColor:'rgba(2,12,22,.95)',borderColor:'rgba(0,229,255,.22)',borderWidth:1,
+    titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:10},
+    titleColor:'#00e5ff',bodyColor:'#c2dce8',padding:10,
+    callbacks:{label:c=>'  '+yLabel+c.raw.toFixed(2)},
+  }},
+  scales:{
+    x:{display:false},
+    y:{display:true,position:'right',min:yMin,max:yMax,
+      grid:{color:'rgba(0,229,255,.05)'},
+      ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9},maxTicksLimit:5,callback:v=>yLabel+v}}
+  },animation:{duration:300},
+});
+
+// ── MAIN TIMESERIES ──
+let mainTsChart=null, currentMetric='requests';
+const METRICS={
+  requests:{label:'Requests/s',min:8000,max:32000,color:CYAN,unit:''},
+  throughput:{label:'Throughput GB/h',min:120,max:480,color:GREEN,unit:''},
+  accuracy:{label:'Precisión ML %',min:88,max:99,color:VIOLET,unit:''},
+  latency:{label:'Latencia ms',min:0.8,max:3.5,color:AMBER,unit:'ms'},
+};
+let tsData={};
+Object.keys(METRICS).forEach(k=>{ tsData[k]=genArr(60,METRICS[k].min,METRICS[k].max); });
+const tsLabels=Array.from({length:60},(_,i)=>{
+  const m=new Date(); m.setMinutes(m.getMinutes()-60+i);
+  return m.getHours()+':'+(String(m.getMinutes()).padStart(2,'0'));
+});
+
+function buildMainTs(){
+  const ctx=document.getElementById('mainTs').getContext('2d');
+  const m=METRICS[currentMetric];
+  const data=tsData[currentMetric];
+  const color=m.color;
+  if(mainTsChart)mainTsChart.destroy();
+  mainTsChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:tsLabels,datasets:[{
+      data,borderColor:color+'1)',borderWidth:2,fill:true,
+      backgroundColor:ctx2=>makeGrad(ctx2.chart.ctx,color),
+      pointRadius:0,tension:.42,
+    }]},
+    options:{...baseOpts(m.min*.95,m.max*1.02,m.unit,.42),
+      scales:{
+        x:{display:true,ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9},maxTicksLimit:10},
+          grid:{color:'rgba(0,229,255,.04)'}},
+        y:{display:true,position:'right',grid:{color:'rgba(0,229,255,.05)'},
+          ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9},maxTicksLimit:6,
+            callback:v=>m.unit+(v>=1000?(v/1000).toFixed(1)+'k':v.toFixed(1))}}
+      }
+    }
+  });
+}
+function switchMetric(val){ currentMetric=val; buildMainTs(); }
+buildMainTs();
+
+// ── LIVE UPDATE MAIN ──
+setInterval(()=>{
+  Object.keys(METRICS).forEach(k=>{
+    const m=METRICS[k];
+    const last=tsData[k][tsData[k].length-1];
+    const next=Math.max(m.min,Math.min(m.max,last*(1+(rnd(-1,1)*.04))));
+    tsData[k].push(parseFloat(next.toFixed(2)));
+    tsData[k].shift();
+  });
+  if(mainTsChart){
+    mainTsChart.data.datasets[0].data=tsData[currentMetric];
+    mainTsChart.update('none');
+  }
+  updateHeroStats();
+  updateKPIs();
+},1600);
+
+// ── DONUT CHART ──
+new Chart(document.getElementById('donutChart').getContext('2d'),{
+  type:'doughnut',
+  data:{
+    labels:['APIs REST','SQL/DBs','IoT Sensors','File Systems','Streaming','SaaS'],
+    datasets:[{
+      data:[32,24,18,12,10,4],
+      backgroundColor:['rgba(0,229,255,.75)','rgba(0,255,179,.65)','rgba(255,179,0,.65)','rgba(155,89,255,.65)','rgba(255,77,109,.55)','rgba(0,153,184,.65)'],
+      borderColor:'rgba(2,12,22,.8)',borderWidth:2,hoverOffset:6,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+    plugins:{legend:{position:'right',labels:{color:'#7aaabb',font:{family:'Share Tech Mono',size:9},boxWidth:10,padding:10}},
+      tooltip:{backgroundColor:'rgba(2,12,22,.95)',borderColor:'rgba(0,229,255,.22)',borderWidth:1,
+        titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:9},
+        titleColor:'#00e5ff',bodyColor:'#c2dce8',
+        callbacks:{label:c=>` ${c.label}: ${c.raw}%`}
+      }
+    }
+  }
+});
+
+// ── HEATMAP (activity) ──
+(()=>{
+  const days=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const hours=Array.from({length:24},(_,i)=>`${String(i).padStart(2,'0')}h`);
+  const body=document.getElementById('heatmapBody');
+  let html='<div style="display:grid;grid-template-columns:36px repeat(24,1fr);gap:2px;">';
+  // header row
+  html+='<div></div>';
+  hours.forEach(h=>{ html+=`<div style="font-family:'Share Tech Mono';font-size:.45rem;color:var(--dim);text-align:center;padding-bottom:4px;">${h}</div>`; });
+  days.forEach(day=>{
+    html+=`<div style="font-family:'Share Tech Mono';font-size:.52rem;color:var(--silver);display:flex;align-items:center;">${day}</div>`;
+    hours.forEach(()=>{
+      const val=rnd(0,100); const i=val/100;
+      const bg=`rgba(0,229,255,${(i*.6).toFixed(2)})`;
+      const border=val>80?'1px solid rgba(0,229,255,.5)':'none';
+      html+=`<div style="height:16px;background:${bg};border:${border};border-radius:1px;" title="${val.toFixed(0)}%"></div>`;
+    });
+  });
+  html+='</div>';
+  body.innerHTML=html;
+})();
+
+// ── ML BAR CHART ──
+new Chart(document.getElementById('barModels').getContext('2d'),{
+  type:'bar',
+  data:{
+    labels:['LSTM','XGBoost','Random F.','BERT-NLP','CNN-CV','AutoML','Prophet'],
+    datasets:[{
+      label:'Precisión %',
+      data:[97.2,95.8,94.1,96.4,98.3,93.7,91.2],
+      backgroundColor:['rgba(0,229,255,.6)','rgba(0,255,179,.6)','rgba(155,89,255,.6)','rgba(0,229,255,.5)','rgba(0,255,179,.7)','rgba(255,179,0,.6)','rgba(255,77,109,.5)'],
+      borderColor:['rgba(0,229,255,.9)','rgba(0,255,179,.9)','rgba(155,89,255,.9)','rgba(0,229,255,.8)','rgba(0,255,179,.9)','rgba(255,179,0,.9)','rgba(255,77,109,.8)'],
+      borderWidth:1,borderRadius:2,
+    }]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(2,12,22,.95)',borderColor:'rgba(0,229,255,.22)',borderWidth:1,titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:10},titleColor:'#00e5ff',bodyColor:'#c2dce8'}},
+    scales:{
+      x:{ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9}},grid:{display:false}},
+      y:{min:88,max:100,ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9},callback:v=>v+'%'},grid:{color:'rgba(0,229,255,.05)'}}
+    }
+  }
+});
+
+// ── SCATTER CLUSTERING ──
+const clusterColors=['rgba(0,229,255,.7)','rgba(0,255,179,.7)','rgba(255,179,0,.7)'];
+const scatterDatasets=clusterColors.map((c,ci)=>({
+  label:`Cluster ${ci+1}`,
+  data:Array.from({length:30},()=>({x:parseFloat(rnd(-3+ci*3,ci*3+2).toFixed(2)),y:parseFloat(rnd(-2+ci*2,ci*2+3).toFixed(2))})),
+  backgroundColor:c,pointRadius:4,pointHoverRadius:6,
+}));
+new Chart(document.getElementById('scatterChart').getContext('2d'),{
+  type:'scatter',data:{datasets:scatterDatasets},
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{color:'#7aaabb',font:{family:'Share Tech Mono',size:9},boxWidth:8,padding:8}},
+      tooltip:{backgroundColor:'rgba(2,12,22,.95)',borderColor:'rgba(0,229,255,.22)',borderWidth:1,
+        titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:10},titleColor:'#00e5ff',bodyColor:'#c2dce8',
+        callbacks:{label:c=>`(${c.raw.x}, ${c.raw.y})`}
+      }
+    },
+    scales:{x:{ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9}},grid:{color:'rgba(0,229,255,.05)'}},
+      y:{ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9}},grid:{color:'rgba(0,229,255,.05)'}}
+    }
+  }
+});
+
+// ── FORECAST CHART ──
+(()=>{
+  const n=60, forecast=30;
+  const hist=genArr(n,1200,1800);
+  const predStart=hist[n-1];
+  const pred=Array.from({length:forecast},(_,i)=>parseFloat((predStart*(1+.003*i+rnd(-.01,.015))).toFixed(2)));
+  const upperBand=pred.map((v,i)=>parseFloat((v*(1+.02+i*.002)).toFixed(2)));
+  const lowerBand=pred.map((v,i)=>parseFloat((v*(1-.02-i*.002)).toFixed(2)));
+  const allLabels=[...Array.from({length:n},(_,i)=>`H-${n-i}`), ...Array.from({length:forecast},(_,i)=>`+${i+1}d`)];
+  const histPad=[...hist,...Array(forecast).fill(null)];
+  const predPad=[...Array(n-1).fill(null),hist[n-1],...pred];
+  const upPad=[...Array(n-1).fill(null),hist[n-1],...upperBand];
+  const loPad=[...Array(n-1).fill(null),hist[n-1],...lowerBand];
+  new Chart(document.getElementById('forecastChart').getContext('2d'),{
+    type:'line',
+    data:{labels:allLabels,datasets:[
+      {label:'Histórico',data:histPad,borderColor:'rgba(0,229,255,.9)',borderWidth:2,fill:false,pointRadius:0,tension:.4,spanGaps:false},
+      {label:'Predicción',data:predPad,borderColor:'rgba(0,255,179,.9)',borderWidth:2,borderDash:[6,3],fill:false,pointRadius:0,tension:.4,spanGaps:false},
+      {label:'Banda Alta',data:upPad,borderColor:'rgba(0,255,179,.2)',borderWidth:1,fill:'+1',backgroundColor:'rgba(0,255,179,.07)',pointRadius:0,tension:.4,spanGaps:false},
+      {label:'Banda Baja',data:loPad,borderColor:'rgba(0,255,179,.2)',borderWidth:1,fill:false,pointRadius:0,tension:.4,spanGaps:false},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'end',labels:{color:'#7aaabb',font:{family:'Share Tech Mono',size:9},boxWidth:12,padding:12}},
+        tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(2,12,22,.95)',borderColor:'rgba(0,229,255,.22)',borderWidth:1,titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:10},titleColor:'#00e5ff',bodyColor:'#c2dce8'}
+      },
+      scales:{
+        x:{ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9},maxTicksLimit:12},grid:{color:'rgba(0,229,255,.04)'}},
+        y:{ticks:{color:'#3e6478',font:{family:'Share Tech Mono',size:9},maxTicksLimit:6},grid:{color:'rgba(0,229,255,.05)'}}
+      }
+    }
+  });
+})();
+
+// ── SPARKLINES ──
+function buildSpark(id,data,color){
+  new Chart(document.getElementById(id).getContext('2d'),{
+    type:'line',
+    data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,borderWidth:1.5,fill:false,pointRadius:0,tension:.4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},animation:{duration:0}}
+  });
+}
+buildSpark('spark1',genArr(20,600,900),'rgba(0,229,255,.8)');
+buildSpark('spark2',genArr(20,8000,14000),'rgba(0,255,179,.8)');
+buildSpark('spark3',genArr(20,20,50),'rgba(255,179,0,.8)');
+buildSpark('spark4',genArr(20,92,97),'rgba(155,89,255,.8)');
+
+// ── ML MODELS PANEL ──
+const ML_MODELS=[
+  {name:'DEMAND FORECAST',type:'LSTM',acc:97.2,status:'EN VIVO',instances:'3x'},
+  {name:'ANOMALY DETECT',type:'AUTOENCODER',acc:96.8,status:'EN VIVO',instances:'2x'},
+  {name:'CHURN PREDICT',type:'XGBOOST',acc:94.1,status:'EN VIVO',instances:'1x'},
+  {name:'NLP SENTIMENT',type:'BERT',acc:96.4,status:'TRAINING',instances:'—'},
+];
+document.getElementById('mlModels').innerHTML=ML_MODELS.map(m=>`
+  <div class="ml-model">
+    <div class="mm-header">
+      <div class="mm-name">${m.name}</div>
+      <div class="mm-acc">${m.acc}%</div>
+    </div>
+    <div class="mm-bar"><div class="mm-fill" style="width:${m.acc}%"></div></div>
+    <div class="mm-meta">
+      <b>Tipo:</b> ${m.type}<br>
+      <b>Estado:</b> <span style="color:${m.status==='EN VIVO'?'var(--g)':'var(--amber)'}">${m.status}</span> &nbsp;
+      <b>Instancias:</b> ${m.instances}
+    </div>
+  </div>`).join('');
+
+// ── INSIGHTS FEED ──
+const INSIGHTS=[
+  {title:'Pico de requests detectado a las 14:23 — 340% sobre el promedio histórico',type:'high',tag:'// ANOMALÍA',time:'hace 2 min'},
+  {title:'Modelo LSTM actualizó forecast: demanda +18% proyectada para próxima semana',type:'med',tag:'// ML FORECAST',time:'hace 8 min'},
+  {title:'Cluster C degradado: latencia 2.4ms detectada, redirigiendo tráfico automáticamente',type:'high',tag:'// INFRA',time:'hace 15 min'},
+  {title:'Dataset "ventas_q1" ingested: 2.3M registros procesados, 99.97% calidad',type:'low',tag:'// ETL',time:'hace 22 min'},
+  {title:'Nuevo segmento de clientes identificado por K-Means — 12,400 usuarios premium potenciales',type:'med',tag:'// CLUSTERING',time:'hace 41 min'},
+];
+function renderInsights(){
+  document.getElementById('insightFeed').innerHTML=INSIGHTS.map(n=>`
+    <div class="insight-item">
+      <div class="ii-dot ii-${n.type}"></div>
+      <div>
+        <div class="ii-title">${n.title}</div>
+        <div class="ii-meta">
+          <div class="ii-tag" style="color:${n.type==='high'?'var(--rose)':n.type==='med'?'var(--amber)':'var(--g)'}">${n.tag}</div>
+          <div class="ii-time">${n.time}</div>
+        </div>
+      </div>
+    </div>`).join('');
+}
+renderInsights();
+
+// ── HERO LIVE STATS ──
+function updateHeroStats(){
+  const base=2847391; const v=Math.round(base+rnd(-50000,80000));
+  const el=document.getElementById('heroRec');
+  if(el)el.textContent=v.toLocaleString('es-MX');
+  const lat=rnd(.9,2.1).toFixed(1);
+  const lEl=document.getElementById('heroLatency');
+  if(lEl)lEl.textContent=lat+'ms';
+}
+
+// ── KPI LIVE ──
+function updateKPIs(){
+  const now=new Date();
+  const tb=Math.round(700+rnd(100,200));
+  const k1=document.getElementById('kpi1');if(k1)k1.textContent=tb+' TB';
+  const ig=Math.round(11000+rnd(500,2000));
+  const k2=document.getElementById('kpi2');if(k2)k2.textContent=ig.toLocaleString('es-MX');
+ath.round(1+rnd(0,3));
+  const k3=document.getElementById('kpi3');if(k3)k3.textContent=an;
+  const acc=rnd(93.5,96.5).toFixed(1);
+  const k4=document.getElementById('kpi4');if(k4)k4.textContent=acc+'%';
+}
+updateHeroStats();
+updateKPIs();
+
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+  <!-- ═══ PWA ═══ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CFE·SICL">
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+  <meta name="msapplication-TileColor" content="#060a06">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#060a06">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>CFE·SICL — Portal</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:   #060a06;
+    --surface: #0d130d;
+    --card:    #111a11;
+    --border:  #1c2e1c;
+    --green:   #00e5a0;
+    --blue:    #0099ff;
+    --orange:  #ff9500;
+    --text:    #d8edd8;
+    --muted:   #4a6e4a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(0,229,160,0.07) 0%, transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrapper {
+    position: relative; z-index: 1;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem 3rem;
+    animation: fadeUp 0.45s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* LOGO */
+  .logo-block { text-align: center; margin-bottom: 2.5rem; }
+  .logo-main {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(3.2rem, 14vw, 5.5rem);
+    letter-spacing: 10px;
+    color: var(--green);
+    line-height: 1;
+  }
+  .logo-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(0.55rem, 2.8vw, 0.7rem);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.3rem;
+  }
+  .logo-line {
+    width: 56px; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--green), transparent);
+    margin: 0.8rem auto 0;
+  }
+
+  /* CARDS */
+  .cards {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .portal-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.2rem 1.35rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    -webkit-tap-highlight-color: transparent;
+    animation: fadeUp 0.4s ease both;
+  }
+  .portal-card:nth-child(1) { animation-delay: 0.05s; }
+  .portal-card:nth-child(2) { animation-delay: 0.13s; }
+  .portal-card:nth-child(3) { animation-delay: 0.21s; }
+
+  .portal-card::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transition: width 0.15s;
+  }
+  .portal-card:active { transform: scale(0.975); }
+  @media (hover: hover) {
+    .portal-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 30px rgba(0,0,0,0.45);
+      transform: translateY(-2px);
+    }
+    .portal-card:hover::before { width: 5px; }
+    .portal-card:hover .card-arrow { color: var(--accent); transform: translateX(4px); }
+  }
+
+  .card-admin  { --accent: var(--green);  }
+  .card-transp { --accent: var(--blue);   }
+  .card-recep  { --accent: var(--orange); }
+
+  .card-icon {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .card-admin  .card-icon { background: rgba(0,229,160,0.07);  border-color: rgba(0,229,160,0.2); }
+  .card-transp .card-icon { background: rgba(0,153,255,0.07);  border-color: rgba(0,153,255,0.2); }
+  .card-recep  .card-icon { background: rgba(255,149,0,0.07);  border-color: rgba(255,149,0,0.2); }
+
+  .card-body { flex: 1; min-width: 0; }
+  .card-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.3rem;
+    letter-spacing: 3px;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+  }
+  .card-admin  .card-title { color: var(--green);  }
+  .card-transp .card-title { color: var(--blue);   }
+  .card-recep  .card-title { color: var(--orange); }
+
+  .card-desc { font-size: 0.76rem; color: var(--muted); line-height: 1.4; }
+
+  .card-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.56rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border: 1px solid;
+    white-space: nowrap;
+    flex-shrink: 0;
+    color: var(--accent);
+    border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  }
+  .card-arrow {
+    font-size: 1.1rem;
+    color: var(--muted);
+    flex-shrink: 0;
+    transition: color 0.15s, transform 0.15s;
+    margin-left: 0.25rem;
+  }
+
+  /* STATUS */
+  .status-bar {
+    width: 100%;
+    max-width: 440px;
+    margin-top: 1.4rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.9rem 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    animation: fadeUp 0.4s 0.3s ease both;
+  }
+  .status-item { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; }
+  .status-val {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.6rem;
+    line-height: 1;
+    color: var(--green);
+  }
+  .status-lbl {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.52rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .status-sep { width: 1px; height: 28px; background: var(--border); }
+
+  /* PULSE DOT */
+  .pulse-dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* FOOTER */
+  .footer {
+    margin-top: 1.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: center;
+    opacity: 0.55;
+    animation: fadeUp 0.4s 0.38s ease both;
+  }
+
+  /* RIPPLE */
+  @keyframes ripple { to { transform: scale(5); opacity: 0; } }
+  .ripple-el {
+    position: absolute;
+    border-radius: 50%;
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.05);
+    transform: scale(0);
+    animation: ripple 0.55s linear;
+    pointer-events: none;
+    margin-left: -30px; margin-top: -30px;
+  }
+
+  /* SAFE AREA (iPhone notch) */
+  .wrapper { padding-bottom: max(3rem, env(safe-area-inset-bottom)); }
+
+  /* INSTALL BANNER */
+  #installBanner {
+    display: none;
+    position: fixed;
+    bottom: max(1.25rem, env(safe-area-inset-bottom));
+    left: 50%; transform: translateX(-50%);
+    width: calc(100% - 2.5rem);
+    max-width: 440px;
+    background: var(--surface);
+    border: 1px solid var(--green);
+    padding: 0.85rem 1rem;
+    z-index: 999;
+    align-items: center;
+    gap: 0.85rem;
+    box-shadow: 0 0 30px rgba(0,229,160,0.12);
+    animation: slideUp 0.3s ease both;
+  }
+  @keyframes slideUp {
+    from { opacity:0; transform: translateX(-50%) translateY(20px); }
+    to   { opacity:1; transform: translateX(-50%) translateY(0); }
+  }
+  #installBanner .ban-icon { font-size: 1.6rem; flex-shrink: 0; }
+  #installBanner .ban-text { flex: 1; }
+  #installBanner .ban-title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 0.95rem;
+    letter-spacing: 2px;
+    color: var(--green);
+  }
+  #installBanner .ban-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-top: 0.15rem;
+  }
+  #installBanner .ban-btn {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    background: var(--green);
+    color: var(--black);
+    border: none;
+    padding: 0.45rem 1rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #installBanner .ban-close {
+    font-size: 1.1rem;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem;
+    flex-shrink: 0;
+    line-height: 1;
+    -webkit-tap-highlight-color: transparent;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+  <div class="logo-block">
+    <div class="logo-main">CFE·<span style="color:#ffe033">SICL</span></div>
+    <div class="logo-sub">Sistema de Inventario y Control Logístico</div>
+    <div class="logo-line"></div>
+  </div>
+
+  <div class="cards">
+
+    <a class="portal-card card-admin" href="index_administracion.html" onclick="ripple(event)">
+      <div class="card-icon">🗂️</div>
+      <div class="card-body">
+        <div class="card-title">Administración</div>
+        <div class="card-desc">Inventario, órdenes de despacho y exportar reportes</div>
+      </div>
+      <span class="card-badge">Admin</span>
+      <span class="card-arrow">›</span>
+    </a>
+
+    <a class="portal-card card-transp" href="index_transporte.html" onclick="ripple(event)">
+      <div class="card-icon">🚚</div>
+      <div class="card-body">
+        <div class="card-title">Transportista</div>
+        <div class="card-desc">Mis órdenes asignadas y confirmar despacho</div>
+      </div>
+      <span class="card-badge">Transporte</span>
+      <span class="card-arrow">›</span>
+    </a>
+
+    <a class="portal-card card-recep" href="index_recepcion.html" onclick="ripple(event)">
+      <div class="card-icon">📦</div>
+      <div class="card-body">
+        <div class="card-title">Recepción de Zona</div>
+        <div class="card-desc">Confirmar entregas, registrar faltantes y devoluciones</div>
+      </div>
+      <span class="card-badge">Zona</span>
+      <span class="card-arrow">›</span>
+    </a>
+
+  </div>
+
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="status-val" id="sProds">—</div>
+      <div class="status-lbl">Productos</div>
+    </div>
+    <div class="status-sep"></div>
+    <div class="status-item">
+      <div class="status-val" id="sPend">—</div>
+      <div class="status-lbl">Pendientes</div>
+    </div>
+    <div class="status-sep"></div>
+    <div class="status-item">
+      <div class="status-val" id="sRuta">—</div>
+      <div class="status-lbl">En ruta</div>
+    </div>
+    <div class="status-sep"></div>
+    <div class="status-item">
+      <div class="status-val" id="sDone">—</div>
+      <div class="status-lbl">Entregadas</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="pulse-dot"></span>
+    SICL · <span id="fechaHoy"></span>
+  </div>
+
+</div>
+
+<!-- BANNER DE INSTALACIÓN PWA -->
+<div id="installBanner">
+  <span class="ban-icon">📲</span>
+  <div class="ban-text">
+    <div class="ban-title">Instalar SICL</div>
+    <div class="ban-sub">Agregar a pantalla de inicio</div>
+  </div>
+  <button class="ban-btn" onclick="installApp()">Instalar</button>
+  <button class="ban-close" onclick="this.closest('#installBanner').style.display='none'" aria-label="Cerrar">✕</button>
+</div>
+
+<script>
+function ripple(e) {
+  const card = e.currentTarget;
+  const el = document.createElement('span');
+  el.className = 'ripple-el';
+  const r = card.getBoundingClientRect();
+  el.style.left = (e.clientX - r.left) + 'px';
+  el.style.top  = (e.clientY - r.top)  + 'px';
+  card.appendChild(el);
+  setTimeout(() => el.remove(), 600);
+}
+
+function loadStats() {
+  try {
+    const inv    = JSON.parse(localStorage.getItem('sicl_inventory') || '[]');
+    const orders = JSON.parse(localStorage.getItem('sicl_orders')    || '[]');
+    document.getElementById('sProds').textContent = inv.length;
+    document.getElementById('sPend').textContent  = orders.filter(o => o.status === 'pendiente').length;
+    document.getElementById('sRuta').textContent  = orders.filter(o => o.status === 'en_transito' || o.status === 'parcial').length;
+    document.getElementById('sDone').textContent  = orders.filter(o => o.status === 'entregado' || o.status === 'entregado_faltante').length;
+  } catch(_) {
+    ['sProds','sPend','sRuta','sDone'].forEach(id => document.getElementById(id).textContent = '0');
+  }
+}
+
+document.getElementById('fechaHoy').textContent = new Date().toLocaleDateString('es-MX', {
+  weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
+});
+
+loadStats();
+setInterval(loadStats, 8000);
+</script>
+
+  <!-- ═══ REGISTRO SERVICE WORKER ═══ -->
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] Service Worker registrado:', reg.scope))
+          .catch(err => console.warn('[PWA] SW error:', err));
+      });
+    }
+
+    // Banner de instalación
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'flex';
+    });
+    window.addEventListener('appinstalled', () => {
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'none';
+      deferredPrompt = null;
+    });
+    function installApp(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        deferredPrompt = null;
+        const banner = document.getElementById('installBanner');
+        if(banner) banner.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>

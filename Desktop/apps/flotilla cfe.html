@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>CFE — Flotilla</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --bg:#050a0f; --surface:#0b1520; --card:#0f1e2e; --card2:#132030;
+  --border:#1e3248; --border2:#254060;
+  --cfe:#007A3D; --cfe2:#00b359; --cfe-glow:rgba(0,179,89,.2);
+  --text:#e2eaf2; --muted:#6b8aaa; --muted2:#4a6885;
+  --ok:#22c55e; --warn:#f59e0b; --danger:#ef4444; --info:#3b82f6;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;}
+
+/* HEADER */
+.header{background:linear-gradient(180deg,#07141f 0%,#050a0f 100%);border-bottom:1px solid var(--border);padding:0 14px;position:sticky;top:0;z-index:200;}
+.header-main{display:flex;align-items:center;justify-content:space-between;padding:12px 0 8px;}
+.logo-wrap{display:flex;align-items:center;gap:10px;}
+.cfe-emblem{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--cfe),#005a2d);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:13px;color:#fff;letter-spacing:.5px;border:1px solid rgba(0,179,89,.3);box-shadow:0 0 16px rgba(0,122,61,.4);}
+.logo-text{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:.5px;}
+.logo-text span{color:var(--cfe2);}
+.logo-sub{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:1px;}
+.header-actions{display:flex;gap:8px;}
+.icon-btn{width:36px;height:36px;border-radius:9px;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;position:relative;}
+.icon-btn:active{background:var(--border);transform:scale(.94);}
+.alert-count{position:absolute;top:-4px;right:-4px;width:17px;height:17px;border-radius:50%;background:var(--danger);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--bg);}
+
+/* STATS */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 0 12px;}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 6px;text-align:center;}
+.stat-n{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:22px;}
+.stat-l{font-size:9px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:1px;}
+.stat-ok .stat-n{color:var(--ok);}
+.stat-warn .stat-n{color:var(--warn);}
+.stat-danger .stat-n{color:var(--danger);}
+.stat-info .stat-n{color:var(--info);}
+
+/* TABS */
+.tabs{display:flex;overflow-x:auto;gap:4px;padding:0 14px 12px;scrollbar-width:none;background:var(--bg);}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{white-space:nowrap;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;transition:all .15s;letter-spacing:.3px;}
+.tab.active{background:var(--cfe);color:#fff;border-color:var(--cfe);box-shadow:0 0 12px var(--cfe-glow);}
+
+/* SEARCH */
+.search-row{display:flex;gap:8px;padding:0 14px 10px;}
+.search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 12px;}
+.search-wrap input{background:transparent;border:none;outline:none;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;flex:1;}
+.search-wrap input::placeholder{color:var(--muted2);}
+.btn-add{padding:10px 16px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--cfe2),var(--cfe));color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;letter-spacing:.3px;box-shadow:0 4px 16px rgba(0,122,61,.35);transition:all .15s;}
+.btn-add:active{transform:scale(.96);opacity:.9;}
+
+/* VEHICLE CARDS */
+.vehicles{padding:0 14px 100px;}
+.vcard{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;animation:fadeUp .3s ease both;transition:border-color .2s;}
+.vcard-header{display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid transparent;cursor:pointer;}
+.vcard.expanded .vcard-header{border-bottom-color:var(--border);}
+.v-type-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.type-camion{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);}
+.type-pickup{background:rgba(0,179,89,.1);border:1px solid rgba(0,179,89,.25);}
+.type-moto{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);}
+.type-grua{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);}
+.type-van{background:rgba(163,113,247,.1);border:1px solid rgba(163,113,247,.25);}
+.type-otro{background:rgba(107,138,170,.1);border:1px solid rgba(107,138,170,.2);}
+.v-main{flex:1;min-width:0;}
+.v-eco{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;color:var(--cfe2);letter-spacing:.5px;}
+.v-name{font-size:12px;color:var(--muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.v-badges{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.badge{padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;display:inline-flex;align-items:center;gap:3px;}
+.badge-ok{background:rgba(34,197,94,.12);color:var(--ok);border:1px solid rgba(34,197,94,.25);}
+.badge-warn{background:rgba(245,158,11,.12);color:var(--warn);border:1px solid rgba(245,158,11,.25);}
+.badge-danger{background:rgba(239,68,68,.12);color:var(--danger);border:1px solid rgba(239,68,68,.25);}
+.badge-info{background:rgba(59,130,246,.12);color:var(--info);border:1px solid rgba(59,130,246,.25);}
+.v-actions{display:flex;gap:6px;flex-shrink:0;}
+.vact-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.vact-btn:active{transform:scale(.9);}
+
+/* CARD BODY */
+.vcard-body{display:none;padding:12px 14px 14px;}
+.vcard-body.open{display:block;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.detail-item{background:var(--surface);border-radius:8px;padding:8px 10px;}
+.detail-lbl{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.detail-val{font-size:13px;font-weight:500;}
+.detail-full{grid-column:span 2;}
+.alert-row{display:flex;align-items:center;gap:10px;background:var(--surface);border-radius:8px;padding:10px;margin-bottom:6px;border-left:3px solid transparent;}
+.alert-row.ok{border-left-color:var(--ok);}
+.alert-row.warn{border-left-color:var(--warn);}
+.alert-row.danger{border-left-color:var(--danger);}
+.alert-icon{font-size:18px;flex-shrink:0;}
+.alert-info{flex:1;}
+.alert-title{font-size:12px;font-weight:600;}
+.alert-date{font-size:11px;color:var(--muted);margin-top:2px;}
+.days-chip{padding:3px 9px;border-radius:6px;font-size:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;white-space:nowrap;}
+.alerts-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-icon{font-size:56px;margin-bottom:14px;opacity:.5;}
+
+/* OVERLAY / MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:400;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s;}
+.overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border-radius:22px 22px 0 0;width:100%;max-height:92vh;overflow-y:auto;border-top:1px solid var(--border);border-left:1px solid var(--border);border-right:1px solid var(--border);transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding-bottom:30px;}
+.overlay.open .modal{transform:translateY(0);}
+.modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:14px auto 0;}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:16px 18px 14px;border-bottom:1px solid var(--border);}
+.modal-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;letter-spacing:.5px;}
+.modal-close{width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.modal-body{padding:16px 18px;}
+.form-section{margin-bottom:18px;}
+.form-section-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;color:var(--cfe2);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.form-section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.form-row.full{grid-template-columns:1fr;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group label{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.3px;}
+.form-control{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--text);font-size:13px;font-family:'Barlow',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none;}
+.form-control:focus{border-color:var(--cfe2);}
+.form-control::placeholder{color:var(--muted2);}
+select.form-control{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b8aaa' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;}
+.btn-save{width:100%;padding:15px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--cfe2),var(--cfe));color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:17px;cursor:pointer;letter-spacing:.5px;margin-top:6px;box-shadow:0 6px 20px rgba(0,122,61,.4);transition:all .15s;}
+.btn-save:active{opacity:.85;transform:scale(.98);}
+
+/* ALERTS PANEL */
+.alert-panel{padding:14px;}
+.alert-card{display:flex;gap:12px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;margin-bottom:8px;border-left:3px solid transparent;}
+.alert-card.danger{border-left-color:var(--danger);}
+.alert-card.warn{border-left-color:var(--warn);}
+.alert-card.ok{border-left-color:var(--ok);}
+.ac-icon{font-size:24px;flex-shrink:0;}
+.ac-body{flex:1;}
+.ac-title{font-size:13px;font-weight:600;margin-bottom:3px;}
+.ac-sub{font-size:11px;color:var(--muted);line-height:1.5;}
+.ac-chip{display:inline-block;margin-top:5px;padding:2px 10px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Barlow Condensed',sans-serif;}
+.ac-chip.danger{background:rgba(239,68,68,.15);color:var(--danger);}
+.ac-chip.warn{background:rgba(245,158,11,.15);color:var(--warn);}
+
+/* IMPORT PANEL */
+.import-panel{padding:14px;}
+.drop-zone{border:2px dashed var(--border2);border-radius:14px;padding:40px 20px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--cfe2);background:rgba(0,179,89,.05);}
+.drop-icon{font-size:48px;margin-bottom:12px;}
+.drop-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:18px;margin-bottom:6px;}
+.drop-sub{font-size:12px;color:var(--muted);}
+.template-info{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px;}
+.template-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--cfe2);margin-bottom:10px;}
+.col-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.col-item{background:var(--surface);border-radius:7px;padding:6px 10px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+.col-item span{color:var(--text);font-weight:500;}
+.btn-template{width:100%;margin-top:12px;padding:12px;border-radius:10px;border:1px solid var(--border2);background:transparent;color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;cursor:pointer;transition:all .15s;}
+.btn-template:active{background:var(--border);}
+.import-log{background:var(--surface);border-radius:10px;padding:12px;margin-top:12px;font-size:11px;color:var(--muted);border:1px solid var(--border);max-height:130px;overflow-y:auto;white-space:pre-line;line-height:1.6;}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:8px 0 22px;z-index:300;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:transparent;border:none;cursor:pointer;color:var(--muted);font-size:9px;font-family:'Barlow',sans-serif;letter-spacing:.3px;font-weight:500;transition:color .15s;}
+.nav-btn.active{color:var(--cfe2);}
+.nav-icon{font-size:22px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:85px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--card2);border:1px solid var(--border2);color:var(--text);padding:10px 20px;border-radius:10px;font-size:13px;font-weight:500;opacity:0;transition:all .3s;z-index:500;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4);}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* CONFIRM */
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.confirm-overlay.open{opacity:1;pointer-events:all;}
+.confirm-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:320px;text-align:center;}
+.confirm-icon{font-size:44px;margin-bottom:12px;}
+.confirm-title{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:20px;margin-bottom:8px;}
+.confirm-msg{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5;}
+.confirm-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.btn-cancel{padding:13px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:14px;cursor:pointer;font-family:'Barlow',sans-serif;}
+.btn-confirm-del{padding:13px;border-radius:10px;border:none;background:var(--danger);color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;cursor:pointer;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-main">
+    <div class="logo-wrap">
+      <div class="cfe-emblem">CFE</div>
+      <div>
+        <div class="logo-text">Flotilla <span>CFE</span></div>
+        <div class="logo-sub">Control de Vehículos</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="showTab('alertas')" id="alertBtn">
+        🔔<span class="alert-count" id="alertCount" style="display:none">0</span>
+      </button>
+      <button class="icon-btn" onclick="showTab('importar')">📥</button>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-box stat-info"><div class="stat-n" id="st-total">0</div><div class="stat-l">Total</div></div>
+    <div class="stat-box stat-ok"><div class="stat-n" id="st-ok">0</div><div class="stat-l">Al día</div></div>
+    <div class="stat-box stat-warn"><div class="stat-n" id="st-warn">0</div><div class="stat-l">Próximos</div></div>
+    <div class="stat-box stat-danger"><div class="stat-n" id="st-danger">0</div><div class="stat-l">Vencidos</div></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab active" onclick="showTab('flotilla')" id="tab-flotilla">🚛 Flotilla</button>
+  <button class="tab" onclick="showTab('alertas')" id="tab-alertas">⚠️ Alertas</button>
+  <button class="tab" onclick="showTab('importar')" id="tab-importar">📥 Importar Excel</button>
+</div>
+
+<!-- PANEL FLOTILLA -->
+<div id="panel-flotilla">
+  <div class="search-row">
+    <div class="search-wrap">
+      <span style="color:var(--muted);font-size:15px">🔍</span>
+      <input type="text" placeholder="Eco, placa, serie, operador, área..." id="searchInput" oninput="renderFlota()">
+    </div>
+    <button class="btn-add" onclick="openModal()">+ Agregar</button>
+  </div>
+  <div class="vehicles" id="vehicleList"></div>
+</div>
+
+<!-- PANEL ALERTAS -->
+<div id="panel-alertas" style="display:none">
+  <div class="alert-panel" id="alertPanel"></div>
+</div>
+
+<!-- PANEL IMPORTAR -->
+<div id="panel-importar" style="display:none">
+  <div class="import-panel">
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+      ondragover="event.preventDefault();this.classList.add('dragover')"
+      ondragleave="this.classList.remove('dragover')"
+      ondrop="handleDrop(event)">
+      <div class="drop-icon">📊</div>
+      <div class="drop-title">Importar desde Excel</div>
+      <div class="drop-sub">Toca para seleccionar o arrastra tu archivo .xlsx / .xls</div>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFile(event)">
+    <div class="template-info">
+      <div class="template-title">📋 Columnas del archivo Excel</div>
+      <div class="col-list">
+        <div class="col-item">A: <span>Núm. Económico</span></div>
+        <div class="col-item">B: <span>Placa</span></div>
+        <div class="col-item">C: <span>No. Serie (VIN)</span></div>
+        <div class="col-item">D: <span>Marca</span></div>
+        <div class="col-item">E: <span>Modelo</span></div>
+        <div class="col-item">F: <span>Año</span></div>
+        <div class="col-item">G: <span>Tipo Vehículo</span></div>
+        <div class="col-item">H: <span>Color</span></div>
+        <div class="col-item">I: <span>Operador</span></div>
+        <div class="col-item">J: <span>Área / División</span></div>
+        <div class="col-item">K: <span>Km Actual</span></div>
+        <div class="col-item">L: <span>Vence Verificación</span></div>
+        <div class="col-item">M: <span>Vence Tenencia</span></div>
+        <div class="col-item">N: <span>Vence Seguro</span></div>
+        <div class="col-item">O: <span>Multas Pendientes</span></div>
+        <div class="col-item">P: <span>Monto Multas ($)</span></div>
+      </div>
+      <button class="btn-template" onclick="downloadTemplate()">⬇️ Descargar plantilla Excel</button>
+    </div>
+    <div class="import-log" id="importLog">Listo para importar archivos Excel...</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-flotilla" onclick="showTab('flotilla')"><span class="nav-icon">🚛</span>Flotilla</button>
+  <button class="nav-btn" id="nav-alertas" onclick="showTab('alertas')"><span class="nav-icon">⚠️</span>Alertas</button>
+  <button class="nav-btn" id="nav-importar" onclick="showTab('importar')"><span class="nav-icon">📥</span>Importar</button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL AGREGAR/EDITAR -->
+<div class="overlay" id="modalOverlay" onclick="closeModalOut(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">🚛 Nuevo Vehículo</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-section">
+        <div class="form-section-title">🔑 Identificación</div>
+        <div class="form-row">
+          <div class="form-group"><label>Núm. Económico *</label><input class="form-control" id="f-eco" placeholder="CFE-001" maxlength="20"></div>
+          <div class="form-group"><label>Placa *</label><input class="form-control" id="f-placa" placeholder="ABC-1234" maxlength="10" style="text-transform:uppercase"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>Número de Serie / VIN</label><input class="form-control" id="f-serie" placeholder="17 caracteres" maxlength="20" style="text-transform:uppercase"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">🚗 Datos del Vehículo</div>
+        <div class="form-row">
+          <div class="form-group"><label>Marca</label>
+            <select class="form-control" id="f-marca">
+              <option value="">— Marca —</option>
+              <option>Chevrolet</option><option>Ford</option><option>Nissan</option>
+              <option>Toyota</option><option>Dodge</option><option>Ram</option>
+              <option>International</option><option>Kenworth</option><option>Freightliner</option>
+              <option>Volkswagen</option><option>Mercedes-Benz</option><option>Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Modelo</label><input class="form-control" id="f-modelo" placeholder="F-150, Silverado..."></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Año</label><input class="form-control" id="f-anio" type="number" placeholder="2020" min="1990" max="2030"></div>
+          <div class="form-group"><label>Color</label><input class="form-control" id="f-color" placeholder="Blanco CFE"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Tipo de Vehículo</label>
+            <select class="form-control" id="f-tipo">
+              <option value="">— Tipo —</option>
+              <option>Camión</option><option>Pickup</option><option>Van / Camioneta</option>
+              <option>Motocicleta</option><option>Grúa</option><option>Pipa</option>
+              <option>Tráiler</option><option>Automóvil</option><option>Otro</option>
+            </select>
+          </div>
+          <div class="form-group"><label>Km Actual</label><input class="form-control" id="f-km" type="number" placeholder="0"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">👤 Asignación</div>
+        <div class="form-row">
+          <div class="form-group"><label>Operador / Responsable</label><input class="form-control" id="f-operador" placeholder="Nombre completo"></div>
+          <div class="form-group"><label>Área / División</label>
+            <select class="form-control" id="f-area">
+              <option value="">— Área —</option>
+              <option>Distribución</option><option>Transmisión</option><option>Generación</option>
+              <option>Medición</option><option>Construcción</option><option>Mantenimiento</option>
+              <option>Operación</option><option>Administración</option><option>Otra</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>Base / Centro de Trabajo</label><input class="form-control" id="f-base" placeholder="Subestación, zona, delegación..."></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">📅 Vencimientos</div>
+        <div class="form-row">
+          <div class="form-group"><label>🔬 Vence Verificación</label><input class="form-control" id="f-verif" type="date"></div>
+          <div class="form-group"><label>🏛️ Vence Tenencia</label><input class="form-control" id="f-tenencia" type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>🛡️ Vence Seguro</label><input class="form-control" id="f-seguro" type="date"></div>
+          <div class="form-group"><label>📄 Vence Circulación</label><input class="form-control" id="f-circul" type="date"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>🔧 Prox. Servicio (km)</label><input class="form-control" id="f-servkm" type="number" placeholder="Km del servicio"></div>
+          <div class="form-group"><label>🔧 Fecha Prox. Servicio</label><input class="form-control" id="f-servfecha" type="date"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">⚖️ Multas e Infracciones</div>
+        <div class="form-row">
+          <div class="form-group"><label>Núm. de Multas</label><input class="form-control" id="f-multas" type="number" placeholder="0" min="0"></div>
+          <div class="form-group"><label>Monto Total ($)</label><input class="form-control" id="f-monto" type="number" placeholder="0.00" min="0"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>Notas / Observaciones</label><textarea class="form-control" id="f-notas" rows="3" placeholder="Estado, observaciones, historial..." style="resize:none"></textarea></div>
+        </div>
+      </div>
+
+      <button class="btn-save" onclick="saveVehicle()">💾 Guardar Vehículo</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DELETE -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">🗑️</div>
+    <div class="confirm-title">Eliminar Vehículo</div>
+    <div class="confirm-msg" id="confirmMsg">¿Estás seguro? Esta acción no se puede deshacer.</div>
+    <div class="confirm-actions">
+      <button class="btn-cancel" onclick="closeConfirm()">Cancelar</button>
+      <button class="btn-confirm-del" onclick="confirmDelete()">Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STORAGE ──────────────────────────────
+const STORAGE_KEY='cfe_flotilla_v3';
+let flotilla=[];
+let editingId=null,deleteId=null;
+const WARN_DAYS=30;
+
+function saveData(){localStorage.setItem(STORAGE_KEY,JSON.stringify(flotilla));}
+function loadData(){
+  const d=localStorage.getItem(STORAGE_KEY);
+  if(d){try{flotilla=JSON.parse(d);}catch(e){flotilla=[];}}
+  if(!flotilla.length) flotilla=getSampleData();
+}
+
+function getSampleData(){
+  const t=new Date();
+  const ad=(n)=>{const x=new Date(t);x.setDate(x.getDate()+n);return x.toISOString().split('T')[0];};
+  return [
+    {id:1,eco:'CFE-001',placa:'ABC-123A',serie:'1FTFW1ET8EKE12345',marca:'Ford',modelo:'F-150',anio:2021,color:'Blanco',tipo:'Pickup',km:45200,operador:'Juan Rodríguez',area:'Distribución',base:'Subestación Norte',verif:ad(45),tenencia:ad(10),seguro:ad(90),circul:ad(200),servkm:50000,servfecha:ad(25),multas:0,monto:0,notas:'Unidad en buen estado general.'},
+    {id:2,eco:'CFE-002',placa:'XYZ-789B',serie:'3GCPCREC4EG123456',marca:'Chevrolet',modelo:'Silverado',anio:2019,color:'Blanco',tipo:'Pickup',km:78000,operador:'María López',area:'Transmisión',base:'Zona Centro',verif:ad(-5),tenencia:ad(120),seguro:ad(15),circul:ad(180),servkm:80000,servfecha:ad(60),multas:2,monto:1800,notas:'Verificación vencida — programar cita.'},
+    {id:3,eco:'CFE-003',placa:'DEF-456C',serie:'1FTNX21L94EC00001',marca:'International',modelo:'4300',anio:2018,color:'Amarillo',tipo:'Camión',km:120000,operador:'Carlos Méndez',area:'Mantenimiento',base:'Taller Central',verif:ad(5),tenencia:ad(-10),seguro:ad(200),circul:ad(300),servkm:125000,servfecha:ad(30),multas:1,monto:650,notas:'Tenencia vencida — trámite en proceso.'},
+    {id:4,eco:'CFE-004',placa:'GHI-012D',serie:'2FZHAZCV09AX00002',marca:'Ford',modelo:'F-350',anio:2022,color:'Blanco',tipo:'Pickup',km:22000,operador:'Ana Torres',area:'Medición',base:'Zona Sur',verif:ad(120),tenencia:ad(200),seguro:ad(250),circul:ad(350),servkm:25000,servfecha:ad(90),multas:0,monto:0,notas:'Unidad nueva, sin observaciones.'},
+    {id:5,eco:'CFE-005',placa:'JKL-345E',serie:'1HTM524L1YH000003',marca:'Kenworth',modelo:'T370',anio:2017,color:'Blanco/Verde',tipo:'Grúa',km:180000,operador:'Roberto García',area:'Construcción',base:'Patio de Maniobras',verif:ad(60),tenencia:ad(80),seguro:ad(-2),circul:ad(120),servkm:185000,servfecha:ad(10),multas:0,monto:0,notas:'Seguro vencido — renovar urgente.'},
+  ];
+}
+
+// ── UTILS ──────────────────────────────
+function daysUntil(s){
+  if(!s)return null;
+  const n=new Date();n.setHours(0,0,0,0);
+  return Math.round((new Date(s+'T00:00:00')-n)/86400000);
+}
+function fmtDate(s){if(!s)return'—';const[y,m,d]=s.split('-');return`${d}/${m}/${y}`;}
+function sc(d){if(d===null)return'neutral';if(d<0)return'danger';if(d<=WARN_DAYS)return'warn';return'ok';}
+function sl(d){if(d===null)return'—';if(d<0)return`Vencido ${Math.abs(d)}d`;if(d===0)return'Vence hoy';return`${d} días`;}
+function vEmoji(t){return{Camión:'🚛',Pickup:'🛻','Van / Camioneta':'🚐',Motocicleta:'🏍️',Grúa:'🏗️',Pipa:'🚒',Tráiler:'🚚',Automóvil:'🚗'}[t]||'🚙';}
+function tClass(t){return{Camión:'type-camion',Pickup:'type-pickup',Motocicleta:'type-moto',Grúa:'type-grua','Van / Camioneta':'type-van'}[t]||'type-otro';}
+function worstSt(v){
+  const ds=[v.verif,v.tenencia,v.seguro,v.circul,v.servfecha].map(daysUntil).filter(d=>d!==null);
+  if(v.multas>0&&ds.every(d=>d>=0))return'warn';
+  if(ds.some(d=>d<0))return'danger';
+  if(ds.some(d=>d<=WARN_DAYS))return'warn';
+  return'ok';
+}
+function genId(){return Date.now()+Math.floor(Math.random()*9999);}
+
+// ── STATS ──────────────────────────────
+function updateStats(){
+  let ok=0,warn=0,danger=0;
+  flotilla.forEach(v=>{const s=worstSt(v);if(s==='ok')ok++;else if(s==='warn')warn++;else danger++;});
+  document.getElementById('st-total').textContent=flotilla.length;
+  document.getElementById('st-ok').textContent=ok;
+  document.getElementById('st-warn').textContent=warn;
+  document.getElementById('st-danger').textContent=danger;
+  const ac=warn+danger;
+  const acEl=document.getElementById('alertCount');
+  acEl.textContent=ac;
+  acEl.style.display=ac?'flex':'none';
+}
+
+// ── RENDER FLOTILLA ──────────────────────────────
+function renderFlota(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  let list=flotilla.filter(v=>!q||[v.eco,v.placa,v.serie,v.operador,v.marca,v.modelo,v.area,v.base,v.color].some(f=>(f||'').toLowerCase().includes(q)));
+  const el=document.getElementById('vehicleList');
+  if(!list.length){el.innerHTML=`<div class="empty"><div class="empty-icon">🚫</div>Sin vehículos encontrados</div>`;return;}
+  el.innerHTML=list.map((v,i)=>{
+    const dV=daysUntil(v.verif),dT=daysUntil(v.tenencia),dS=daysUntil(v.seguro),dC=daysUntil(v.circul),dSv=daysUntil(v.servfecha);
+    const ws=worstSt(v);
+    return`<div class="vcard" id="vcard-${v.id}" style="animation-delay:${i*.04}s">
+      <div class="vcard-header" onclick="toggleCard(${v.id})">
+        <div class="v-type-icon ${tClass(v.tipo)}">${vEmoji(v.tipo)}</div>
+        <div class="v-main">
+          <div class="v-eco">${v.eco||'—'}</div>
+          <div class="v-name">${[v.marca,v.modelo,v.anio?'('+v.anio+')':''].filter(Boolean).join(' ')} · ${v.placa||'SIN PLACA'}</div>
+          <div class="v-badges">
+            ${ws==='danger'?'<span class="badge badge-danger">⚠️ Vencido</span>':ws==='warn'?'<span class="badge badge-warn">⏰ Por vencer</span>':'<span class="badge badge-ok">✅ Al corriente</span>'}
+            ${v.multas>0?`<span class="badge badge-warn">⚖️ ${v.multas} multa(s) $${Number(v.monto||0).toLocaleString()}</span>`:''}
+            ${v.area?`<span class="badge badge-info">${v.area}</span>`:''}
+          </div>
+        </div>
+        <div class="v-actions">
+          <button class="vact-btn" style="color:var(--info)" onclick="editVehicle(event,${v.id})" title="Editar">✏️</button>
+          <button class="vact-btn" style="color:var(--danger)" onclick="askDelete(event,${v.id})" title="Eliminar">🗑️</button>
+        </div>
+      </div>
+      <div class="vcard-body" id="body-${v.id}">
+        <div class="detail-grid">
+          <div class="detail-item"><div class="detail-lbl">No. Serie / VIN</div><div class="detail-val" style="font-size:11px;word-break:break-all">${v.serie||'—'}</div></div>
+          <div class="detail-item"><div class="detail-lbl">Color</div><div class="detail-val">${v.color||'—'}</div></div>
+          <div class="detail-item"><div class="detail-lbl">Operador</div><div class="detail-val">${v.operador||'—'}</div></div>
+          <div class="detail-item"><div class="detail-lbl">Base / Centro</div><div class="detail-val">${v.base||'—'}</div></div>
+          <div class="detail-item"><div class="detail-lbl">Km Actual</div><div class="detail-val">${v.km?Number(v.km).toLocaleString()+' km':'—'}</div></div>
+          <div class="detail-item"><div class="detail-lbl">Prox. Servicio km</div><div class="detail-val">${v.servkm?Number(v.servkm).toLocaleString()+' km':'—'}</div></div>
+          ${v.multas>0?`<div class="detail-item"><div class="detail-lbl">Multas</div><div class="detail-val" style="color:var(--warn)">${v.multas} multa(s)</div></div><div class="detail-item"><div class="detail-lbl">Monto Multas</div><div class="detail-val" style="color:var(--warn)">$${Number(v.monto||0).toLocaleString()}</div></div>`:''}
+          ${v.notas?`<div class="detail-item detail-full"><div class="detail-lbl">Notas</div><div class="detail-val" style="font-size:12px;line-height:1.4">${v.notas}</div></div>`:''}
+        </div>
+        <div class="alerts-title">Estado de Documentos</div>
+        ${aRow('🔬','Verificación',v.verif,dV)}
+        ${aRow('🏛️','Tenencia',v.tenencia,dT)}
+        ${aRow('🛡️','Seguro',v.seguro,dS)}
+        ${aRow('📄','Tarjeta Circulación',v.circul,dC)}
+        ${aRow('🔧','Próx. Servicio',v.servfecha,dSv)}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function aRow(icon,label,dateStr,days){
+  if(!dateStr)return'';
+  const s=sc(days);
+  const chipStyle=s==='danger'?'background:rgba(239,68,68,.15);color:var(--danger)':s==='warn'?'background:rgba(245,158,11,.15);color:var(--warn)':'background:rgba(34,197,94,.1);color:var(--ok)';
+  return`<div class="alert-row ${s}"><div class="alert-icon">${icon}</div><div class="alert-info"><div class="alert-title">${label}</div><div class="alert-date">Vence: ${fmtDate(dateStr)}</div></div><div class="days-chip" style="${chipStyle}">${sl(days)}</div></div>`;
+}
+
+function toggleCard(id){
+  const body=document.getElementById('body-'+id);
+  const card=document.getElementById('vcard-'+id);
+  const isOpen=body.classList.toggle('open');
+  card.classList.toggle('expanded',isOpen);
+}
+
+// ── RENDER ALERTS ──────────────────────────────
+function renderAlerts(){
+  const el=document.getElementById('alertPanel');
+  const items=[];
+  flotilla.forEach(v=>{
+    [{icon:'🔬',l:'Verificación',d:v.verif},{icon:'🏛️',l:'Tenencia',d:v.tenencia},{icon:'🛡️',l:'Seguro',d:v.seguro},{icon:'📄',l:'Circulación',d:v.circul},{icon:'🔧',l:'Servicio',d:v.servfecha}]
+    .forEach(c=>{const days=daysUntil(c.d);if(days!==null&&days<=WARN_DAYS)items.push({v,icon:c.icon,label:c.l,date:c.d,days});});
+    if(v.multas>0)items.push({v,icon:'⚖️',label:'Multas pendientes',date:null,days:null});
+  });
+  items.sort((a,b)=>{if(a.days===null)return 1;if(b.days===null)return -1;return a.days-b.days;});
+  if(!items.length){el.innerHTML=`<div class="empty"><div class="empty-icon">✅</div>Sin alertas activas.<br>Toda la flotilla al corriente.</div>`;return;}
+  el.innerHTML=items.map(item=>{
+    const s=item.days!==null?sc(item.days):'warn';
+    return`<div class="alert-card ${s}"><div class="ac-icon">${item.icon}</div><div class="ac-body"><div class="ac-title">${item.v.eco} — ${item.v.placa||'—'}</div><div class="ac-sub">${item.label} · ${item.v.operador||'Sin operador'} · ${item.v.area||''}</div><div class="ac-sub">${item.date?'Vence: '+fmtDate(item.date):item.v.multas?`${item.v.multas} multa(s) · $${Number(item.v.monto||0).toLocaleString()}`:''}</div><span class="ac-chip ${s}">${item.days!==null?sl(item.days):'Requiere atención'}</span></div></div>`;
+  }).join('');
+}
+
+// ── TABS ──────────────────────────────
+function showTab(tab){
+  ['flotilla','alertas','importar'].forEach(t=>{
+    document.getElementById('panel-'+t).style.display=t===tab?'block':'none';
+    document.getElementById('tab-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('nav-'+t)?.classList.toggle('active',t===tab);
+  });
+  if(tab==='alertas')renderAlerts();
+}
+
+// ── MODAL ──────────────────────────────
+function openModal(v=null){
+  editingId=v?v.id:null;
+  document.getElementById('modalTitle').textContent=v?'✏️ Editar Vehículo':'🚛 Nuevo Vehículo';
+  ['eco','placa','serie','marca','modelo','anio','color','tipo','km','operador','area','base','verif','tenencia','seguro','circul','servkm','servfecha','multas','monto','notas'].forEach(f=>{
+    const el=document.getElementById('f-'+f);if(el)el.value=v?(v[f]??''):'';
+  });
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow='';editingId=null;}
+function closeModalOut(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+function editVehicle(e,id){e.stopPropagation();const v=flotilla.find(x=>x.id===id);if(v)openModal(v);}
+
+function saveVehicle(){
+  const eco=document.getElementById('f-eco').value.trim();
+  const placa=document.getElementById('f-placa').value.trim().toUpperCase();
+  if(!eco){showToast('⚠️ Ingresa el número económico');return;}
+  if(!placa){showToast('⚠️ Ingresa la placa');return;}
+  const v={
+    id:editingId||genId(),eco,placa,
+    serie:document.getElementById('f-serie').value.trim().toUpperCase(),
+    marca:document.getElementById('f-marca').value,
+    modelo:document.getElementById('f-modelo').value.trim(),
+    anio:document.getElementById('f-anio').value,
+    color:document.getElementById('f-color').value.trim(),
+    tipo:document.getElementById('f-tipo').value,
+    km:parseInt(document.getElementById('f-km').value)||0,
+    operador:document.getElementById('f-operador').value.trim(),
+    area:document.getElementById('f-area').value,
+    base:document.getElementById('f-base').value.trim(),
+    verif:document.getElementById('f-verif').value,
+    tenencia:document.getElementById('f-tenencia').value,
+    seguro:document.getElementById('f-seguro').value,
+    circul:document.getElementById('f-circul').value,
+    servkm:parseInt(document.getElementById('f-servkm').value)||0,
+    servfecha:document.getElementById('f-servfecha').value,
+    multas:parseInt(document.getElementById('f-multas').value)||0,
+    monto:parseFloat(document.getElementById('f-monto').value)||0,
+    notas:document.getElementById('f-notas').value.trim(),
+  };
+  if(editingId){const i=flotilla.findIndex(x=>x.id===editingId);if(i>-1)flotilla[i]=v;showToast('✅ Vehículo actualizado');}
+  else{flotilla.unshift(v);showToast('✅ Vehículo agregado');}
+  saveData();updateStats();renderFlota();closeModal();
+}
+
+// ── DELETE ──────────────────────────────
+function askDelete(e,id){
+  e.stopPropagation();deleteId=id;
+  const v=flotilla.find(x=>x.id===id);
+  document.getElementById('confirmMsg').textContent=`¿Eliminar ${v?v.eco+' ('+v.placa+')':'este vehículo'}? Esta acción no se puede deshacer.`;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm(){document.getElementById('confirmOverlay').classList.remove('open');deleteId=null;}
+function confirmDelete(){if(!deleteId)return;flotilla=flotilla.filter(x=>x.id!==deleteId);saveData();updateStats();renderFlota();closeConfirm();showToast('🗑️ Vehículo eliminado');}
+
+// ── EXCEL IMPORT ──────────────────────────────
+function handleDrop(e){e.preventDefault();document.getElementById('dropZone').classList.remove('dragover');const f=e.dataTransfer.files[0];if(f)processExcel(f);}
+function handleFile(e){if(e.target.files[0])processExcel(e.target.files[0]);}
+
+function processExcel(file){
+  const log=document.getElementById('importLog');
+  log.textContent='⏳ Procesando archivo...';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      let added=0,skipped=0;const msgs=[];
+      rows.slice(1).forEach((row,i)=>{
+        if(!row[0]&&!row[1])return;
+        const eco=String(row[0]||'').trim();
+        if(!eco){skipped++;msgs.push(`Fila ${i+2}: sin número económico, omitida`);return;}
+        if(flotilla.find(x=>x.eco===eco)){skipped++;msgs.push(`Fila ${i+2}: ${eco} ya existe, omitido`);return;}
+        const pd=v=>{if(!v)return'';if(v instanceof Date)return v.toISOString().split('T')[0];const s=String(v).trim();if(/^\d{4}-\d{2}-\d{2}$/.test(s))return s;const p=s.split('/');if(p.length===3){const[a,b,c]=p;const y=c.length===4?c:'20'+c;return`${y}-${b.padStart(2,'0')}-${a.padStart(2,'0')}`;}return'';};
+        flotilla.push({id:genId(),eco,placa:String(row[1]||'').trim().toUpperCase(),serie:String(row[2]||'').trim().toUpperCase(),marca:String(row[3]||'').trim(),modelo:String(row[4]||'').trim(),anio:row[5]||'',tipo:String(row[6]||'').trim(),color:String(row[7]||'').trim(),operador:String(row[8]||'').trim(),area:String(row[9]||'').trim(),km:parseInt(row[10])||0,base:'',verif:pd(row[11]),tenencia:pd(row[12]),seguro:pd(row[13]),circul:'',servkm:0,servfecha:'',multas:parseInt(row[14])||0,monto:parseFloat(row[15])||0,notas:''});
+        added++;msgs.push(`✅ Fila ${i+2}: ${eco} importado`);
+      });
+      saveData();updateStats();renderFlota();
+      log.textContent=`Importados: ${added} | Omitidos: ${skipped}\n`+msgs.join('\n');
+      showToast(`✅ ${added} vehículo(s) importados`);
+    }catch(err){log.textContent='❌ Error: '+err.message;showToast('❌ Error en el archivo');}
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ── DOWNLOAD TEMPLATE ──────────────────────────────
+function downloadTemplate(){
+  if(typeof XLSX==='undefined'){showToast('❌ Librería no cargada');return;}
+  const wb=XLSX.utils.book_new();
+  const hdr=[['Num. Económico','Placa','No. Serie (VIN)','Marca','Modelo','Año','Tipo Vehículo','Color','Operador','Área / División','Km Actual','Vence Verificación','Vence Tenencia','Vence Seguro','Multas Pendientes','Monto Multas ($)']];
+  const ex=[['CFE-001','ABC-1234','1FTFW1ET8EKE12345','Ford','F-150',2021,'Pickup','Blanco','Juan Rodríguez','Distribución',45000,'2025-06-30','2025-12-31','2026-01-15',0,0]];
+  const ws=XLSX.utils.aoa_to_sheet([...hdr,...ex]);
+  ws['!cols']=hdr[0].map(()=>({wch:22}));
+  XLSX.utils.book_append_sheet(wb,ws,'Flotilla CFE');
+  XLSX.writeFile(wb,'Plantilla_Flotilla_CFE.xlsx');
+  showToast('📥 Plantilla descargada');
+}
+
+// ── TOAST ──────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ── INIT ──────────────────────────────
+loadData();updateStats();renderFlota();
+</script>
+</body>
+</html>

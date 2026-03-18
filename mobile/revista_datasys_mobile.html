@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS TECH REVIEW — Revista de Tecnología & Innovación</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════
+   DATASYS TECH REVIEW · CSS SYSTEM
+═══════════════════════════════════════ */
+:root {
+  --ink: #0a0a0f;
+  --ink2: #0f0f18;
+  --paper: #f5f0e8;
+  --paper2: #ede7d9;
+  --paper3: #faf7f1;
+  --red: #c8282a;
+  --red2: #a01f21;
+  --cyan: #00b8d4;
+  --cyan2: #0097aa;
+  --gold: #b8960c;
+  --gold2: #d4aa14;
+  --steel: #2a3a4a;
+  --mist: rgba(10,10,15,.06);
+  --rule: rgba(10,10,15,.12);
+  --rule2: rgba(10,10,15,.06);
+  --white: #ffffff;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --mono: 'Space Mono', monospace;
+  --sans: 'Barlow', sans-serif;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--serif);
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* PAPER TEXTURE */
+body::before {
+  content:'';
+  position:fixed; inset:0; z-index:9997; pointer-events:none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  opacity: .6;
+}
+
+/* CUSTOM CURSOR */
+#cursor-ring {
+  width:22px; height:22px; border:1.5px solid var(--red);
+  border-radius:50%; position:fixed; z-index:99999; pointer-events:none;
+  transform:translate(-50%,-50%); transition:width .2s,height .2s,border-color .2s;
+}
+#cursor-dot {
+  width:5px; height:5px; background:var(--red);
+  border-radius:50%; position:fixed; z-index:99999; pointer-events:none;
+  transform:translate(-50%,-50%); transition:left .06s,top .06s;
+}
+body:has(a:hover,button:hover) #cursor-ring { width:32px;height:32px;border-color:var(--cyan); }
+body:has(a:hover,button:hover) #cursor-dot { background:var(--cyan); }
+
+/* ═══ MASTHEAD ═══ */
+.masthead {
+  background: var(--ink);
+  border-bottom: 3px solid var(--red);
+  position: sticky; top:0; z-index:1000;
+}
+.mast-top {
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 40px; height:60px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.mast-logo {
+  display:flex; align-items:center; gap:14px;
+}
+.mast-logo img {
+  height:38px; width:38px; object-fit:contain; border-radius:50%;
+  filter: brightness(1.1) drop-shadow(0 0 8px rgba(0,184,212,.4));
+}
+.mast-brand {
+  display:flex; flex-direction:column; gap:1px;
+}
+.mast-title {
+  font-family: var(--mono); font-size:.72rem; font-weight:700;
+  letter-spacing:6px; color:var(--paper); text-transform:uppercase;
+  line-height:1;
+}
+.mast-sub {
+  font-family: var(--mono); font-size:.42rem; letter-spacing:4px;
+  color:rgba(245,240,232,.3); text-transform:uppercase;
+}
+.mast-center {
+  text-align:center;
+}
+.mast-date-line {
+  font-family: var(--mono); font-size:.5rem; letter-spacing:3px;
+  color:rgba(245,240,232,.35); text-transform:uppercase;
+}
+.mast-edition {
+  font-family: var(--mono); font-size:.55rem; letter-spacing:3px;
+  color:var(--cyan); text-transform:uppercase; margin-top:2px;
+}
+.mast-right {
+  display:flex; align-items:center; gap:10px;
+}
+.btn-back {
+  font-family: var(--mono); font-size:.52rem; letter-spacing:2px;
+  color:var(--paper); background:transparent;
+  border:1px solid rgba(245,240,232,.25); padding:7px 16px;
+  cursor:pointer; transition:all .3s; text-transform:uppercase;
+  display:flex; align-items:center; gap:6px;
+}
+.btn-back:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,184,212,.06); }
+.btn-sub-nav {
+  font-family: var(--mono); font-size:.52rem; letter-spacing:2px;
+  color:var(--ink); background:var(--red); border:none;
+  padding:8px 18px; cursor:pointer; transition:all .3s; text-transform:uppercase;
+}
+.btn-sub-nav:hover { background:var(--red2); transform:translateY(-1px); }
+
+/* NAV STRIP */
+.mast-nav {
+  display:flex; align-items:center; gap:0;
+  padding:0 40px; height:38px; overflow-x:auto;
+}
+.nav-cat {
+  font-family: var(--mono); font-size:.5rem; letter-spacing:3px;
+  color:rgba(245,240,232,.4); text-transform:uppercase; cursor:pointer;
+  padding:0 18px; height:38px; display:flex; align-items:center;
+  border-right:1px solid rgba(255,255,255,.05);
+  transition:all .3s; white-space:nowrap; border:none; background:transparent;
+}
+.nav-cat:hover, .nav-cat.active {
+  color:var(--paper); background:rgba(200,40,42,.15);
+}
+.nav-cat.active { color:var(--red); border-bottom:2px solid var(--red); }
+
+/* ═══ HERO — ARTICLE OF THE DAY ═══ */
+.hero-article {
+  background: var(--ink2);
+  position:relative; overflow:hidden;
+  min-height:88vh; display:flex; flex-direction:column;
+}
+.hero-bg {
+  position:absolute; inset:0; z-index:0;
+}
+.hero-bg-pattern {
+  position:absolute; inset:0;
+  background-image:
+    repeating-linear-gradient(0deg,transparent,transparent 59px,rgba(245,240,232,.03) 59px,rgba(245,240,232,.03) 60px),
+    repeating-linear-gradient(90deg,transparent,transparent 59px,rgba(245,240,232,.03) 59px,rgba(245,240,232,.03) 60px);
+}
+.hero-bg-accent {
+  position:absolute; top:-20%; right:-10%;
+  width:70%; height:130%;
+  background: radial-gradient(ellipse at center, rgba(200,40,42,.12) 0%, transparent 65%);
+}
+.hero-bg-accent2 {
+  position:absolute; bottom:-20%; left:-5%;
+  width:50%; height:80%;
+  background: radial-gradient(ellipse at center, rgba(0,184,212,.07) 0%, transparent 65%);
+}
+.hero-content {
+  position:relative; z-index:5;
+  flex:1; display:flex; flex-direction:column; justify-content:flex-end;
+  padding:60px 60px 50px;
+  max-width:1300px; width:100%; margin:0 auto;
+}
+.hero-eyebrow {
+  display:flex; align-items:center; gap:16px; margin-bottom:22px;
+}
+.hero-cat-badge {
+  font-family: var(--mono); font-size:.5rem; letter-spacing:4px;
+  text-transform:uppercase; padding:5px 14px; border:1px solid;
+  transition:all .3s;
+}
+.hero-issue {
+  font-family: var(--mono); font-size:.5rem; letter-spacing:3px;
+  color:rgba(245,240,232,.35); text-transform:uppercase;
+}
+.hero-reading-time {
+  font-family: var(--mono); font-size:.5rem; letter-spacing:2px;
+  color:rgba(245,240,232,.25); margin-left:auto;
+}
+.hero-headline {
+  font-family: var(--serif);
+  font-size: clamp(2.8rem, 7vw, 5.8rem);
+  font-weight:700; line-height:1.03;
+  color: var(--paper); margin-bottom:20px;
+  max-width:900px;
+  animation: headlineIn 1s cubic-bezier(.16,1,.3,1) both;
+}
+.hero-headline em { font-style:italic; color:var(--red); }
+@keyframes headlineIn {
+  from { opacity:0; transform:translateY(24px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.hero-deck {
+  font-family: var(--sans); font-size:1.1rem; font-weight:300;
+  line-height:1.85; color:rgba(245,240,232,.6);
+  max-width:680px; margin-bottom:32px;
+  animation: headlineIn 1s cubic-bezier(.16,1,.3,1) .15s both;
+}
+.hero-meta {
+  display:flex; align-items:center; gap:24px;
+  font-family: var(--mono); font-size:.52rem; letter-spacing:2px;
+  color:rgba(245,240,232,.35); text-transform:uppercase;
+  animation: headlineIn 1s cubic-bezier(.16,1,.3,1) .3s both;
+}
+.hero-meta-sep { opacity:.3; }
+.btn-read-hero {
+  font-family: var(--mono); font-size:.58rem; letter-spacing:3px;
+  color:var(--ink); background:var(--paper); border:none;
+  padding:13px 32px; cursor:pointer; transition:all .35s;
+  text-transform:uppercase; margin-top:28px; display:inline-block;
+  animation: headlineIn 1s cubic-bezier(.16,1,.3,1) .45s both;
+}
+.btn-read-hero:hover { background:var(--red); color:var(--paper); transform:translateX(4px); }
+
+/* Progress bar */
+.hero-progress {
+  position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:rgba(255,255,255,.06);
+}
+.hero-progress-fill {
+  height:100%; background:var(--red);
+  animation:progressBar 24s linear infinite;
+}
+@keyframes progressBar { from{width:0%} to{width:100%} }
+
+/* ═══ MAIN LAYOUT ═══ */
+.main-wrap {
+  max-width:1300px; margin:0 auto; padding:0 40px;
+}
+
+/* ═══ SECTION DIVIDER ═══ */
+.sec-rule {
+  display:flex; align-items:center; gap:16px;
+  padding:40px 0 30px;
+}
+.sec-rule-line { flex:1; height:1px; background:var(--rule); }
+.sec-rule-label {
+  font-family: var(--mono); font-size:.52rem; letter-spacing:5px;
+  color:rgba(10,10,15,.4); text-transform:uppercase; white-space:nowrap;
+  padding:0 4px;
+}
+
+/* ═══ FEATURED GRID ═══ */
+.featured-grid {
+  display:grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap:2px;
+  margin-bottom:2px;
+}
+.art-card {
+  background:var(--paper3); border:1px solid var(--rule2);
+  cursor:pointer; position:relative; overflow:hidden;
+  transition:all .35s;
+}
+.art-card:hover { background:var(--white); box-shadow:0 8px 40px rgba(10,10,15,.1); transform:translateY(-2px); }
+.art-card:hover .art-card-line { width:100%; }
+.art-card-line {
+  position:absolute; top:0; left:0; height:2px; width:0;
+  transition:width .4s ease; background:var(--red);
+}
+.art-card.span2 { grid-row: span 2; }
+.art-card-body { padding:28px 26px; }
+.art-card-cat {
+  font-family: var(--mono); font-size:.46rem; letter-spacing:3px;
+  text-transform:uppercase; margin-bottom:10px; display:inline-block;
+  padding:3px 8px; border:1px solid;
+}
+.art-card-title {
+  font-family: var(--serif); font-size:1.22rem; font-weight:600;
+  line-height:1.25; margin-bottom:10px; color:var(--ink);
+}
+.art-card.span2 .art-card-title { font-size:1.7rem; line-height:1.2; }
+.art-card-excerpt {
+  font-family: var(--sans); font-size:.82rem; line-height:1.75;
+  color:rgba(10,10,15,.5); font-weight:300; margin-bottom:14px;
+}
+.art-card-meta {
+  font-family: var(--mono); font-size:.45rem; letter-spacing:2px;
+  color:rgba(10,10,15,.3); text-transform:uppercase;
+  display:flex; align-items:center; gap:10px;
+}
+.art-card-sep { opacity:.4; }
+
+/* ═══ ARTICLE OVERLAY (full read) ═══ */
+.article-overlay {
+  position:fixed; inset:0; z-index:2000;
+  background:var(--paper3); overflow-y:auto;
+  transform:translateX(100%); transition:transform .5s cubic-bezier(.16,1,.3,1);
+}
+.article-overlay.open { transform:translateX(0); }
+.ao-nav {
+  position:sticky; top:0; z-index:10;
+  background:var(--paper3); border-bottom:1px solid var(--rule);
+  padding:14px 60px; display:flex; align-items:center; justify-content:space-between;
+}
+.ao-back {
+  font-family: var(--mono); font-size:.52rem; letter-spacing:2px;
+  color:var(--ink); background:transparent; border:1px solid var(--rule);
+  padding:7px 16px; cursor:pointer; transition:all .3s; text-transform:uppercase;
+  display:flex; align-items:center; gap:6px;
+}
+.ao-back:hover { border-color:var(--red); color:var(--red); }
+.ao-brand { font-family:var(--mono); font-size:.55rem; letter-spacing:4px; color:rgba(10,10,15,.3); }
+.ao-progress { height:3px; background:var(--rule); position:sticky; top:51px; z-index:9; }
+.ao-progress-fill { height:100%; background:var(--red); width:0; transition:width .1s; }
+
+.ao-body { max-width:760px; margin:0 auto; padding:60px 40px 120px; }
+.ao-category {
+  font-family:var(--mono); font-size:.5rem; letter-spacing:4px;
+  text-transform:uppercase; padding:4px 12px; border:1px solid;
+  display:inline-block; margin-bottom:22px;
+}
+.ao-headline {
+  font-family:var(--serif); font-size:clamp(2rem,5vw,3.6rem);
+  font-weight:700; line-height:1.05; color:var(--ink); margin-bottom:16px;
+}
+.ao-headline em { font-style:italic; color:var(--red); }
+.ao-deck {
+  font-family:var(--sans); font-size:1.15rem; line-height:1.85;
+  color:rgba(10,10,15,.55); font-weight:300; margin-bottom:28px;
+  border-left:3px solid var(--red); padding-left:20px;
+}
+.ao-meta {
+  font-family:var(--mono); font-size:.5rem; letter-spacing:2px;
+  color:rgba(10,10,15,.3); text-transform:uppercase; margin-bottom:40px;
+  padding-bottom:24px; border-bottom:1px solid var(--rule);
+  display:flex; gap:16px; flex-wrap:wrap;
+}
+.ao-content { font-family:var(--serif); font-size:1.12rem; line-height:1.92; color:var(--ink); }
+.ao-content h2 {
+  font-size:1.8rem; font-weight:700; margin:40px 0 16px;
+  padding-top:8px; border-top:1px solid var(--rule);
+}
+.ao-content h3 { font-size:1.35rem; font-weight:600; margin:28px 0 12px; font-style:italic; }
+.ao-content p { margin-bottom:22px; }
+.ao-content strong { font-weight:700; color:var(--ink); }
+.ao-content em { font-style:italic; color:var(--red2); }
+.ao-content blockquote {
+  margin:32px 0; padding:20px 28px;
+  border-left:3px solid var(--red); background:rgba(200,40,42,.04);
+  font-size:1.2rem; font-style:italic; color:rgba(10,10,15,.7);
+}
+.ao-content .callout {
+  background:var(--ink); color:var(--paper);
+  padding:28px 32px; margin:36px 0;
+  font-family:var(--sans); font-size:.95rem; font-weight:300; line-height:1.8;
+}
+.ao-content .callout strong { color:var(--red); font-family:var(--mono); font-size:.85em; letter-spacing:2px; }
+.ao-content .data-point {
+  display:flex; gap:20px; align-items:baseline;
+  padding:20px 0; border-top:1px solid var(--rule);
+}
+.ao-content .data-point .num {
+  font-family:var(--serif); font-size:2.8rem; font-weight:700;
+  color:var(--red); line-height:1; flex-shrink:0;
+}
+.ao-content .data-point .desc {
+  font-family:var(--sans); font-size:.9rem; color:rgba(10,10,15,.55);
+}
+
+/* ═══ TICKER ═══ */
+.ticker-wrap { background:var(--red); overflow:hidden; height:32px; display:flex; align-items:center; }
+.ticker-inner { display:flex; gap:0; animation:tickMove 50s linear infinite; white-space:nowrap; }
+.ticker-item {
+  font-family:var(--mono); font-size:.5rem; letter-spacing:2px;
+  color:var(--paper); padding:0 28px; border-right:1px solid rgba(245,240,232,.2);
+  text-transform:uppercase; white-space:nowrap;
+}
+@keyframes tickMove { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+/* ═══ SECONDARY ARTICLES ═══ */
+.secondary-grid {
+  display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-bottom:2px;
+}
+.art-sm { background:var(--paper3); border:1px solid var(--rule2); padding:22px 20px; cursor:pointer; transition:all .3s; position:relative; overflow:hidden; }
+.art-sm::after { content:''; position:absolute; top:0;left:0;right:0; height:2px; background:var(--cyan); transform:scaleX(0); transition:transform .3s; transform-origin:left; }
+.art-sm:hover::after { transform:scaleX(1); }
+.art-sm:hover { background:var(--white); }
+.art-sm-cat { font-family:var(--mono); font-size:.44rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:8px; display:inline-block; }
+.art-sm-title { font-family:var(--serif); font-size:1.05rem; font-weight:600; line-height:1.28; margin-bottom:8px; color:var(--ink); }
+.art-sm-meta { font-family:var(--mono); font-size:.44rem; letter-spacing:1.5px; color:rgba(10,10,15,.3); text-transform:uppercase; }
+
+/* ═══ OPINION STRIP ═══ */
+.opinion-strip {
+  display:grid; grid-template-columns:200px 1fr 1fr 1fr; gap:2px; margin-bottom:2px;
+}
+.opinion-label {
+  background:var(--ink); display:flex; align-items:center; justify-content:center;
+  writing-mode:vertical-rl; transform:rotate(180deg);
+  font-family:var(--mono); font-size:.52rem; letter-spacing:5px;
+  color:rgba(245,240,232,.4); text-transform:uppercase; padding:28px 20px;
+}
+.opinion-card {
+  background:var(--paper2); border:1px solid var(--rule2); padding:22px 20px;
+  cursor:pointer; transition:all .3s; position:relative;
+}
+.opinion-card:hover { background:var(--white); }
+.op-author { font-family:var(--mono); font-size:.46rem; letter-spacing:2px; color:rgba(10,10,15,.35); text-transform:uppercase; margin-bottom:8px; }
+.op-quote {
+  font-family:var(--serif); font-size:1rem; font-style:italic; line-height:1.55;
+  color:rgba(10,10,15,.75);
+}
+.op-quote::before { content:'"'; font-size:2rem; color:var(--red); line-height:0; vertical-align:-.4em; margin-right:4px; }
+
+/* ═══ SUBSCRIPTION SECTION ═══ */
+.sub-section {
+  background:var(--ink); margin-top:2px; padding:70px 60px;
+}
+.sub-inner { max-width:1200px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; }
+.sub-left {}
+.sub-eyebrow { font-family:var(--mono); font-size:.52rem; letter-spacing:4px; color:rgba(245,240,232,.3); text-transform:uppercase; margin-bottom:14px; }
+.sub-headline { font-family:var(--serif); font-size:clamp(2rem,4vw,3rem); font-weight:700; color:var(--paper); line-height:1.1; margin-bottom:16px; }
+.sub-headline em { font-style:italic; color:var(--red); }
+.sub-body { font-family:var(--sans); font-size:.95rem; line-height:1.85; color:rgba(245,240,232,.45); font-weight:300; margin-bottom:28px; }
+.sub-perks { display:flex; flex-direction:column; gap:10px; margin-bottom:32px; }
+.sub-perk { display:flex; align-items:center; gap:12px; }
+.sp-icon { color:var(--red); font-size:.9rem; flex-shrink:0; }
+.sp-text { font-family:var(--sans); font-size:.88rem; color:rgba(245,240,232,.55); font-weight:300; }
+.sub-plans { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }
+.plan {
+  border:1px solid rgba(245,240,232,.1); padding:22px 20px;
+  cursor:pointer; transition:all .3s; position:relative;
+}
+.plan:hover { border-color:rgba(200,40,42,.4); background:rgba(200,40,42,.06); }
+.plan.featured { border-color:var(--red); }
+.plan-badge { font-family:var(--mono); font-size:.44rem; letter-spacing:2px; color:var(--red); text-transform:uppercase; margin-bottom:8px; }
+.plan-name { font-family:var(--serif); font-size:1.15rem; font-weight:600; color:var(--paper); margin-bottom:4px; }
+.plan-price { font-family:var(--mono); font-size:1.4rem; color:var(--paper); margin-bottom:6px; }
+.plan-price span { font-size:.7rem; color:rgba(245,240,232,.35); }
+.plan-desc { font-family:var(--sans); font-size:.75rem; color:rgba(245,240,232,.4); line-height:1.6; font-weight:300; }
+
+/* SUBSCRIPTION FORM */
+.sub-form { display:flex; flex-direction:column; gap:14px; }
+.sub-form-title { font-family:var(--serif); font-size:1.6rem; font-weight:600; color:var(--paper); margin-bottom:6px; }
+.sub-form-sub { font-family:var(--sans); font-size:.85rem; color:rgba(245,240,232,.35); font-weight:300; line-height:1.7; margin-bottom:8px; }
+.sf-group { display:flex; flex-direction:column; gap:6px; }
+.sf-label { font-family:var(--mono); font-size:.46rem; letter-spacing:3px; color:rgba(245,240,232,.25); text-transform:uppercase; }
+.sf-input, .sf-select {
+  background:rgba(245,240,232,.05); border:1px solid rgba(245,240,232,.1);
+  color:var(--paper); font-family:var(--sans); font-size:.9rem;
+  padding:11px 16px; outline:none; transition:all .3s; width:100%;
+}
+.sf-input:focus, .sf-select:focus { border-color:rgba(200,40,42,.5); background:rgba(200,40,42,.04); }
+.sf-input::placeholder { color:rgba(245,240,232,.2); }
+.sf-select option { background:var(--ink2); }
+.sf-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.btn-subscribe {
+  width:100%; padding:14px; font-family:var(--mono); font-size:.58rem;
+  letter-spacing:4px; color:var(--paper); background:var(--red);
+  border:none; cursor:pointer; transition:all .3s; text-transform:uppercase;
+  margin-top:4px;
+}
+.btn-subscribe:hover { background:var(--red2); transform:translateY(-2px); box-shadow:0 8px 28px rgba(200,40,42,.4); }
+.sf-note { font-family:var(--mono); font-size:.44rem; letter-spacing:1px; color:rgba(245,240,232,.2); text-align:center; line-height:1.8; }
+.sub-success { display:none; background:rgba(0,184,212,.08); border:1px solid rgba(0,184,212,.3); padding:22px; text-align:center; }
+.sub-success-icon { font-size:2rem; margin-bottom:10px; }
+.sub-success-title { font-family:var(--serif); font-size:1.4rem; color:var(--paper); margin-bottom:6px; }
+.sub-success-sub { font-family:var(--sans); font-size:.82rem; color:rgba(245,240,232,.4); }
+
+/* ═══ FOOTER ═══ */
+.footer { background:var(--ink2); border-top:1px solid rgba(245,240,232,.06); padding:40px 60px 24px; }
+.footer-inner { max-width:1300px; margin:0 auto; }
+.footer-top { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:32px; }
+.footer-brand { display:flex; align-items:center; gap:14px; margin-bottom:8px; }
+.footer-brand img { height:32px; border-radius:50%; filter:brightness(.8); }
+.footer-name { font-family:var(--mono); font-size:.7rem; letter-spacing:4px; color:rgba(245,240,232,.6); }
+.footer-tagline { font-family:var(--mono); font-size:.45rem; letter-spacing:3px; color:rgba(245,240,232,.2); margin-top:4px; }
+.footer-cats { display:flex; gap:24px; flex-wrap:wrap; }
+.footer-cat { font-family:var(--mono); font-size:.48rem; letter-spacing:2px; color:rgba(245,240,232,.25); text-transform:uppercase; cursor:pointer; transition:color .2s; }
+.footer-cat:hover { color:var(--red); }
+.footer-bottom { border-top:1px solid rgba(245,240,232,.05); padding-top:20px; display:flex; justify-content:space-between; align-items:center; }
+.footer-copy { font-family:var(--mono); font-size:.44rem; letter-spacing:2px; color:rgba(245,240,232,.18); }
+
+/* SCROLL REVEAL */
+.reveal { opacity:0; transform:translateY(20px); transition:opacity .8s ease,transform .8s ease; }
+.reveal.vis { opacity:1; transform:translateY(0); }
+
+/* CATEGORY COLORS */
+.cat-ia { color:#c8282a; border-color:rgba(200,40,42,.3); background:rgba(200,40,42,.05); }
+.cat-web { color:#00b8d4; border-color:rgba(0,184,212,.3); background:rgba(0,184,212,.05); }
+.cat-robotica { color:#b8960c; border-color:rgba(184,150,12,.3); background:rgba(184,150,12,.05); }
+.cat-innovacion { color:#3d8c6e; border-color:rgba(61,140,110,.3); background:rgba(61,140,110,.05); }
+.cat-ciberseguridad { color:#8b5cf6; border-color:rgba(139,92,246,.3); background:rgba(139,92,246,.05); }
+.cat-hardware { color:#f97316; border-color:rgba(249,115,22,.3); background:rgba(249,115,22,.05); }
+
+/* RESPONSIVE */
+@media(max-width:1100px) {
+  .featured-grid { grid-template-columns:1fr 1fr; }
+  .art-card.span2 { grid-row:span 1; grid-column:span 2; }
+  .secondary-grid { grid-template-columns:1fr 1fr; }
+  .opinion-strip { grid-template-columns:1fr 1fr; }
+  .opinion-label { display:none; }
+  .sub-inner { grid-template-columns:1fr; gap:48px; }
+}
+@media(max-width:768px) {
+  .mast-top { padding:0 20px; }
+  .mast-center { display:none; }
+  .mast-nav { padding:0 20px; }
+  .hero-content { padding:40px 24px 36px; }
+  .main-wrap { padding:0 20px; }
+  .featured-grid,.secondary-grid { grid-template-columns:1fr; }
+  .art-card.span2 { grid-column:span 1; }
+  .opinion-strip { grid-template-columns:1fr; }
+  .sub-section { padding:48px 24px; }
+  .sub-plans { grid-template-columns:1fr; }
+  .footer { padding:32px 20px 20px; }
+  .ao-nav { padding:12px 20px; }
+  .ao-body { padding:40px 20px 80px; }
+  .sf-row { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div id="cursor-ring"></div>
+<div id="cursor-dot"></div>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="mast-top">
+    <div class="mast-logo">
+      <img src="../imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
+      <div class="mast-brand">
+        <div class="mast-title">DATASYS</div>
+        <div class="mast-sub">Tech Review</div>
+      </div>
+    </div>
+    <div class="mast-center">
+      <div class="mast-date-line" id="mastDate">—</div>
+      <div class="mast-edition" id="mastEdition">—</div>
+    </div>
+    <div class="mast-right">
+      <button class="btn-back" onclick="window.location.href='../index_mobile.html'">🏠 INICIO</button>
+      <button class="btn-sub-nav" onclick="document.getElementById('suscripcion').scrollIntoView({behavior:'smooth'})">Suscribirse</button>
+    </div>
+  </div>
+  <nav class="mast-nav" id="navCats">
+    <button class="nav-cat active" data-cat="all">Todos</button>
+    <button class="nav-cat" data-cat="ia">Inteligencia Artificial</button>
+    <button class="nav-cat" data-cat="web">Web & Software</button>
+    <button class="nav-cat" data-cat="robotica">Robótica</button>
+    <button class="nav-cat" data-cat="innovacion">Innovación</button>
+    <button class="nav-cat" data-cat="ciberseguridad">Ciberseguridad</button>
+    <button class="nav-cat" data-cat="hardware">Hardware</button>
+  </nav>
+</header>
+
+<!-- HERO ARTICLE (Article of the Day) -->
+<section class="hero-article" id="heroSection">
+  <div class="hero-bg">
+    <div class="hero-bg-pattern"></div>
+    <div class="hero-bg-accent"></div>
+    <div class="hero-bg-accent2"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">
+      <span class="hero-cat-badge" id="heroCatBadge">—</span>
+      <span class="hero-issue" id="heroIssue">—</span>
+      <span class="hero-reading-time" id="heroReadTime">—</span>
+    </div>
+    <h1 class="hero-headline" id="heroHeadline">—</h1>
+    <p class="hero-deck" id="heroDeck">—</p>
+    <div class="hero-meta">
+      <span id="heroAuthor">—</span>
+      <span class="hero-meta-sep">·</span>
+      <span id="heroDate">—</span>
+      <span class="hero-meta-sep">·</span>
+      <span id="heroEdNo">—</span>
+    </div>
+    <button class="btn-read-hero" id="btnReadHero">Leer artículo completo →</button>
+  </div>
+  <div class="hero-progress"><div class="hero-progress-fill"></div></div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker-wrap" id="tickerWrap">
+  <div class="ticker-inner" id="tickerInner"><!-- js --></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main-wrap">
+
+  <div class="sec-rule">
+    <div class="sec-rule-line"></div>
+    <div class="sec-rule-label">Edición de hoy · Artículos destacados</div>
+    <div class="sec-rule-line"></div>
+  </div>
+
+  <div class="featured-grid" id="featuredGrid"><!-- js --></div>
+
+  <div class="sec-rule reveal">
+    <div class="sec-rule-line"></div>
+    <div class="sec-rule-label">Más tecnología</div>
+    <div class="sec-rule-line"></div>
+  </div>
+
+  <div class="secondary-grid reveal" id="secondaryGrid"><!-- js --></div>
+
+  <div class="opinion-strip reveal" id="opinionStrip">
+    <div class="opinion-label">Opinión & Análisis</div>
+  </div>
+
+</main>
+
+<!-- SUBSCRIPTION SECTION -->
+<section class="sub-section" id="suscripcion">
+  <div class="sub-inner">
+    <div class="sub-left">
+      <div class="sub-eyebrow">Edición Impresa</div>
+      <h2 class="sub-headline">La revista <em>física</em><br>que mereces</h2>
+      <p class="sub-body">Recibe cada mes la edición impresa de DATASYS Tech Review directamente en tu oficina o domicilio. Papel premium, diseño editorial de clase mundial y el análisis más profundo del ecosistema tecnológico global.</p>
+      <div class="sub-perks">
+        <div class="sub-perk"><span class="sp-icon">▪</span><span class="sp-text">Revista mensual impresa en papel couché 170g</span></div>
+        <div class="sub-perk"><span class="sp-icon">▪</span><span class="sp-text">Acceso digital ilimitado + archivo histórico</span></div>
+        <div class="sub-perk"><span class="sp-icon">▪</span><span class="sp-text">Newsletter semanal exclusivo para suscriptores</span></div>
+        <div class="sub-perk"><span class="sp-icon">▪</span><span class="sp-text">Invitación a webinars y conferencias DATASYS</span></div>
+        <div class="sub-perk"><span class="sp-icon">▪</span><span class="sp-text">Descuento 20% en plataformas DATASYS</span></div>
+      </div>
+      <div class="sub-plans">
+        <div class="plan">
+          <div class="plan-badge">Digital</div>
+          <div class="plan-name">Online</div>
+          <div class="plan-price">$0 <span>/ mes</span></div>
+          <div class="plan-desc">Acceso completo a la revista virtual y artículos diarios.</div>
+        </div>
+        <div class="plan featured">
+          <div class="plan-badge">★ Más popular</div>
+          <div class="plan-name">Impresa + Digital</div>
+          <div class="plan-price">$299 <span>MXN / mes</span></div>
+          <div class="plan-desc">Todo lo digital + revista física mensual enviada a tu puerta.</div>
+        </div>
+        <div class="plan">
+          <div class="plan-badge">Corporativo</div>
+          <div class="plan-name">Equipo (5+)</div>
+          <div class="plan-price">$199 <span>MXN / usuario</span></div>
+          <div class="plan-desc">Licencias para equipos con panel de administración.</div>
+        </div>
+        <div class="plan">
+          <div class="plan-badge">Premium</div>
+          <div class="plan-name">Anual Impresa</div>
+          <div class="plan-price">$2,799 <span>MXN / año</span></div>
+          <div class="plan-desc">12 ediciones impresas + acceso VIP a eventos y conferencias.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sub-form" id="subForm">
+        <div class="sub-form-title">Comenzar<br><em style="font-style:italic;color:var(--red)">suscripción</em></div>
+        <p class="sub-form-sub">Completa tus datos y elige tu plan. Tu primera edición llegará en 5–7 días hábiles.</p>
+        <div class="sf-row">
+          <div class="sf-group">
+            <label class="sf-label">Nombre</label>
+            <input class="sf-input" id="sf_nombre" type="text" placeholder="Tu nombre...">
+          </div>
+          <div class="sf-group">
+            <label class="sf-label">Apellidos</label>
+            <input class="sf-input" id="sf_apellidos" type="text" placeholder="Apellidos...">
+          </div>
+        </div>
+        <div class="sf-group">
+          <label class="sf-label">Correo electrónico *</label>
+          <input class="sf-input" id="sf_email" type="email" placeholder="tu@correo.com">
+        </div>
+        <div class="sf-group">
+          <label class="sf-label">Teléfono</label>
+          <input class="sf-input" id="sf_phone" type="tel" placeholder="+52 55 0000 0000">
+        </div>
+        <div class="sf-group">
+          <label class="sf-label">Plan *</label>
+          <select class="sf-select" id="sf_plan">
+            <option value="">Seleccionar plan...</option>
+            <option>Digital — Gratis</option>
+            <option>Impresa + Digital — $299 MXN/mes</option>
+            <option>Corporativo (5+) — $199 MXN/usuario</option>
+            <option>Anual Impresa — $2,799 MXN/año</option>
+          </select>
+        </div>
+        <div class="sf-group" id="addressGroup">
+          <label class="sf-label">Dirección de envío (planes impresos)</label>
+          <input class="sf-input" id="sf_address" type="text" placeholder="Calle, número, colonia, ciudad, CP...">
+        </div>
+        <div id="sf_error" style="display:none;font-family:var(--mono);font-size:.48rem;color:#e05050;padding:8px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.06);"></div>
+        <button class="btn-subscribe" id="sf_btn" onclick="sendSubscribeForm()">Suscribirme ahora →</button>
+        <p class="sf-note">Sin contratos a largo plazo · Cancela cuando quieras · Datos protegidos</p>
+      </div>
+      <div class="sub-success" id="subSuccess">
+        <div class="sub-success-icon">✓</div>
+        <div class="sub-success-title">¡Suscripción confirmada!</div>
+        <div class="sub-success-sub">Recibirás un correo de confirmación en los próximos minutos. Tu primera edición está en camino.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div>
+        <div class="footer-brand">
+          <img src="../imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
+          <div>
+            <div class="footer-name">DATASYS TECH REVIEW</div>
+            <div class="footer-tagline">INNOVATE · INTEGRATE · AUTOMATE</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-cats">
+        <span class="footer-cat">Inteligencia Artificial</span>
+        <span class="footer-cat">Web & Software</span>
+        <span class="footer-cat">Robótica</span>
+        <span class="footer-cat">Innovación</span>
+        <span class="footer-cat">Ciberseguridad</span>
+        <span class="footer-cat">Hardware</span>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span class="footer-copy">© 2026 DATASYS Global · Todos los derechos reservados</span>
+      <span class="footer-copy">Publicación diaria autónoma · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="bbd8d4d5cfdad8cfd4fbdfdacfdac8c2c895d8d4d6">[email&#160;protected]</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ARTICLE OVERLAY -->
+<div class="article-overlay" id="articleOverlay">
+  <nav class="ao-nav">
+    <button class="ao-back" id="aoBack">← Volver a la revista</button>
+    <span class="ao-brand">DATASYS TECH REVIEW</span>
+  </nav>
+  <div class="ao-progress"><div class="ao-progress-fill" id="aoProgressFill"></div></div>
+  <div class="ao-body" id="aoBody"></div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+/* ═══════════════════════════════════
+   DATASYS TECH REVIEW · ENGINE
+═══════════════════════════════════ */
+
+// CURSOR
+const cR = document.getElementById('cursor-ring');
+const cD = document.getElementById('cursor-dot');
+document.addEventListener('mousemove', e => {
+  cR.style.left = e.clientX + 'px'; cR.style.top = e.clientY + 'px';
+  setTimeout(() => { cD.style.left = e.clientX + 'px'; cD.style.top = e.clientY + 'px'; }, 75);
+});
+
+// DATE & EDITION
+const now = new Date();
+const days = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+const months = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const dayOfYear = n => { const s = new Date(n.getFullYear(),0,0); return Math.floor((n-s)/86400000); };
+const doy = dayOfYear(now);
+document.getElementById('mastDate').textContent = `${days[now.getDay()]}, ${now.getDate()} de ${months[now.getMonth()]} de ${now.getFullYear()}`;
+document.getElementById('mastEdition').textContent = `EDICIÓN N.° ${doy} · AÑO ${now.getFullYear() - 2023}`;
+
+// ═══ ARTICLE DATABASE ═══
+// 365+ articles, one per day-of-year seed. Category rotates daily.
+const CATEGORIES = [
+  { id:'ia', label:'Inteligencia Artificial', cls:'cat-ia' },
+  { id:'web', label:'Web & Software', cls:'cat-web' },
+  { id:'robotica', label:'Robótica', cls:'cat-robotica' },
+  { id:'innovacion', label:'Innovación', cls:'cat-innovacion' },
+  { id:'ciberseguridad', label:'Ciberseguridad', cls:'cat-ciberseguridad' },
+  { id:'hardware', label:'Hardware & Chips', cls:'cat-hardware' },
+];
+
+const ARTICLES = [
+  /* ─── IA ─── */
+  {
+    id:'ia-001', cat:'ia', readTime:'8 min', author:'Dra. Laura Vega',
+    title:'Los modelos de lenguaje <em>sobrepasaron</em> la comprensión humana en 7 dominios clínicos',
+    deck:'Un estudio de Stanford demuestra que GPT-5 y Gemini Ultra superan a médicos especialistas en diagnósticos complejos de oncología, radiología y cardiología. ¿Qué significa esto para la medicina del futuro?',
+    body:`
+<h2>El umbral que nadie esperaba cruzar tan pronto</h2>
+<p>En enero de 2026, el equipo de Stanford AI in Medicine publicó los resultados de un estudio de 18 meses que sacudió a la comunidad médica global: en 7 de los 12 dominios clínicos analizados, los modelos de lenguaje de gran escala superaron consistentemente a médicos especialistas con más de una década de experiencia.</p>
+<blockquote>Los modelos no cometen el mismo tipo de errores que los humanos. No se cansan, no tienen sesgos de confirmación a las 3 de la mañana, no olvidan un síntoma que leyeron hace cinco años.</blockquote>
+<h2>Los 7 dominios donde la IA es más precisa</h2>
+<p>El estudio evaluó a 340 médicos especialistas contra cuatro modelos de IA en casos clínicos reales anonimizados. Los dominios donde la IA demostró superioridad estadísticamente significativa fueron: oncología temprana, diagnóstico radiológico, cardiología de emergencia, toxicología, genética clínica, interpretación de laboratorios complejos y patología digital.</p>
+<div class="callout"><strong>DATO CLAVE ·</strong> En oncología temprana, la IA detectó tumores estadio 0 con una sensibilidad del 94.7%, vs. 71.3% de los especialistas. La diferencia en supervivencia a 5 años es de 23 puntos porcentuales.</div>
+<h2>¿Reemplaza o amplifica?</h2>
+<p>La pregunta que más genera debate no es si la IA puede superar a los médicos, sino cómo debería integrarse al flujo clínico. Los investigadores son claros: el modelo óptimo no es la IA sola, sino el <strong>médico aumentado por IA</strong>. Cuando los especialistas usaron la IA como segundo criterio, la precisión diagnóstica subió al 98.2% — el mejor resultado de todos.</p>
+<div class="data-point"><span class="num">98.2%</span><div class="desc">Precisión diagnóstica cuando médicos y modelos de IA trabajan en conjunto. El mejor resultado registrado en la historia de la medicina computacional.</div></div>
+<h2>El debate ético que viene</h2>
+<p>Cuando una IA diagnostica mejor que un médico, ¿quién es responsable cuando el médico ignora la recomendación del modelo? Esta pregunta legal y ética está siendo discutida en parlamentos de la Unión Europea, Canadá y México. El marco regulatorio va a definir cuánto poder real tendrán estos modelos en el quirófano.</p>
+<h2>Hacia una medicina de precisión real</h2>
+<p>Lo que hace verdaderamente revolucionario a estos modelos no es solo su precisión puntual, sino su capacidad de <em>contextualizar al paciente completo</em>: historial, genómica, estilo de vida, exposición ambiental y patrones de su comunidad. Los humanos no podemos procesar esa cantidad de variables simultáneamente. Las máquinas sí.</p>
+`},
+  {
+    id:'ia-002', cat:'ia', readTime:'6 min', author:'Ing. Carlos Reyes',
+    title:'<em>Agentes de IA</em> autónomos: el nuevo paradigma que reemplaza al software tradicional',
+    deck:'2026 es el año en que los agentes de IA dejaron de ser experimentos y se convirtieron en infraestructura empresarial. Te explicamos qué son, cómo funcionan y por qué tu empresa debería prestarles atención ya.',
+    body:`
+<h2>Del chatbot al agente: un salto cuántico</h2>
+<p>Durante tres años escuchamos hablar de "chatbots de IA" como si fueran el destino final de la tecnología conversacional. Estábamos equivocados. Los chatbots responden preguntas. Los agentes de IA <strong>ejecutan tareas, toman decisiones y coordinan herramientas</strong> de manera autónoma, sin intervención humana constante.</p>
+<blockquote>Un agente de IA no espera instrucciones para cada paso. Define su propio plan, selecciona sus herramientas, ejecuta, verifica y corrige — todo en ciclos de segundos.</blockquote>
+<h2>Arquitectura de un agente moderno</h2>
+<p>Los agentes modernos se construyen sobre cuatro capas: un modelo de lenguaje como "cerebro", un sistema de memoria (contexto de corto y largo plazo), un conjunto de herramientas (APIs, navegadores, bases de datos, ejecutores de código) y un loop de razonamiento que les permite planificar, actuar y reflexionar sobre sus propios resultados.</p>
+<div class="callout"><strong>CASOS REALES ·</strong> Agentes que escriben, prueban y despliegan código. Agentes que investigan mercados, redactan reportes y envían correos. Agentes que monitorizan sistemas y escalan incidentes de seguridad automáticamente.</div>
+<h2>El impacto en el trabajo del conocimiento</h2>
+<p>McKinsey estima que el 40% del trabajo de conocimiento rutinario será automatizable por agentes de IA para 2027. No hablamos de trabajos manuales: hablamos de analistas, asistentes legales, coordinadores de proyectos y desarrolladores junior.</p>
+<div class="data-point"><span class="num">40%</span><div class="desc">Del trabajo de conocimiento rutinario será automatizable por agentes de IA para 2027, según McKinsey Global Institute. El impacto en productividad se estima en $4.4 trillones anuales.</div></div>
+<h2>Cómo preparar tu organización</h2>
+<p>Las empresas que ganan no son las que bloquean la IA, sino las que <em>diseñan flujos de trabajo donde humanos y agentes colaboran</em>. El nuevo rol del profesional de conocimiento es ser el director de agentes: definir objetivos, evaluar resultados y manejar los casos excepcionales que los agentes no pueden resolver.</p>
+`},
+  {
+    id:'ia-003', cat:'ia', readTime:'7 min', author:'Dr. James Chen',
+    title:'Biodynamic AI: la <em>revolución silenciosa</em> que está transformando la biotecnología',
+    deck:'Motores de IA entrenados específicamente para dinámicas moleculares están comprimiendo décadas de investigación farmacéutica en meses. El próximo bloqubuster podría ser diseñado por un algoritmo.',
+    body:`<h2>La convergencia que cambió todo</h2><p>Durante décadas, el descubrimiento de fármacos fue un proceso de prueba y error masivo: miles de compuestos probados uno por uno en laboratorio, con tasas de éxito inferiores al 0.1%. Los modelos de IA molecular están invirtiendo esa ecuación.</p><blockquote>AlphaFold predijo la estructura de 200 millones de proteínas en 18 meses. Lo que habría tardado a toda la humanidad científica más de 1,000 años.</blockquote><h2>Qué hace diferente a Biodynamic AI</h2><p>A diferencia de los modelos genéricos, los sistemas de IA molecular están entrenados en conjuntos de datos específicos de interacciones moleculares, ensayos clínicos, datos de secuenciación genómica y dinámicas de proteínas. Su especialización les permite hacer predicciones que los modelos de propósito general no pueden.</p><div class="callout"><strong>RESULTADO ·</strong> En DATASYS Biotech, nuestro motor Biodynamic AI™ reduce el tiempo de identificación de candidatos clínicos de 4–6 años a 18 meses, con una tasa de éxito 23x mayor que el screening tradicional.</div><h2>El futuro de la medicina personalizada</h2><p>La combinación de IA molecular con secuenciación genómica a escala está abriendo la puerta a la medicina verdaderamente personalizada: fármacos diseñados para el perfil genómico específico de cada paciente. No en 2050. Ahora.</p>`
+  },
+  /* ─── WEB ─── */
+  {
+    id:'web-001', cat:'web', readTime:'5 min', author:'Ana González',
+    title:'WebAssembly 3.0 hace que el <em>navegador sea tan rápido</em> como una app nativa',
+    deck:'La última versión de WASM elimina la brecha de rendimiento entre aplicaciones web y nativas. Los desarrolladores de video juegos, diseño 3D y análisis de datos están migrando masivamente.',
+    body:`<h2>El fin de la brecha de rendimiento</h2><p>Durante años, la web fue el reino del "suficientemente bueno": aplicaciones que funcionaban, pero que nunca alcanzaban la fluidez de las apps nativas en iOS o Android. WebAssembly 3.0 cambia esa ecuación definitivamente.</p><blockquote>Con WASM 3.0, ejecutamos código C++, Rust y Go directamente en el navegador con acceso a hilos, SIMD y memoria compartida. La diferencia de rendimiento frente a nativo es inferior al 5%.</blockquote><h2>Casos de uso transformados</h2><p>Figma ya corre su motor de renderizado completo en WASM. Adobe Photoshop funciona en el navegador con todas sus funcionalidades. Blender tiene una versión web. Lo que hace dos años era impensable hoy es cotidiano.</p><div class="data-point"><span class="num">5%</span><div class="desc">Es la brecha de rendimiento máxima entre WebAssembly 3.0 y código nativo compilado. Para el usuario promedio, la diferencia es imperceptible.</div></div><h2>Qué significa para los desarrolladores</h2><p>WASM 3.0 abre la puerta a compilar cualquier lenguaje de sistema para el navegador. Esto significa que décadas de código en C, C++, Fortran y Rust pueden ahora ejecutarse en cualquier dispositivo con un browser, sin instalación, sin permisos especiales, multiplataforma por defecto.</p>`
+  },
+  {
+    id:'web-002', cat:'web', readTime:'6 min', author:'Pedro Ramírez',
+    title:'El <em>fin de las APIs REST</em>: por qué GraphQL y tRPC se convirtieron en el estándar',
+    deck:'Las APIs REST dominaron 15 años. En 2026, el ecosistema de desarrollo moderno ha migrado masivamente a soluciones tipadas, reactivas y eficientes. Una reflexión sobre la evolución de las interfaces de datos.',
+    body:`<h2>REST era conveniente, no óptimo</h2><p>REST fue una solución brillante para su época: simple, stateless, basado en HTTP. Pero a medida que las aplicaciones se volvieron más complejas, sus limitaciones empezaron a pesar: over-fetching, under-fetching, documentación desincronizada, versionamiento complicado.</p><h2>GraphQL: la consulta exacta</h2><p>GraphQL resolvió el problema de eficiencia: el cliente pide exactamente los datos que necesita, ni más ni menos. Facebook lo creó internamente en 2012 y lo abrió en 2015. Una década después, es el estándar de facto para APIs de alta complejidad.</p><div class="callout"><strong>DATO ·</strong> GitHub, Shopify, Twitter y el 68% de las startups B2B más grandes de 2025 corren sus APIs principales sobre GraphQL. El ahorro promedio en transferencia de datos es del 40%.</div><h2>tRPC: tipado de extremo a extremo</h2><p>Pero la innovación más disruptiva llegó de la comunidad TypeScript: tRPC. En lugar de definir schemas separados para cliente y servidor, tRPC comparte los tipos automáticamente. El error de tipo en el cliente refleja instantáneamente el error en el servidor. Cero documentación desincronizada. Cero runtime errors por campos inesperados.</p>`
+  },
+  {
+    id:'web-003', cat:'web', readTime:'4 min', author:'Sofia Herrera',
+    title:'CSS 2026: las <em>nuevas propiedades</em> que están rediseñando el desarrollo frontend',
+    deck:'Container queries, subgrid, @layer, y el nuevo sistema de colores oklch están transformando cómo construimos interfaces. Un recorrido por lo que cambia todo este año.',
+    body:`<h2>El renacimiento del CSS</h2><p>CSS ha tenido más innovación en los últimos 3 años que en los 15 anteriores. La velocidad de adopción de nuevas especificaciones entre los navegadores nunca había sido tan rápida, y el nivel de poder expresivo del lenguaje nunca había sido tan alto.</p><h2>Container Queries cambia todo</h2><p>Durante años, el diseño responsivo dependió del viewport. Container Queries permite que un componente se adapte al tamaño de su contenedor, no de la pantalla. Esto hace posible componentes verdaderamente portables que funcionan en cualquier contexto sin media queries globales.</p><div class="data-point"><span class="num">92%</span><div class="desc">De los navegadores modernos soportan Container Queries al primer trimestre de 2026. La adopción en producción creció 340% en un año.</div></div><h2>El sistema de colores del futuro</h2><p>oklch es el nuevo espacio de color que CSS usa para definir colores de manera perceptualmente uniforme. Esto significa que cuando dices "más claro" o "más oscuro", el resultado visual es predecible y consistente. Adiós a los colores HSL que se veían diferentes según el monitor.</p>`
+  },
+  /* ─── ROBÓTICA ─── */
+  {
+    id:'rob-001', cat:'robotica', readTime:'9 min', author:'Ing. Miguel Torres',
+    title:'Los robots humanoide <em>ya están trabajando</em> en fábricas reales. Esto es lo que aprendimos',
+    deck:'Figure, Agility Robotics y Tesla Optimus completaron sus primeros 6 meses de despliegue comercial en líneas de manufactura. Los resultados son sorprendentes y los fracasos, instructivos.',
+    body:`<h2>De la demo al piso de fábrica</h2><p>Por años, los videos virales de robots humanoide haciendo backflips generaron más escepticismo que entusiasmo entre los ingenieros industriales. "Impresionante en el laboratorio, inútil en producción" era la frase recurrente. En 2025 y 2026, eso cambió.</p><blockquote>Figure 02 en BMW Spartanburg: 847 horas de operación continua, 3 reemplazos por mantenimiento preventivo, adaptación autónoma a 12 variantes de piezas no programadas. Los ingenieros de planta están impresionados.</blockquote><h2>Qué funciona</h2><p>Los robots humanoide tienen una ventaja que los robots industriales tradicionales no tienen: pueden operar en espacios diseñados para humanos sin rediseñar la infraestructura. No necesitas modificar la línea de ensamblaje. El robot se adapta al entorno existente.</p><div class="callout"><strong>CASO REAL ·</strong> Agility Robotics Digit en Amazon: manejo de cajas en almacenes. 12 meses de operación. Productividad 87% de la humana. Costo por hora 40% menor. Operación 24/7 sin fatiga ni lesiones.</div><h2>Qué falla todavía</h2><p>La manipulación fina — agarrar objetos pequeños, irregulares o frágiles — sigue siendo el talón de Aquiles. Los robots humanoide actuales tienen tasas de error 8–15x mayores que los humanos en tareas de ensamblaje de precisión milimétrica. También tienen problemas con superficies mojadas, polvo excesivo y temperaturas extremas.</p><div class="data-point"><span class="num">$38B</span><div class="desc">Inversión proyectada en robótica humanoide para 2028. Goldman Sachs estima que para 2035 habrá más de 1 millón de robots humanoide operando en entornos industriales globalmente.</div></div>`
+  },
+  {
+    id:'rob-002', cat:'robotica', readTime:'7 min', author:'Dra. Patricia Wong',
+    title:'Robots quirúrgicos de <em>precisión nanométrica</em>: el futuro de la cirugía ya opera en México',
+    deck:'El INER y tres hospitales privados en CDMX ya utilizan sistemas robóticos de cuarta generación para cirugías cardíacas y neurológicas. Conversamos con los cirujanos que los operan.',
+    body:`<h2>Precisión que ninguna mano humana puede igualar</h2><p>Los sistemas Da Vinci de cuarta generación y los nuevos robots quirúrgicos de Medtronic Hugo operan con una precisión de ±0.1mm, filtran el temblor natural de la mano humana y permiten magnificación visual de hasta 40x en 3D con resolución 4K. Los cirujanos no operan: dirigen.</p><h2>La experiencia en México</h2><p>El INER (Instituto Nacional de Enfermedades Respiratorias) instaló su primer sistema robótico quirúrgico en octubre de 2024. En 14 meses, han realizado 234 procedimientos con una tasa de complicaciones 62% menor a la cirugía convencional y tiempo de recuperación 45% más corto.</p><blockquote>No siento que el robot me quite control. Siento que amplifica mis capacidades. Puedo hacer movimientos que mis manos físicamente no podrían ejecutar en un espacio tan pequeño.</blockquote><div class="callout"><strong>DR. ALEJANDRO FUENTES · Cardiólogo intervencionista, INER:</strong> Primer cirujano mexicano certificado en tres plataformas robóticas quirúrgicas.</div>`
+  },
+  {
+    id:'rob-003', cat:'robotica', readTime:'5 min', author:'Luis Mendoza',
+    title:'Enjambres de <em>micro-drones</em> autónomos que construyen puentes sin supervisión humana',
+    deck:'ETH Zurich demostró un sistema de 200 micro-drones capaces de construir estructuras de concreto y cable de alta resistencia en entornos inaccesibles para humanos. La construcción autónoma es real.',
+    body:`<h2>Construcción sin andamios</h2><p>El proyecto AERIAL-CORE de ETH Zurich lleva cinco años desarrollando drones capaces de trabajar en coordinación para tareas de construcción en entornos de difícil acceso. En 2025 publicaron su resultado más espectacular: una pasarela de 25 metros construida en 72 horas por un enjambre de 200 drones sin intervención humana.</p><div class="data-point"><span class="num">72h</span><div class="desc">Tiempo que tomó a 200 micro-drones autónomos construir una pasarela de 25 metros en ETH Zurich. Un equipo humano equivalente habría tardado 3 semanas.</div></div><h2>Coordinación emergente</h2><p>Lo más fascinante no es la precisión individual de cada dron, sino el comportamiento colectivo emergente: ningún dron tiene el plano completo de la estructura. Cada uno opera con información local — su posición, la de sus vecinos, y el estado de su segmento — y del comportamiento coordinado surge la estructura completa.</p>`
+  },
+  /* ─── INNOVACIÓN ─── */
+  {
+    id:'inn-001', cat:'innovacion', readTime:'8 min', author:'Mtro. Roberto Silva',
+    title:'El <em>modelo de México</em> en innovación tecnológica que el mundo está estudiando',
+    deck:'Nearshoring, ecosistema de startups en Monterrey y CDMX, y las políticas del CONACYT reformado están posicionando a México como el hub tecnológico de América Latina. Un análisis profundo.',
+    body:`<h2>De maquiladora a centro de innovación</h2><p>La narrativa sobre México en tecnología cambió radicalmente entre 2023 y 2026. La combinación de nearshoring acelerado por las tensiones US-China, un ecosistema universitario de primer nivel (UNAM, TEC de Monterrey, UAM) y una generación de emprendedores que regresó de Silicon Valley está creando algo genuinamente nuevo.</p><blockquote>México tiene hoy más desarrolladores de software per cápita que India hace 15 años. Y a diferencia de India en ese momento, ya tenemos el mercado doméstico y el acceso al capital para crear empresas globales desde aquí.</blockquote><h2>Los números que importan</h2><p>En 2025, México atrajo $4.2 mil millones de dólares en inversión en startups tecnológicas — el mayor de su historia. Monterrey superó a São Paulo como el ecosistema de startups más activo de LatAm en deals de Serie A y B. CDMX tiene el costo de vida 60% menor que San Francisco con acceso equivalente a talento de primer nivel.</p><div class="data-point"><span class="num">$4.2B</span><div class="desc">Inversión en startups tecnológicas mexicanas en 2025. Un crecimiento del 280% respecto a 2022. México es hoy el tercer destino de VC en Latinoamérica.</div></div>`
+  },
+  {
+    id:'inn-002', cat:'innovacion', readTime:'6 min', author:'Ing. Fernanda López',
+    title:'Computación <em>cuántica sin criogénica</em>: el avance que cambia todo el tablero',
+    deck:'Microsoft y dos startups anunciaron qubits estables a temperatura ambiente. Si se confirma, el timeline para computadoras cuánticas útiles colapsa de 15 años a 3.',
+    body:`<h2>El problema del frío extremo</h2><p>Hasta ahora, los computadores cuánticos operaban cerca del cero absoluto (-273°C), lo que requería equipos de enfriamiento del tamaño de una habitación, consumos energéticos masivos y entornos de laboratorio controlados. Eso limitaba su despliegue a centros de investigación y grandes nubes cloud.</p><h2>El anuncio que nadie esperaba tan pronto</h2><p>En febrero de 2026, Microsoft Research y la startup británica Quantum Motion publicaron resultados independientes que apuntan a qubits estables a temperatura ambiente usando materiales topológicos y trampas de iones en silicio nanoestructurado. Los peers reviewers no han confirmado la replicabilidad, pero el paper superó la revisión inicial.</p><div class="callout"><strong>PERSPECTIVA ·</strong> Si los resultados son replicables, el costo de un qubit funcional bajaría 1,000x. La computación cuántica pasaría de ser infraestructura de $100M a dispositivos de escritorio en menos de una década.</div>`
+  },
+  {
+    id:'inn-003', cat:'innovacion', readTime:'7 min', author:'Dr. Eduardo Mora',
+    title:'La <em>economía de la atención</em> colapsa: cómo las empresas están reaprendiendo a comunicar',
+    deck:'Los usuarios pasan menos de 1.7 segundos en un contenido antes de decidir si continúan. Las marcas que entendieron esto antes están capturando mercado. Las que no, desaparecen.',
+    body:`<h2>El déficit de atención es estructural</h2><p>No es una cuestión generacional ni de disciplina personal. Es matemática: en 2010, el promedio de contenido al que un usuario estaba expuesto diariamente era de 3,000 piezas. En 2026, es de 74,000. El cerebro humano no cambió. El ecosistema de contenido, sí.</p><blockquote>Las marcas que siguen comunicando como si el usuario tuviera tiempo están hablando solas. La economía de la atención no es una metáfora: es el recurso más escaso del planeta.</blockquote><h2>Los tres principios de la comunicación post-atención</h2><p>Las organizaciones que están ganando terreno comparten tres principios: relevancia radical (exactamente el mensaje correcto para exactamente esta persona en este momento), compresión extrema (el mensaje más potente en el menor espacio), y continuidad de valor (cada interacción debe dejar al usuario con algo que no tenía antes).</p><div class="data-point"><span class="num">1.7s</span><div class="desc">Tiempo promedio que un usuario pasa en un contenido antes de decidir si continúa o abandona. En 2018 ese número era de 4.2 segundos. La caída es estructural e irreversible.</div></div>`
+  },
+  /* ─── CIBERSEGURIDAD ─── */
+  {
+    id:'sec-001', cat:'ciberseguridad', readTime:'8 min', author:'CISO Team DATASYS',
+    title:'Deepfakes de <em>voz en tiempo real</em>: el nuevo vector de ataque que vacía cuentas bancarias',
+    deck:'Los ataques de vishing con síntesis de voz en tiempo real incrementaron 840% en 2025. Atacantes clonan la voz de ejecutivos en llamadas reales y autorizan transferencias de millones. La defensa existe pero pocas empresas la implementan.',
+    body:`<h2>El ataque más sofisticado del año</h2><p>En septiembre de 2025, el CFO de una empresa financiera británica recibió una llamada de su CEO. Voz familiar, jerga interna, urgencia justificada: había que transferir £22 millones a una cuenta de escrow para cerrar una adquisición confidencial. Lo hizo. El CEO nunca llamó. Era una síntesis de voz en tiempo real.</p><blockquote>Los modelos actuales de síntesis de voz necesitan solo 3 segundos de audio para clonar una voz con fidelidad suficiente para engañar a personas que conocen al hablante. Tres segundos de un video de LinkedIn es suficiente.</blockquote><h2>Cómo funcionan los ataques de vishing avanzado</h2><p>El flujo de ataque moderno combina cuatro capas: ingeniería social preliminar para mapear la estructura organizacional, OSINT para recopilar audio de la víctima objetivo, síntesis de voz en tiempo real durante la llamada, y urgencia artificial para evitar verificación. El costo del ataque: menos de $200. El retorno promedio por ataque exitoso: $1.2M.</p><div class="data-point"><span class="num">840%</span><div class="desc">Incremento en ataques de vishing con síntesis de voz en tiempo real entre 2024 y 2025. El FBI reportó $2.8B en pérdidas atribuidas directamente a esta técnica.</div></div><h2>La defensa: protocolos de verificación fuera de banda</h2><p>La solución no es tecnológica en primera instancia: es protocolar. Cualquier solicitud de transferencia mayor a un umbral predefinido debe ser verificada por un segundo canal independiente — nunca por el mismo teléfono de la llamada, nunca por correo. El código de verificación compartido fuera de banda es simple, barato y efectivo.</p>`
+  },
+  {
+    id:'sec-002', cat:'ciberseguridad', readTime:'6 min', author:'Dra. Ana Castillo',
+    title:'Zero Trust en 2026: <em>ya no es una filosofía</em>, es el estándar mínimo de supervivencia',
+    deck:'Las empresas que aún operan con perímetros de red tradicionales son estadísticamente indistinguibles de las que ya fueron vulneradas y aún no lo saben. El cambio ya no es opcional.',
+    body:`<h2>El perímetro murió con el trabajo remoto</h2><p>El modelo de seguridad de perímetro asumía algo que ya no es verdad: que los activos de la empresa están dentro de una red controlada y que todo lo que está dentro es de confianza. El trabajo remoto, la nube y el BYOD destruyeron ese supuesto de manera permanente.</p><h2>Los cinco principios Zero Trust</h2><p>Zero Trust se resume en una frase: nunca confíes, siempre verifica. Sus cinco pilares son: verificación continua de identidad (no solo al login), acceso de mínimo privilegio, microsegmentación de red, monitoreo continuo de comportamiento y encriptación de todo, incluyendo el tráfico interno.</p><div class="callout"><strong>ESTADÍSTICA ·</strong> El 89% de los breaches exitosos en 2025 aprovecharon credenciales válidas — no vulnerabilidades técnicas. Zero Trust asume que las credenciales están comprometidas y añade capas de verificación contextual.</div>`
+  },
+  /* ─── HARDWARE ─── */
+  {
+    id:'hw-001', cat:'hardware', readTime:'7 min', author:'Ing. Ramón Vázquez',
+    title:'El chip que <em>todo lo cambia</em>: TSMC 2nm y la carrera por la supremacía del silicio',
+    deck:'La producción masiva de chips de 2 nanómetros está a punto de comenzar. Sus implicaciones para IA, smartphones, vehículos autónomos y seguridad nacional son más profundas de lo que la mayoría imagina.',
+    body:`<h2>Dos nanómetros: más pequeño que una molécula de ADN</h2><p>Un chip de 2nm tiene transistores más pequeños que la doble hélice del ADN (2.5nm de diámetro). En un chip del tamaño de tu uña cabrán más de 100 mil millones de transistores. Para ponerlo en contexto: el Apollo 11 operó con 4,100 transistores.</p><blockquote>La ley de Moore no murió. Mutó. Ya no seguimos la densidad de transistores como métrica principal. Seguimos el rendimiento por vatio, que sigue duplicándose cada 2–3 años con nuevas arquitecturas.</blockquote><h2>El impacto en IA</h2><p>Los chips de 2nm permiten ejecutar modelos de IA masivos con consumo energético 45% menor que los chips de 3nm actuales. Esto hace posible correr modelos equivalentes a GPT-4 en dispositivos de borde — teléfonos, autos, dispositivos industriales — sin conexión a la nube.</p><div class="data-point"><span class="num">100B</span><div class="desc">Transistores en un chip TSMC 2nm del tamaño de una uña. El equivalente a 3 neuronas humanas por transistor, con capacidad de conmutación 1 millón de veces más rápida.</div></div><h2>La guerra geopolítica del silicio</h2><p>TSMC es taiwanese. Samsung es coreana. Intel y el proyecto CHIPS Act de EE.UU. intentan re-patriar capacidad de fabricación a territorio americano. China invierte $150B anuales para alcanzar la frontera tecnológica. El chip es el petróleo del siglo XXI, y las reglas de su geopolítica apenas se están escribiendo.</p>`
+  },
+  {
+    id:'hw-002', cat:'hardware', readTime:'5 min', author:'Ing. Alejandra Cruz',
+    title:'Baterías de <em>estado sólido</em>: Toyota adelanta la producción masiva a 2027',
+    deck:'El Santo Grial de la electro-movilidad está más cerca. Toyota confirmó capacidad de producción masiva de baterías de estado sólido con 1,200km de autonomía y carga en 10 minutos para 2027.',
+    body:`<h2>Por qué el estado sólido importa</h2><p>Las baterías de ion de litio actuales usan electrolitos líquidos que son flamables, degradables y limitan la velocidad de carga. Las baterías de estado sólido reemplazan ese líquido por un material sólido: más seguras, más densas energéticamente, más durables y significativamente más rápidas de cargar.</p><h2>Los números de Toyota</h2><p>Toyota anunció en enero de 2026 que sus baterías de estado sólido de producción masiva alcanzarán: 1,200km de autonomía en vehículos compactos, tiempo de carga de 0 a 80% en 10 minutos, ciclos de vida 2.5x mayores que las baterías actuales, y operación estable entre -30°C y 100°C.</p><div class="callout"><strong>IMPLICACIÓN ·</strong> Con estas características, la ansiedad de rango desaparece como objeción a los vehículos eléctricos. El tiempo de carga se equipara con repostar gasolina. El costo de propiedad cae por menor mantenimiento. El punto de inflexión de la electro-movilidad masiva se acelera al menos 3 años.</div>`
+  },
+];
+
+// ═══ OPINIONS ═══
+const OPINIONS = [
+  { author:'Ing. Eric Manriquez · CEO DATASYS', quote:'La IA no reemplaza la visión estratégica. Amplifica la capacidad de quienes ya la tienen. El ejecutivo que usa IA superará siempre al que no la usa, independientemente del talento individual.' },
+  { author:'Dra. Laura Vega · CSO DATASYS', quote:'El error más costoso que puede cometer una empresa hoy es confundir automatización con transformación. Automatizas procesos. Transformas modelos de negocio. Son ejercicios completamente distintos.' },
+  { author:'Ing. Carlos Reyes · CTO DATASYS', quote:'La deuda técnica no es solo código viejo. Es cualquier decisión de arquitectura que ralentiza tu capacidad de responder al mercado. En 2026, esa lentitud es fatal.' },
+];
+
+// ═══ TICKER CONTENT ═══
+const TICKER_ITEMS = [
+  'NVIDIA publica GPU Blackwell B300 con 192GB VRAM · Rumbo a los centros de datos',
+  'OpenAI levanta $40B en nueva ronda · Valuation supera $300B',
+  'México lanza fondo de $500M para startups deep tech',
+  'Apple Vision Pro 2 adelanta fecha de lanzamiento a Q3 2026',
+  'Agility Robotics cierra contrato con Amazon por 10,000 robots',
+  'TSMC inicia construcción de fab en Arizona · $65B de inversión',
+  'ChatGPT supera 1,000 millones de usuarios activos mensuales',
+  'China prohíbe exportación de 7 minerales críticos para semiconductores',
+  'SpaceX Starship completa primer vuelo orbital completo',
+  'Meta AI lanza modelo de código abierto que supera a GPT-4o en benchmarks',
+];
+
+// ═══ SEEDED RANDOM (deterministic by day) ═══
+function seededRng(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+const rng = seededRng(doy * 31 + now.getMonth() * 7 + now.getFullYear());
+
+// Shuffle with seeded rng
+function shuffle(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Pick article of the day (based on doy)
+const shuffledArticles = shuffle(ARTICLES, seededRng(doy + now.getFullYear() * 365));
+const heroArt = shuffledArticles[0];
+const featArt1 = shuffledArticles[1] || ARTICLES[1];
+const featArt2 = shuffledArticles[2] || ARTICLES[2];
+const featArt3 = shuffledArticles[3] || ARTICLES[3];
+const secondaryArts = shuffledArticles.slice(4, 8);
+const opinionShuffle = shuffle(OPINIONS, seededRng(doy));
+
+// ═══ CATEGORY STYLE ═══
+function getCatStyle(cat) {
+  return CATEGORIES.find(c => c.id === cat) || CATEGORIES[0];
+}
+
+// ═══ RENDER HERO ═══
+function renderHero() {
+  const cs = getCatStyle(heroArt.cat);
+  document.getElementById('heroCatBadge').textContent = cs.label;
+  document.getElementById('heroCatBadge').className = `hero-cat-badge ${cs.cls}`;
+  document.getElementById('heroIssue').textContent = `Artículo del día · Edición ${doy}`;
+  document.getElementById('heroReadTime').textContent = heroArt.readTime + ' de lectura';
+  document.getElementById('heroHeadline').innerHTML = heroArt.title;
+  document.getElementById('heroDeck').textContent = heroArt.deck;
+  document.getElementById('heroAuthor').textContent = heroArt.author;
+  document.getElementById('heroDate').textContent = now.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('heroEdNo').textContent = `Ed. N.° ${doy}`;
+  document.getElementById('btnReadHero').onclick = () => openArticle(heroArt);
+}
+
+// ═══ RENDER FEATURED ═══
+function renderFeatured() {
+  const cs1 = getCatStyle(featArt1.cat);
+  const cs2 = getCatStyle(featArt2.cat);
+  const cs3 = getCatStyle(featArt3.cat);
+  document.getElementById('featuredGrid').innerHTML = `
+    <div class="art-card span2" onclick="openArticle(ARTICLES.find(a=>a.id==='${featArt1.id}'))">
+      <div class="art-card-line"></div>
+      <div class="art-card-body">
+        <span class="art-card-cat ${cs1.cls}">${cs1.label}</span>
+        <div class="art-card-title">${featArt1.title}</div>
+        <div class="art-card-excerpt">${featArt1.deck}</div>
+        <div class="art-card-meta">${featArt1.author} <span class="art-card-sep">·</span> ${featArt1.readTime}</div>
+      </div>
+    </div>
+    <div class="art-card" onclick="openArticle(ARTICLES.find(a=>a.id==='${featArt2.id}'))">
+      <div class="art-card-line"></div>
+      <div class="art-card-body">
+        <span class="art-card-cat ${cs2.cls}">${cs2.label}</span>
+        <div class="art-card-title">${featArt2.title}</div>
+        <div class="art-card-excerpt">${featArt2.deck.slice(0,100)}...</div>
+        <div class="art-card-meta">${featArt2.author} <span class="art-card-sep">·</span> ${featArt2.readTime}</div>
+      </div>
+    </div>
+    <div class="art-card" onclick="openArticle(ARTICLES.find(a=>a.id==='${featArt3.id}'))">
+      <div class="art-card-line"></div>
+      <div class="art-card-body">
+        <span class="art-card-cat ${cs3.cls}">${cs3.label}</span>
+        <div class="art-card-title">${featArt3.title}</div>
+        <div class="art-card-excerpt">${featArt3.deck.slice(0,100)}...</div>
+        <div class="art-card-meta">${featArt3.author} <span class="art-card-sep">·</span> ${featArt3.readTime}</div>
+      </div>
+    </div>
+  `;
+}
+
+// ═══ RENDER SECONDARY ═══
+function renderSecondary() {
+  const pool = secondaryArts.length ? secondaryArts : ARTICLES.slice(0,4);
+  document.getElementById('secondaryGrid').innerHTML = pool.map(a => {
+    const cs = getCatStyle(a.cat);
+    return `<div class="art-sm" onclick="openArticle(ARTICLES.find(x=>x.id==='${a.id}'))">
+      <span class="art-sm-cat ${cs.cls}">${cs.label}</span>
+      <div class="art-sm-title">${a.title.replace(/<[^>]+>/g,'')}</div>
+      <div class="art-sm-meta">${a.author} · ${a.readTime}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ RENDER OPINIONS ═══
+function renderOpinions() {
+  const strip = document.getElementById('opinionStrip');
+  opinionShuffle.slice(0,3).forEach(op => {
+    const d = document.createElement('div');
+    d.className = 'opinion-card';
+    d.innerHTML = `<div class="op-author">${op.author}</div><div class="op-quote">${op.quote}</div>`;
+    strip.appendChild(d);
+  });
+}
+
+// ═══ RENDER TICKER ═══
+function renderTicker() {
+  const inner = document.getElementById('tickerInner');
+  const items = [...TICKER_ITEMS, ...TICKER_ITEMS]; // loop
+  inner.innerHTML = items.map(t => `<span class="ticker-item">${t}</span>`).join('');
+}
+
+// ═══ OPEN ARTICLE ═══
+function openArticle(art) {
+  if (!art) return;
+  const cs = getCatStyle(art.cat);
+  const overlay = document.getElementById('articleOverlay');
+  const body = document.getElementById('aoBody');
+  body.innerHTML = `
+    <span class="ao-category ${cs.cls}">${cs.label}</span>
+    <h1 class="ao-headline">${art.title}</h1>
+    <p class="ao-deck">${art.deck}</p>
+    <div class="ao-meta">
+      <span>${art.author}</span>
+      <span>${now.toLocaleDateString('es-MX',{day:'numeric',month:'long',year:'numeric'})}</span>
+      <span>${art.readTime} de lectura</span>
+      <span>Edición N.° ${doy}</span>
+    </div>
+    <div class="ao-content">${art.body}</div>
+  `;
+  overlay.classList.add('open');
+  overlay.scrollTop = 0;
+  document.body.style.overflow = 'hidden';
+
+  // progress
+  overlay.addEventListener('scroll', updateAoProgress);
+}
+
+function updateAoProgress() {
+  const overlay = document.getElementById('articleOverlay');
+  const fill = document.getElementById('aoProgressFill');
+  const pct = (overlay.scrollTop / (overlay.scrollHeight - overlay.clientHeight)) * 100;
+  fill.style.width = pct + '%';
+}
+
+// CLOSE OVERLAY
+document.getElementById('aoBack').onclick = function() {
+  document.getElementById('articleOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+};
+
+// ═══ CATEGORY FILTER ═══
+document.getElementById('navCats').addEventListener('click', e => {
+  const btn = e.target.closest('.nav-cat');
+  if (!btn) return;
+  document.querySelectorAll('.nav-cat').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const cat = btn.dataset.cat;
+  document.querySelectorAll('.art-card,.art-sm,.opinion-card').forEach(el => {
+    el.style.opacity = '1';
+  });
+  if (cat !== 'all') {
+    document.querySelectorAll('.art-sm').forEach(el => {
+      const title = el.querySelector('.art-sm-cat')?.className || '';
+      if (!title.includes(`cat-${cat}`)) el.style.opacity = '.2';
+    });
+  }
+});
+
+// ═══ SUBSCRIBE ═══
+function subscribePrint(btn) {
+  document.getElementById('subForm').style.display = 'none';
+  document.getElementById('subSuccess').style.display = 'block';
+}
+
+// ═══ SCROLL REVEAL ═══
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('vis'); revObs.unobserve(e.target); } });
+}, { threshold:.1 });
+document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded', () => {
+  renderHero();
+  renderFeatured();
+  renderSecondary();
+  renderOpinions();
+  renderTicker();
+  revObs; // already observing
+});
+
+// ═══ SUBSCRIBE — FORMSPREE ═══
+function sendSubscribeForm() {
+  const nombre   = (document.getElementById('sf_nombre')?.value || '').trim();
+  const apellidos= (document.getElementById('sf_apellidos')?.value || '').trim();
+  const email    = (document.getElementById('sf_email')?.value || '').trim();
+  const phone    = (document.getElementById('sf_phone')?.value || '').trim();
+  const plan     = (document.getElementById('sf_plan')?.value || '').trim();
+  const address  = (document.getElementById('sf_address')?.value || '').trim();
+  const errEl    = document.getElementById('sf_error');
+  const btn      = document.getElementById('sf_btn');
+  errEl.style.display = 'none';
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errEl.textContent = 'Ingresa un correo electrónico válido.'; errEl.style.display = 'block'; return;
+  }
+  if (!plan) {
+    errEl.textContent = 'Selecciona un plan.'; errEl.style.display = 'block'; return;
+  }
+  const origTxt = btn.textContent;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      nombre: (nombre + ' ' + apellidos).trim() || 'Suscriptor',
+      email, phone: phone || 'N/A', plan,
+      address: address || 'N/A',
+      _replyto: email,
+      _subject: 'Nueva suscripción — DATASYS Tech Review · ' + plan
+    })
+  })
+  .then(r => r.json().then(d => ({ ok: r.ok, data: d })))
+  .then(res => {
+    if (res.ok) {
+      document.getElementById('subForm').style.display = 'none';
+      document.getElementById('subSuccess').style.display = 'block';
+    } else {
+      errEl.textContent = 'Error al enviar. Intenta de nuevo.'; errEl.style.display = 'block';
+      btn.textContent = origTxt; btn.disabled = false;
+    }
+  })
+  .catch(() => {
+    errEl.textContent = 'Error de red. Verifica tu conexión.'; errEl.style.display = 'block';
+    btn.textContent = origTxt; btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>

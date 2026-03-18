@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+  <!-- ═══ PWA ═══ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CFE·SICL">
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+  <meta name="msapplication-TileColor" content="#060a06">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CFE·SICL — Recepción</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #060c09;
+    --surface: #0b1510;
+    --card: #0e1c14;
+    --border: #1a2e20;
+    --accent: #00e5a0;
+    --accent2: #0099ff;
+    --warn: #ff9500;
+    --danger: #ff3355;
+    --text: #d5ede3;
+    --muted: #4a7a60;
+    --grid: rgba(0,229,160,0.04);
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--black);
+    color:var(--text);
+    font-family:'IBM Plex Sans', sans-serif;
+    min-height:100vh;
+  }
+  body::before {
+    content:''; position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none; z-index:0;
+  }
+
+  header {
+    position:sticky; top:0; z-index:100;
+    background:rgba(6,12,9,0.96); backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    padding:0 2rem; display:flex; align-items:center; justify-content:space-between; height:64px;
+  }
+  .logo { font-family:'Bebas Neue',cursive; font-size:1.8rem; letter-spacing:4px; color:var(--accent); }
+  .logo span { color:var(--text); }
+  .logo .cfe { color:#ffe033; }
+  .badge { background:var(--accent); color:var(--black); font-family:'IBM Plex Mono',monospace; font-size:0.65rem; font-weight:600; padding:3px 10px; letter-spacing:2px; }
+  .nav-link { padding:6px 14px; font-size:0.75rem; font-weight:500; letter-spacing:1px; text-transform:uppercase; color:var(--muted); text-decoration:none; border:1px solid transparent; transition:all 0.2s; }
+  .nav-link:hover { color:var(--accent); border-color:var(--accent); }
+
+  /* RPE + ZONA BAR */
+  #infoBar {
+    background:rgba(6,12,9,0.97); border-bottom:1px solid var(--border);
+    padding:0.75rem 2rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;
+    font-family:'IBM Plex Mono',monospace; font-size:0.65rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted);
+    position:sticky; top:64px; z-index:90;
+  }
+  .bar-input {
+    background:var(--surface); border:1px solid var(--border); color:var(--accent);
+    padding:0.35rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.85rem;
+    outline:none; width:160px;
+  }
+  .bar-input:focus { border-color:var(--accent); }
+  .zone-select {
+    background:var(--surface); border:1px solid var(--border); color:var(--accent);
+    padding:0.35rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.82rem;
+    outline:none; cursor:pointer;
+  }
+  .zone-select option { background:var(--surface); }
+  .divider { width:1px; height:20px; background:var(--border); }
+
+  main { position:relative; z-index:1; max-width:1100px; margin:0 auto; padding:2rem; display:flex; flex-direction:column; gap:1.5rem; }
+
+  .section { background:var(--card); border:1px solid var(--border); padding:1.5rem; position:relative; overflow:hidden; }
+  .section::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); }
+  .section-title { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; font-weight:600; letter-spacing:3px; text-transform:uppercase; color:var(--accent); margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem; }
+  .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+  /* ORDER CARDS */
+  .orders-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr)); gap:1rem; }
+  .order-card {
+    background:var(--surface); border:1px solid var(--border);
+    padding:1.25rem; position:relative; transition:border-color 0.2s, box-shadow 0.2s;
+  }
+  .order-card:hover { border-color:var(--accent); box-shadow:0 0 20px rgba(0,229,160,0.06); }
+  .order-id { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--accent2); font-weight:600; letter-spacing:1px; }
+  .order-date { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:var(--muted); }
+
+  .chip { display:inline-block; padding:2px 10px; font-family:'IBM Plex Mono',monospace; font-size:0.62rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; }
+  .chip-transit { background:rgba(255,149,0,0.15); color:var(--warn); }
+  .chip-done    { background:rgba(0,229,160,0.12); color:var(--accent); }
+  .chip-partial { background:rgba(0,153,255,0.12); color:var(--accent2); }
+
+  .info-label { color:var(--muted); font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; font-family:'IBM Plex Mono',monospace; margin-bottom:0.3rem; }
+  .info-value { font-family:'IBM Plex Mono',monospace; font-size:0.85rem; }
+
+  .zones-row { display:flex; flex-wrap:wrap; gap:0.4rem; margin:0.5rem 0 0.75rem; }
+  .zone-tag { padding:3px 10px; font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:1px; text-transform:uppercase; border:1px solid; }
+  .zone-tag-active { background:rgba(0,229,160,0.12); border-color:rgba(0,229,160,0.3); color:var(--accent); }
+  .zone-tag-other  { background:rgba(100,100,100,0.1); border-color:var(--border); color:var(--muted); }
+  .zone-tag-done   { background:rgba(0,153,255,0.1); border-color:rgba(0,153,255,0.3); color:var(--accent2); }
+
+  .prods-list { background:rgba(0,0,0,0.25); border:1px solid var(--border); padding:0.75rem; margin:0.5rem 0; }
+  .prod-row { display:flex; justify-content:space-between; align-items:center; font-size:0.82rem; padding:0.35rem 0; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .prod-row:last-child { border-bottom:none; }
+  .prod-qty { font-family:'IBM Plex Mono',monospace; color:var(--accent); }
+
+  .btn { padding:0.65rem 1.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; cursor:pointer; border:none; transition:all 0.2s; }
+  .btn-confirm { background:var(--accent); color:var(--black); }
+  .btn-confirm:hover { background:#00ffb3; transform:translateY(-1px); }
+  .btn-secondary { background:transparent; color:var(--accent); border:1px solid var(--accent); }
+  .btn-secondary:hover { background:rgba(0,229,160,0.08); }
+  .btn-sm { padding:0.4rem 1rem; font-size:0.68rem; letter-spacing:1.5px; }
+  .btn:disabled { opacity:0.3; cursor:not-allowed; transform:none!important; }
+
+  .empty-state { text-align:center; padding:3rem; color:var(--muted); font-size:0.85rem; font-family:'IBM Plex Mono',monospace; }
+
+  /* CONFIRM MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); z-index:500; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(6px); }
+  .modal { background:var(--card); border:1px solid var(--border); padding:2rem; max-width:480px; width:90%; position:relative; }
+  .modal::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); }
+  .modal-title { font-family:'Bebas Neue',cursive; font-size:1.8rem; letter-spacing:3px; color:var(--accent); margin-bottom:1rem; }
+  .modal p { font-size:0.88rem; color:var(--muted); margin-bottom:1rem; line-height:1.7; }
+  .modal-actions { display:flex; gap:0.75rem; margin-top:1.25rem; }
+
+  .form-group { display:flex; flex-direction:column; gap:0.4rem; margin-bottom:0.75rem; }
+  .form-group label { font-size:0.68rem; font-weight:600; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); font-family:'IBM Plex Mono',monospace; }
+  .form-group input { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:0.6rem 0.85rem; font-family:'IBM Plex Sans',sans-serif; font-size:0.9rem; outline:none; transition:border-color 0.2s; }
+  .form-group input:focus { border-color:var(--accent); }
+
+  #toast { position:fixed; bottom:2rem; right:2rem; z-index:999; display:flex; flex-direction:column; gap:0.5rem; }
+  .toast-item { background:var(--card); border:1px solid var(--border); border-left:3px solid var(--accent); padding:0.75rem 1.25rem; font-size:0.82rem; font-family:'IBM Plex Mono',monospace; max-width:340px; animation:toastIn 0.3s ease; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+  .toast-item.err { border-left-color:var(--danger); }
+  @keyframes toastIn { from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)} }
+
+  .counter-bar { display:flex; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+  .counter { background:var(--surface); border:1px solid var(--border); padding:0.75rem 1.25rem; }
+  .counter-label { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+  .counter-value { font-family:'Bebas Neue',cursive; font-size:1.8rem; color:var(--accent); line-height:1; }
+
+  /* HISTORY */
+  .history-entry { background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--accent); padding:0.75rem 1rem; margin-bottom:0.5rem; }
+  .history-ts { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color:var(--muted); }
+  .history-msg { font-size:0.82rem; margin-top:0.25rem; }
+
+  /* MODAL PRODUCT ROWS */
+  .modal-prod-row {
+    display:grid; grid-template-columns:1fr 70px 85px 75px 85px;
+    gap:0.4rem; align-items:center;
+    padding:0.5rem 0.6rem;
+    background:var(--surface); border:1px solid var(--border);
+    margin-bottom:0.35rem;
+  }
+  .modal-prod-name { font-size:0.85rem; font-family:'IBM Plex Sans',sans-serif; }
+  .modal-prod-esperado { font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--muted); text-align:center; }
+  /* Campo azul editable: cuánto llega a ESTA zona (arbitrario, no proporcional) */
+  .modal-asig-input {
+    background:var(--black); border:1px solid rgba(0,153,255,0.5); color:var(--accent2);
+    padding:0.35rem 0.4rem; font-family:'IBM Plex Mono',monospace; font-size:0.88rem;
+    font-weight:600; outline:none; width:100%; text-align:center;
+    transition:border-color 0.2s;
+  }
+  .modal-asig-input:focus { border-color:var(--accent2); box-shadow:0 0 0 2px rgba(0,153,255,0.1); }
+  .modal-asig-input.asig-over { border-color:var(--danger); color:var(--danger); }
+  .modal-prod-input {
+    background:var(--black); border:1px solid var(--border); color:var(--accent);
+    padding:0.35rem 0.4rem; font-family:'IBM Plex Mono',monospace; font-size:0.9rem;
+    font-weight:600; outline:none; width:100%; text-align:center;
+    transition:border-color 0.2s;
+  }
+  .modal-prod-input:focus { border-color:var(--accent); }
+  .modal-prod-input.over  { border-color:var(--danger); color:var(--danger); }
+  .modal-prod-input.exact { border-color:var(--accent); }
+  .modal-prod-input.under { border-color:var(--warn); color:var(--warn); }
+  .modal-prod-diff { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; text-align:center; }
+  .diff-ok   { color:var(--accent); }
+  .diff-warn { color:var(--warn); }
+  .diff-err  { color:var(--danger); }
+  .modal-col-header {
+    display:grid; grid-template-columns:1fr 70px 85px 75px 85px;
+    gap:0.4rem; padding:0 0.6rem 0.3rem;
+    font-family:'IBM Plex Mono',monospace; font-size:0.56rem;
+    letter-spacing:1.5px; text-transform:uppercase; color:var(--muted);
+  }
+  /* Nota informativa multi-zona */
+  .asig-info {
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:0.8px;
+    color:var(--accent2); background:rgba(0,153,255,0.06);
+    border:1px solid rgba(0,153,255,0.2); padding:0.45rem 0.8rem;
+    margin-bottom:0.7rem; line-height:1.55;
+  }
+
+  /* DEVOLUCION */
+  .devol-section {
+    background:rgba(255,149,0,0.04);
+    border:1px solid rgba(255,149,0,0.25);
+    padding:0.75rem;
+    margin-bottom:1rem;
+  }
+  .devol-title {
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem;
+    letter-spacing:2px; text-transform:uppercase;
+    color:var(--warn); margin-bottom:0.5rem;
+    display:flex; align-items:center; gap:0.5rem;
+  }
+  .devol-row {
+    display:grid; grid-template-columns:1fr 80px 60px;
+    gap:0.5rem; align-items:center;
+    padding:0.35rem 0.5rem; margin-bottom:0.3rem;
+    background:var(--surface); border:1px solid var(--border);
+    font-size:0.82rem;
+  }
+  .devol-input {
+    background:var(--black); border:1px solid rgba(255,149,0,0.4);
+    color:var(--warn); padding:0.3rem 0.5rem;
+    font-family:'IBM Plex Mono',monospace; font-size:0.85rem;
+    font-weight:600; outline:none; width:100%; text-align:center;
+  }
+  .devol-input:focus { border-color:var(--warn); }
+  .toggle-devol {
+    background:transparent; border:1px dashed rgba(255,149,0,0.4);
+    color:var(--warn); padding:0.3rem 0.75rem;
+    font-family:'IBM Plex Mono',monospace; font-size:0.62rem;
+    letter-spacing:1.5px; text-transform:uppercase; cursor:pointer;
+    transition:all 0.2s; margin-bottom:0.75rem;
+  }
+  .toggle-devol:hover { background:rgba(255,149,0,0.08); }
+
+  /* ═══ CONTROL MATERIAL EN ZONA ═══ */
+  .mat-section { background:var(--card); border:1px solid var(--border); padding:1.5rem; position:relative; overflow:hidden; }
+  .mat-section::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--warn),transparent); }
+  .mat-toolbar { display:flex; align-items:center; gap:0.75rem; margin-bottom:1.25rem; flex-wrap:wrap; }
+  .mat-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:0.9rem; }
+  .mat-card { background:var(--surface); border:1px solid var(--border); padding:1rem 1.1rem; position:relative; transition:border-color 0.2s; }
+  .mat-card:hover { border-color:var(--warn); }
+  .mat-card-name { font-size:0.9rem; font-weight:500; margin-bottom:0.2rem; }
+  .mat-card-meta { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; letter-spacing:1px; color:var(--muted); text-transform:uppercase; margin-bottom:0.75rem; }
+  .mat-stock-row { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.65rem; }
+  .mat-stock-label { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); min-width:60px; }
+  .mat-stock-val { font-family:'Bebas Neue',cursive; font-size:1.55rem; line-height:1; color:var(--accent); }
+  .mat-stock-unit { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--muted); }
+  .mat-stock-warn   { color:var(--warn)   !important; }
+  .mat-stock-danger { color:var(--danger) !important; }
+  .mat-bar { background:rgba(0,0,0,0.3); border-radius:2px; height:6px; width:100%; margin-bottom:0.75rem; overflow:hidden; }
+  .mat-bar-fill { height:100%; border-radius:2px; transition:width 0.4s, background 0.3s; }
+  .mat-use-row { display:flex; gap:0.5rem; align-items:center; }
+  .mat-use-input { background:var(--black); border:1px solid var(--border); color:var(--warn); padding:0.3rem 0.5rem; font-family:'IBM Plex Mono',monospace; font-size:0.88rem; font-weight:600; outline:none; width:88px; text-align:center; transition:border-color 0.2s; }
+  .mat-use-input:focus { border-color:var(--warn); }
+  .mat-use-btn { background:transparent; border:1px solid rgba(255,149,0,0.5); color:var(--warn); padding:0.3rem 0.7rem; font-family:'IBM Plex Mono',monospace; font-size:0.68rem; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .mat-use-btn:hover { background:rgba(255,149,0,0.1); border-color:var(--warn); }
+  .mat-log { margin-top:0.65rem; max-height:100px; overflow-y:auto; }
+  .mat-log-entry { font-family:'IBM Plex Mono',monospace; font-size:0.6rem; color:var(--muted); padding:0.2rem 0; border-bottom:1px solid rgba(255,255,255,0.04); display:flex; justify-content:space-between; gap:0.5rem; }
+  .mat-log-qty { color:var(--warn); white-space:nowrap; }
+  .mat-add-form { display:flex; gap:0.5rem; flex-wrap:wrap; align-items:flex-end; }
+  .mat-add-input { background:var(--surface); border:1px solid var(--border); color:var(--text); padding:0.4rem 0.75rem; font-family:'IBM Plex Mono',monospace; font-size:0.8rem; outline:none; transition:border-color 0.2s; }
+  .mat-add-input:focus { border-color:var(--accent); }
+  .mat-add-input.wide { width:180px; }
+  .mat-add-input.num  { width:90px; text-align:center; }
+  .mat-add-input.un   { width:70px; text-align:center; }
+  .mat-add-btn { background:var(--accent); color:var(--black); border:none; padding:0.4rem 1rem; font-family:'IBM Plex Mono',monospace; font-size:0.72rem; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .mat-add-btn:hover { background:#00ffb3; }
+  .mat-resumen { background:rgba(0,0,0,0.25); border:1px solid var(--border); padding:0.75rem 1rem; margin-bottom:1rem; display:flex; gap:1.5rem; flex-wrap:wrap; }
+  .mat-resumen-val { font-family:'Bebas Neue',cursive; font-size:1.5rem; color:var(--warn); line-height:1; }
+  .mat-resumen-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.55rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); }
+  .mat-section-sub { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; font-weight:600; letter-spacing:2px; text-transform:uppercase; color:var(--warn); margin-bottom:0.75rem; display:flex; align-items:center; gap:0.5rem; }
+  .mat-section-sub::after { content:''; flex:1; height:1px; background:rgba(255,149,0,0.2); }
+  .mat-empty { text-align:center; padding:2rem; color:var(--muted); font-size:0.82rem; font-family:'IBM Plex Mono',monospace; }
+  .chip-warn-sm { background:rgba(255,149,0,0.15); color:var(--warn); font-size:0.55rem; padding:2px 7px; font-family:'IBM Plex Mono',monospace; font-weight:600; letter-spacing:1px; }
+  .mat-del-btn { background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:0.75rem; padding:2px 6px; transition:color 0.2s; position:absolute; top:0.6rem; right:0.6rem; }
+  .mat-del-btn:hover { color:var(--danger); }
+</style>
+</head>
+<body>
+
+<header>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="logo">CFE·<span style="color:#ffe033">SICL</span><span>·ZONA</span></div>
+    <div class="badge">Recepción</div>
+  </div>
+  <a href="index_clave.html" style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1.5px;color:var(--muted);text-decoration:none;text-transform:uppercase;border:1px solid var(--border);padding:5px 12px;transition:all 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← Portal</a>
+</header>
+
+<div id="infoBar">
+  <span>RPE:</span>
+  <input class="bar-input" id="rpeInput" placeholder="Tu RPE" maxlength="20" />
+  <div class="divider"></div>
+  <span>Zona:</span>
+  <select class="zone-select" id="zonaSelect" onchange="onZoneChange()">
+    <option value="">— Seleccionar zona —</option>
+    <option>NEZA33</option>
+    <option>PALMAS</option>
+    <option>AGRICULTURA</option>
+    <option>CHIMALHUACAN</option>
+    <option>LA PAZ</option>
+    <option>SUB ESTACION</option>
+  </select>
+  <div class="divider"></div>
+  <button class="btn btn-sm btn-secondary" onclick="loadOrders()" style="padding:4px 14px;font-size:0.62rem">ACTUALIZAR</button>
+  <div id="zonaLabel" style="color:var(--accent);font-weight:600;font-size:0.8rem"></div>
+</div>
+
+<main>
+
+  <!-- PENDIENTES -->
+  <div class="section">
+    <div class="section-title">Órdenes en Tránsito — Por Recibir</div>
+
+    <div class="counter-bar">
+      <div class="counter"><div class="counter-label">Por Recibir</div><div class="counter-value" id="cPending">0</div></div>
+      <div class="counter"><div class="counter-label">Recibidas Hoy</div><div class="counter-value" id="cToday">0</div></div>
+    </div>
+
+    <div class="orders-grid" id="ordersGrid">
+      <div class="empty-state">Selecciona tu zona para ver las órdenes</div>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div class="section">
+    <div class="section-title">Historial de Recepciones</div>
+    <div id="historialContainer">
+      <div class="empty-state">Sin historial aún</div>
+    </div>
+  </div>
+
+  <!-- ═══ CONTROL DE MATERIAL EN ZONA ═══ -->
+  <div class="mat-section" id="matSection">
+    <div class="mat-toolbar">
+      <div class="section-title" style="margin-bottom:0;flex:1">🏗️ Control de Material en Zona</div>
+      <button class="btn btn-sm btn-secondary" style="border-color:rgba(255,149,0,0.5);color:var(--warn);font-size:0.62rem" onclick="exportMatCSV()">↓ CSV</button>
+    </div>
+    <p style="font-size:0.78rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;margin-bottom:1rem;line-height:1.6">
+      Registra el material disponible en esta zona y descuenta lo consumido día a día.
+    </p>
+
+    <div class="mat-resumen">
+      <div><div class="mat-resumen-val" id="mrTotal">0</div><div class="mat-resumen-lbl">Productos</div></div>
+      <div><div class="mat-resumen-val" id="mrUsadoHoy" style="color:var(--accent2)">0</div><div class="mat-resumen-lbl">Movimientos hoy</div></div>
+      <div><div class="mat-resumen-val" id="mrBajos" style="color:var(--danger)">0</div><div class="mat-resumen-lbl">Stock bajo</div></div>
+    </div>
+
+    <div class="mat-section-sub">+ Agregar producto a esta zona</div>
+    <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:0.85rem;margin-bottom:1rem">
+      <div class="mat-add-form">
+        <input class="mat-add-input wide" id="maName"     placeholder="Nombre del material" />
+        <input class="mat-add-input num"  id="maQty"      placeholder="Cant." type="number" min="0" step="0.1" />
+        <input class="mat-add-input un"   id="maUnit"     placeholder="Unid." />
+        <input class="mat-add-input num"  id="maMinStock" placeholder="Mín." type="number" min="0" step="0.1" title="Stock mínimo para alerta" />
+        <button class="mat-add-btn" onclick="addMaterial()">+ AGREGAR</button>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;color:var(--muted);margin-top:0.5rem;letter-spacing:1px">NOMBRE · CANTIDAD · UNIDAD · STOCK MÍNIMO (alerta)</div>
+    </div>
+
+    <button class="btn btn-sm btn-secondary" style="margin-bottom:1.25rem;font-size:0.65rem" onclick="importarDesdeRecepcion()">
+      ↙ IMPORTAR DESDE ÚLTIMA RECEPCIÓN
+    </button>
+
+    <div class="mat-grid" id="matGrid">
+      <div class="mat-empty">Selecciona tu zona y agrega materiales para comenzar</div>
+    </div>
+  </div>
+
+</main>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal" style="display:none">
+  <div class="modal" style="max-width:620px">
+    <div class="modal-title">Registrar Recepción</div>
+
+    <div id="modalContent"></div>
+
+    <!-- Tabla de cantidades recibidas por producto -->
+    <div style="margin-bottom:0.75rem">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem">
+        Captura cuánto recibiste de cada producto:
+      </div>
+      <div id="modalProdsTable"></div>
+    </div>
+
+    <!-- Sección devolución de sobrantes -->
+    <button class="toggle-devol" id="toggleDevol" onclick="toggleDevolucion()" style="display:none">
+      ↩ DEVOLVER SOBRANTE AL ADMINISTRADOR
+    </button>
+    <div class="devol-section" id="devolSection" style="display:none">
+      <div class="devol-title">↩ Material sobrante — Devolución al Admin</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:0.6rem;font-family:'IBM Plex Mono',monospace">
+        Captura cuánto regresa. Solo lo que sobró de esta zona.
+      </div>
+      <div id="devolProdsTable"></div>
+    </div>
+
+    <div class="form-group">
+      <label>Nombre de quien recibe</label>
+      <input id="receptorNombre" placeholder="Nombre completo" />
+    </div>
+    <div class="form-group">
+      <label>Observaciones (opcional)</label>
+      <input id="receptorObs" placeholder="Todo en orden / Faltante de X unidades..." />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-confirm btn-sm" id="modalConfirmBtn">✓ CONFIRMAR RECEPCIÓN</button>
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">CANCELAR</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const KEY_ORDERS = 'sicl_orders';
+const KEY_LOG = 'sicl_log';
+
+let currentRpe = '';
+let currentZona = '';
+let currentConfirmId = null;
+
+// Init
+document.getElementById('rpeInput').addEventListener('input', function(){
+  currentRpe = this.value.trim();
+  localStorage.setItem('sicl_recepcion_rpe', currentRpe);
+});
+(function(){
+  const r = localStorage.getItem('sicl_recepcion_rpe');
+  const z = localStorage.getItem('sicl_recepcion_zona');
+  if(r){ document.getElementById('rpeInput').value=r; currentRpe=r; }
+  if(z){ document.getElementById('zonaSelect').value=z; currentZona=z; document.getElementById('zonaLabel').textContent=z; loadOrders(); }
+})();
+
+function onZoneChange(){
+  const sel = document.getElementById('zonaSelect');
+  currentZona = sel.value;
+  document.getElementById('zonaLabel').textContent = currentZona || '';
+  localStorage.setItem('sicl_recepcion_zona', currentZona);
+  loadOrders();
+}
+
+/* Devuelve true si esta zona ya confirmó recepción en esta orden */
+function zonaYaRecibio(o, zona){
+  return o.recepciones?.some(r => r.zona.toUpperCase() === zona.toUpperCase());
+}
+
+/* Devuelve true si TODAS las zonas de la orden ya confirmaron */
+function todasZonasRecibieron(o){
+  if(!o.zonas?.length) return false;
+  return o.zonas.every(z => zonaYaRecibio(o, z));
+}
+
+function loadOrders(){
+  if(!currentZona) return;
+  const orders = JSON.parse(localStorage.getItem(KEY_ORDERS)||'[]');
+
+  // Órdenes que incluyen mi zona Y están en tránsito Y mi zona aún no confirmó
+  const porRecibir = orders.filter(o =>
+    (o.status === 'en_transito' || o.status === 'parcial') &&
+    o.zonas?.some(z => z.toUpperCase() === currentZona.toUpperCase()) &&
+    !zonaYaRecibio(o, currentZona)
+  );
+
+  // Órdenes donde mi zona YA confirmó
+  const yaRecibidas = orders.filter(o =>
+    o.zonas?.some(z => z.toUpperCase() === currentZona.toUpperCase()) &&
+    zonaYaRecibio(o, currentZona)
+  );
+
+  // Conteo hoy
+  const today = new Date().toDateString();
+  const hoy = yaRecibidas.filter(o => {
+    const r = o.recepciones?.find(r => r.zona.toUpperCase()===currentZona.toUpperCase());
+    return r && new Date(r.ts).toDateString()===today;
+  });
+
+  document.getElementById('cPending').textContent = porRecibir.length;
+  document.getElementById('cToday').textContent   = hoy.length;
+
+  renderOrders(porRecibir);
+  renderHistorial(yaRecibidas);
+}
+
+function renderOrders(list){
+  const grid = document.getElementById('ordersGrid');
+  if(!list.length){
+    grid.innerHTML='<div class="empty-state">Sin órdenes pendientes para esta zona ✓</div>';
+    return;
+  }
+  grid.innerHTML = list.map(o => {
+    // Estado de otras zonas en esta misma orden
+    const otrasZonas = o.zonas.filter(z => z.toUpperCase() !== currentZona.toUpperCase());
+    const otrasStatus = otrasZonas.map(z => {
+      const recibio = zonaYaRecibio(o, z);
+      return `<span class="zone-tag ${recibio ? 'zone-tag-done' : 'zone-tag-other'}">${recibio ? '✓ ' : ''}${z}</span>`;
+    }).join('');
+
+    return `<div class="order-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0.75rem">
+        <div>
+          <div class="order-id">${o.id}</div>
+          <div class="order-date">${new Date(o.fecha).toLocaleString('es-MX')}</div>
+        </div>
+        <span class="chip chip-transit">EN TRÁNSITO</span>
+      </div>
+
+      <div class="info-label">Transportista</div>
+      <div class="info-value" style="margin-bottom:0.75rem">${o.transportista}
+        <span style="font-size:0.7rem;color:var(--muted)">(${o.rpeTransportista||'—'})</span>
+      </div>
+
+      <div class="info-label" style="margin-bottom:0.3rem">Tu zona</div>
+      <div class="zones-row" style="margin-bottom:0.75rem">
+        <span class="zone-tag zone-tag-active">📍 ${currentZona}</span>
+      </div>
+
+      ${otrasZonas.length ? `
+        <div class="info-label" style="margin-bottom:0.3rem">Otras zonas en esta orden</div>
+        <div class="zones-row" style="margin-bottom:0.75rem">${otrasStatus}</div>
+      ` : ''}
+
+      <div class="info-label">Productos de esta orden</div>
+      <div class="prods-list">
+        ${o.productos.map(p=>`
+          <div class="prod-row">
+            <span>${p.nombre}</span>
+            <span class="prod-qty">${p.cantidad} ${p.unidad}</span>
+          </div>`).join('')}
+      </div>
+
+      ${o.notas ? `<div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.75rem;font-style:italic">"${o.notas}"</div>`:''}
+
+      <button class="btn btn-confirm btn-sm" style="width:100%;margin-top:0.5rem" onclick="openConfirm('${o.id}')">
+        ✓ CONFIRMAR RECEPCIÓN EN ${currentZona}
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function renderHistorial(list){
+  const container = document.getElementById('historialContainer');
+  if(!list.length){ container.innerHTML='<div class="empty-state">Sin recepciones registradas para esta zona</div>'; return; }
+  const sorted = [...list].sort((a,b)=>{
+    const ra = a.recepciones?.find(r=>r.zona.toUpperCase()===currentZona.toUpperCase());
+    const rb = b.recepciones?.find(r=>r.zona.toUpperCase()===currentZona.toUpperCase());
+    return new Date(rb?.ts||0) - new Date(ra?.ts||0);
+  });
+  container.innerHTML = sorted.map(o=>{
+    const rec = o.recepciones?.find(r=>r.zona.toUpperCase()===currentZona.toUpperCase());
+    const completa = todasZonasRecibieron(o);
+    const hayFaltantes = rec?.productos?.some(p => p.faltante > 0);
+
+    const prodsDetalle = rec?.productos ? `
+      <div style="background:rgba(0,0,0,0.2);border:1px solid var(--border);padding:0.5rem 0.6rem;margin:0.4rem 0">
+        <div style="display:grid;grid-template-columns:1fr 80px 80px 80px;gap:0.4rem;font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;padding-bottom:0.3rem;border-bottom:1px solid var(--border)">
+          <span>Producto</span><span style="text-align:center">Esperado</span><span style="text-align:center">Recibido</span><span style="text-align:center">Faltante</span>
+        </div>
+        ${rec.productos.map(p=>`
+          <div style="display:grid;grid-template-columns:1fr 80px 80px 80px;gap:0.4rem;font-size:0.78rem;padding:0.25rem 0;border-bottom:1px solid rgba(255,255,255,0.04);align-items:center">
+            <span>${p.nombre}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;color:var(--muted);text-align:center">${p.esperado} ${p.unidad}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;color:var(--accent);text-align:center;font-weight:600">${p.recibido} ${p.unidad}</span>
+            <span style="font-family:'IBM Plex Mono',monospace;text-align:center;${p.faltante>0?'color:var(--warn)':'color:var(--muted)'}">${p.faltante > 0 ? '-'+p.faltante+' '+p.unidad : '—'}</span>
+          </div>`).join('')}
+      </div>
+      ${rec.devoluciones?.length ? `
+        <div style="background:rgba(255,149,0,0.05);border:1px solid rgba(255,149,0,0.2);padding:0.4rem 0.6rem;margin-top:0.4rem">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--warn);margin-bottom:0.3rem">↩ Devuelto al Admin</div>
+          ${rec.devoluciones.map(d=>`
+            <div style="display:flex;justify-content:space-between;font-size:0.78rem;padding:0.2rem 0">
+              <span>${d.nombre}</span>
+              <span style="font-family:'IBM Plex Mono',monospace;color:var(--warn);font-weight:600">+${d.cantidad} ${d.unidad}</span>
+            </div>`).join('')}
+        </div>` : ''}
+      ` : `<div style="font-size:0.78rem;color:var(--muted);margin:0.3rem 0">${o.productos.map(p=>`${p.nombre} ×${p.cantidad}${p.unidad}`).join(' · ')}</div>`;
+
+    return `<div class="history-entry" style="${hayFaltantes?'border-left-color:var(--warn)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;flex-wrap:wrap;gap:0.4rem">
+        <span class="order-id">${o.id}</span>
+        <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap">
+          ${hayFaltantes
+            ? `<span class="chip" style="background:rgba(255,149,0,0.12);color:var(--warn)">⚠ CON FALTANTES</span>`
+            : `<span class="chip chip-done">✓ COMPLETO</span>`}
+          ${completa
+            ? `<span class="chip" style="background:rgba(0,229,160,0.1);color:var(--accent);font-size:0.58rem">ORDEN CERRADA</span>`
+            : `<span class="chip" style="background:rgba(100,100,100,0.15);color:var(--muted);font-size:0.58rem">OTRAS ZONAS PENDIENTES</span>`}
+        </div>
+      </div>
+      <div class="history-ts">${rec ? new Date(rec.ts).toLocaleString('es-MX') : '—'}</div>
+      ${prodsDetalle}
+      ${rec ? `<div style="font-size:0.72rem;color:var(--accent2);font-family:monospace;margin-top:0.3rem">
+        Recibido por: <strong>${rec.receptor}</strong> · RPE: ${rec.rpe}
+      </div>`:''}
+      ${rec?.obs ? `<div style="font-size:0.72rem;color:var(--muted);font-style:italic;margin-top:0.25rem">"${rec.obs}"</div>`:''}
+      ${!completa ? `<div style="font-size:0.65rem;color:var(--muted);font-family:monospace;margin-top:0.35rem">
+        Zonas pendientes: ${o.zonas.filter(z=>!zonaYaRecibio(o,z)).join(', ')}
+      </div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function openConfirm(orderId){
+  if(!currentRpe){ toast('Ingresa tu RPE primero','err'); return; }
+  const orders = JSON.parse(localStorage.getItem(KEY_ORDERS)||'[]');
+  const o = orders.find(x=>x.id===orderId);
+  if(!o) return;
+  currentConfirmId = orderId;
+
+  const numZonas = o.zonas?.length || 1;
+
+  // Calcula cuánto ya fue asignado/confirmado por OTRAS zonas en esta misma orden
+  const yaAsignadoPorOtras = {}; // { productoId: suma de esperado de otras zonas }
+  o.productos.forEach(p => { yaAsignadoPorOtras[p.id] = 0; });
+  (o.recepciones || []).forEach(rec => {
+    if(rec.zona.toUpperCase() === currentZona.toUpperCase()) return;
+    (rec.productos || []).forEach(rp => {
+      if(yaAsignadoPorOtras[rp.id] !== undefined)
+        yaAsignadoPorOtras[rp.id] = Math.round((yaAsignadoPorOtras[rp.id] + (rp.esperado || 0)) * 1000) / 1000;
+    });
+  });
+
+  document.getElementById('modalContent').innerHTML = `
+    <p style="margin-bottom:0.6rem">
+      Orden <strong style="color:var(--text)">${o.id}</strong> →
+      zona <strong style="color:var(--accent)">${currentZona}</strong> ·
+      Transportista: ${o.transportista}
+    </p>
+    ${numZonas > 1 ? `<div class="asig-info">
+      ✏️ <strong>Asignado a zona</strong> (azul): captura exactamente cuántas piezas llegaron a <strong>${currentZona}</strong>.
+      La distribución es variable — el total entre todas las zonas no puede superar el pedido.
+      <br>Si recibiste de más, usa el botón naranja para registrar la devolución.
+    </div>` : `<p style="color:var(--muted);font-size:0.78rem;margin-bottom:0.75rem">
+      Ajusta si recibiste menos. Si sobró material usa el botón naranja para devolver.</p>`}`;
+
+  // Tabla de productos con columna editable "Asignado a zona"
+  document.getElementById('modalProdsTable').innerHTML = `
+    <div class="modal-col-header">
+      <span>Producto</span>
+      <span style="text-align:center">Total</span>
+      <span style="text-align:center;color:var(--accent2)">Asignado ✏️</span>
+      <span style="text-align:center">Recibido</span>
+      <span style="text-align:center">Diferencia</span>
+    </div>
+    ${o.productos.map((p, i) => {
+      // Lo máximo que puede asignarse a esta zona = total - lo que otras zonas ya registraron
+      const maxDisp    = Math.round((p.cantidad - (yaAsignadoPorOtras[p.id] || 0)) * 1000) / 1000;
+      // Valor inicial sugerido: todo lo disponible (zona única) o el máximo disponible (multi-zona)
+      const sugerido   = Math.max(0, maxDisp);
+      return `
+      <div class="modal-prod-row" id="mprow_${i}">
+        <div class="modal-prod-name">${p.nombre}
+          ${numZonas > 1 ? `<span style="font-size:0.58rem;color:var(--muted);display:block">Disponible: ${maxDisp} ${p.unidad}</span>` : ''}
+        </div>
+        <div class="modal-prod-esperado">${p.cantidad} <span style="font-size:0.62rem">${p.unidad}</span></div>
+        <input class="modal-asig-input" id="mpasig_${i}"
+          type="number" min="0" max="${maxDisp}" step="0.1" value="${sugerido}"
+          oninput="onAsigChange(${i},${maxDisp},'${p.unidad}')" />
+        <input class="modal-prod-input exact" id="mpinput_${i}"
+          type="number" min="0" max="${sugerido}" step="0.1" value="${sugerido}"
+          oninput="updateDiff(${i},'${p.unidad}')" />
+        <div class="modal-prod-diff diff-ok" id="mpdiff_${i}">= exacto</div>
+      </div>`;
+    }).join('')}`;
+
+  // Tabla devolución (sin cambios)
+  document.getElementById('devolProdsTable').innerHTML =
+    `<div style="display:grid;grid-template-columns:1fr 90px 60px;gap:0.5rem;padding:0 0.5rem 0.3rem;font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem">
+      <span>Producto</span><span style="text-align:center">A devolver</span><span style="text-align:center">Unidad</span>
+    </div>` +
+    o.productos.map((p,i) => `
+      <div class="devol-row">
+        <span>${p.nombre}</span>
+        <input class="devol-input" id="devinput_${i}" type="number" min="0" step="0.1" value="0" placeholder="0" />
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.75rem;color:var(--muted);text-align:center">${p.unidad}</span>
+      </div>`).join('');
+
+  document.getElementById('toggleDevol').style.display = 'block';
+  document.getElementById('toggleDevol').textContent   = '↩ DEVOLVER SOBRANTE AL ADMINISTRADOR';
+  document.getElementById('toggleDevol').style.borderColor = 'rgba(255,149,0,0.4)';
+  document.getElementById('toggleDevol').style.color       = 'var(--warn)';
+  document.getElementById('devolSection').style.display    = 'none';
+
+  document.getElementById('receptorNombre').value = '';
+  document.getElementById('receptorObs').value    = '';
+  document.getElementById('confirmModal').style.display = 'flex';
+  document.getElementById('modalConfirmBtn').onclick = () => doReceive(orderId);
+}
+
+/* Cuando cambia "Asignado a zona": limita al máximo disponible y reajusta "Recibido" */
+function onAsigChange(i, maxDisp, unidad){
+  const asigEl = document.getElementById(`mpasig_${i}`);
+  const recEl  = document.getElementById(`mpinput_${i}`);
+  let asig = Math.max(0, parseFloat(asigEl.value) || 0);
+  if(asig > maxDisp + 0.001){
+    asig = maxDisp;
+    asigEl.value = asig;
+    asigEl.classList.add('asig-over');
+    setTimeout(() => asigEl.classList.remove('asig-over'), 800);
+    toast(`Máximo disponible para esta zona: ${maxDisp} ${unidad}`, 'err');
+  }
+  // Si recibido era mayor al nuevo asignado, lo recorta
+  const rec = parseFloat(recEl.value) || 0;
+  if(rec > asig){ recEl.value = asig; }
+  recEl.max = asig;
+  updateDiff(i, unidad);
+}
+
+/* Actualiza el indicador de diferencia entre asignado y recibido */
+function updateDiff(i, unidad){
+  const asig     = Math.max(0, parseFloat(document.getElementById(`mpasig_${i}`)?.value) || 0);
+  const recibido = Math.max(0, parseFloat(document.getElementById(`mpinput_${i}`)?.value) || 0);
+  const diffEl   = document.getElementById(`mpdiff_${i}`);
+  const recEl    = document.getElementById(`mpinput_${i}`);
+  if(!diffEl || !recEl) return;
+  const diff = Math.round((recibido - asig) * 1000) / 1000;
+  recEl.classList.remove('over','exact','under');
+  if(diff > 0.001){
+    recEl.classList.add('over');
+    diffEl.className = 'modal-prod-diff diff-err';
+    diffEl.textContent = `+${diff} ${unidad}`;
+  } else if(diff < -0.001){
+    recEl.classList.add('under');
+    diffEl.className = 'modal-prod-diff diff-warn';
+    diffEl.textContent = `${diff} ${unidad}`;
+  } else {
+    recEl.classList.add('exact');
+    diffEl.className = 'modal-prod-diff diff-ok';
+    diffEl.textContent = '= exacto';
+  }
+}
+
+function toggleDevolucion(){
+  const sec = document.getElementById('devolSection');
+  const btn = document.getElementById('toggleDevol');
+  if(sec.style.display === 'none'){
+    sec.style.display   = 'block';
+    btn.textContent     = '✕ CANCELAR DEVOLUCIÓN';
+    btn.style.borderColor = 'rgba(255,51,85,0.4)';
+    btn.style.color       = 'var(--danger)';
+  } else {
+    sec.style.display   = 'none';
+    btn.textContent     = '↩ DEVOLVER SOBRANTE AL ADMINISTRADOR';
+    btn.style.borderColor = 'rgba(255,149,0,0.4)';
+    btn.style.color       = 'var(--warn)';
+    document.querySelectorAll('.devol-input').forEach(i => i.value = '0');
+  }
+}
+
+function closeModal(){
+  document.getElementById('confirmModal').style.display = 'none';
+  currentConfirmId = null;
+}
+
+function doReceive(orderId){
+  const nombre = document.getElementById('receptorNombre').value.trim();
+  const obs    = document.getElementById('receptorObs').value.trim();
+  if(!nombre){ toast('Ingresa el nombre de quien recibe','err'); return; }
+  if(!currentRpe){ toast('Ingresa tu RPE','err'); return; }
+
+  const orders    = JSON.parse(localStorage.getItem(KEY_ORDERS)||'[]');
+  const inventory = JSON.parse(localStorage.getItem('sicl_inventory')||'[]');
+  const idx = orders.findIndex(x=>x.id===orderId);
+  if(idx<0){ toast('Orden no encontrada','err'); return; }
+
+  const o = orders[idx];
+
+  // Lee cuánto le asignó el receptor a ESTA zona (campo azul editable)
+  // y cuánto confirmó haber recibido físicamente.
+  const productosRecibidos = o.productos.map((p, i) => {
+    const esperadoZona = Math.max(0, Math.round((parseFloat(document.getElementById(`mpasig_${i}`)?.value) || 0) * 1000) / 1000);
+    const recibido     = Math.max(0, Math.round((parseFloat(document.getElementById(`mpinput_${i}`)?.value) || 0) * 1000) / 1000);
+    const faltante     = Math.round((esperadoZona - recibido) * 1000) / 1000;
+    return { id: p.id, nombre: p.nombre, unidad: p.unidad,
+             esperado: esperadoZona, recibido, faltante: faltante > 0 ? faltante : 0 };
+  });
+
+  // Validar que recibido no supere lo asignado a esta zona
+  for(const p of productosRecibidos){
+    if(p.recibido > p.esperado + 0.001){
+      toast(`Recibido supera lo asignado a esta zona: ${p.nombre} (asignado: ${p.esperado} ${p.unidad})`,'err');
+      return;
+    }
+  }
+
+  // Validar que la suma total de asignados (esta zona + otras ya confirmadas) no supere el pedido
+  for(const p of productosRecibidos){
+    const orig = o.productos.find(x => x.id === p.id);
+    if(!orig) continue;
+    const yaOtras = (o.recepciones || []).reduce((acc, rec) => {
+      if(rec.zona.toUpperCase() === currentZona.toUpperCase()) return acc;
+      const rp = (rec.productos || []).find(x => x.id === p.id);
+      return acc + (rp?.esperado || 0);
+    }, 0);
+    const totalAsig = Math.round((yaOtras + p.esperado) * 1000) / 1000;
+    if(totalAsig > orig.cantidad + 0.001){
+      toast(`Total asignado entre zonas (${totalAsig}) supera el pedido (${orig.cantidad}) para: ${p.nombre}`,'err');
+      return;
+    }
+  }
+
+  // Devoluciones de sobrante
+  const devolActiva = document.getElementById('devolSection').style.display !== 'none';
+  const devoluciones = devolActiva
+    ? o.productos.map((p, i) => {
+        const cant = Math.max(0, parseFloat(document.getElementById(`devinput_${i}`)?.value) || 0);
+        return cant > 0 ? { id: p.id, nombre: p.nombre, unidad: p.unidad, cantidad: cant } : null;
+      }).filter(Boolean)
+    : [];
+
+  // Validar que devolución no exceda lo recibido
+  for(const d of devoluciones){
+    const recObj = productosRecibidos.find(p => p.id === d.id);
+    if(recObj && d.cantidad > recObj.recibido){
+      toast(`Devolución excede lo recibido: ${d.nombre} (recibiste ${recObj.recibido} ${recObj.unidad})`,'err');
+      return;
+    }
+  }
+
+  // ── Bug 1 fix: solo regresa al inventario lo que FALTÓ de la parte de esta zona ──
+  // (lo que SÍ se entregó ya salió del inventario al generar la orden y NO debe regresar)
+  for(const pr of productosRecibidos){
+    if(pr.faltante > 0){
+      const invIdx = inventory.findIndex(p => p.id === pr.id);
+      if(invIdx >= 0) inventory[invIdx].existencia = Math.round(
+        (inventory[invIdx].existencia + pr.faltante) * 1000) / 1000;
+    }
+  }
+  for(const d of devoluciones){
+    const invIdx = inventory.findIndex(p => p.id === d.id);
+    if(invIdx >= 0) inventory[invIdx].existencia = Math.round(
+      (inventory[invIdx].existencia + d.cantidad) * 1000) / 1000;
+  }
+  localStorage.setItem('sicl_inventory', JSON.stringify(inventory));
+
+  // Registrar recepción
+  if(!orders[idx].recepciones) orders[idx].recepciones = [];
+  orders[idx].recepciones.push({
+    ts: new Date().toISOString(),
+    zona: currentZona,
+    rpe: currentRpe,
+    receptor: nombre,
+    obs: obs || null,
+    productos: productosRecibidos,
+    devoluciones: devoluciones.length ? devoluciones : undefined
+  });
+
+  if(!orders[idx].historial) orders[idx].historial = [];
+  const hayFaltantes   = productosRecibidos.some(p => p.faltante > 0);
+  const hayDevoluciones = devoluciones.length > 0;
+  orders[idx].historial.push({
+    ts: new Date().toISOString(),
+    accion: `RECIBIDO_${currentZona}${hayFaltantes?'_FALTANTE':''}${hayDevoluciones?'_DEVOLUCION':''}`,
+    rpe: currentRpe, receptor: nombre
+  });
+
+  const todasConfirmadas = todasZonasRecibieron(orders[idx]);
+  const hayFaltantesGlobales = orders[idx].recepciones?.some(r => r.productos?.some(p => p.faltante > 0));
+  // Bug 2 fix: "entregado" = todas las zonas confirmaron (aunque cada una haya recibido su parte proporcional)
+  // "parcial" = hay zonas que aún no confirman. Los faltantes no impiden cerrar la orden.
+  orders[idx].status = todasConfirmadas ? (hayFaltantesGlobales ? 'entregado_faltante' : 'entregado') : 'parcial';
+  if(todasConfirmadas) orders[idx].transporterStatus = 0;
+
+  localStorage.setItem(KEY_ORDERS, JSON.stringify(orders));
+
+  const faltantesMsg   = productosRecibidos.filter(p=>p.faltante>0).map(p=>`${p.nombre} -${p.faltante}${p.unidad}`).join(', ');
+  const devolMsg       = devoluciones.map(d=>`${d.nombre} +${d.cantidad}${d.unidad}`).join(', ');
+  const pendientesZonas = orders[idx].zonas.filter(z=>!zonaYaRecibio(orders[idx],z));
+
+  let msg = `✓ Recepción registrada en ${currentZona}`;
+  if(faltantesMsg)  msg += ` · Faltó: ${faltantesMsg}`;
+  if(devolMsg)      msg += ` · Devuelto: ${devolMsg}`;
+  if(!todasConfirmadas) msg += ` · Pendiente: ${pendientesZonas.join(', ')}`;
+
+  logEvent(`Orden ${orderId} | ${currentZona} | ${nombre} (RPE:${currentRpe}) | ${productosRecibidos.map(p=>`${p.nombre}:${p.recibido}/${p.esperado}`).join(' | ')}${devolMsg?' | DEV:'+devolMsg:''}${obs?' | '+obs:''}`);
+  toast(msg);
+  closeModal();
+  loadOrders();
+}
+
+function logEvent(msg){
+  const logs = JSON.parse(localStorage.getItem(KEY_LOG)||'[]');
+  logs.push({ ts:new Date().toISOString(), rpe:currentRpe, zona:currentZona, msg });
+  localStorage.setItem(KEY_LOG, JSON.stringify(logs));
+}
+function toast(msg, type=''){
+  const el=document.createElement('div');
+  el.className='toast-item'+(type==='err'?' err':'');
+  el.textContent=msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// Poll for changes every 15 seconds
+setInterval(()=>{ if(currentZona) loadOrders(); }, 15000);
+
+/* ═══════════════════════════════════════════════════════
+   CONTROL DE MATERIAL EN ZONA
+   Key: sicl_mat_<ZONA>
+   Item: { id, nombre, unidad, stock, minStock, log[] }
+   Log:  { ts, rpe, qty, nota }
+═══════════════════════════════════════════════════════ */
+function matKey(){ return 'sicl_mat_'+(currentZona||'__').toUpperCase(); }
+function getMateriales(){ try{ return JSON.parse(localStorage.getItem(matKey())||'[]'); }catch(_){ return []; } }
+function saveMateriales(arr){ localStorage.setItem(matKey(), JSON.stringify(arr)); renderMateriales(); }
+
+function addMaterial(){
+  if(!currentZona){ toast('Selecciona tu zona primero','err'); return; }
+  const nombre   = document.getElementById('maName').value.trim();
+  const qty      = parseFloat(document.getElementById('maQty').value) || 0;
+  const unit     = document.getElementById('maUnit').value.trim() || 'pza';
+  const minStock = parseFloat(document.getElementById('maMinStock').value) || 0;
+  if(!nombre){ toast('Escribe el nombre del material','err'); return; }
+  const arr = getMateriales();
+  const existe = arr.find(m => m.nombre.toLowerCase()===nombre.toLowerCase());
+  if(existe){
+    existe.stock = Math.round((existe.stock + qty)*1000)/1000;
+    existe.minStock = minStock || existe.minStock;
+    if(qty > 0) existe.log.unshift({ ts:new Date().toISOString(), rpe:currentRpe||'—', qty, nota:'Ajuste +'+qty });
+    toast(`Stock actualizado: ${nombre} → ${existe.stock} ${existe.unidad}`);
+  } else {
+    arr.push({ id:'mat_'+Date.now(), nombre, unidad:unit, stock:qty, minStock,
+      log: qty>0 ? [{ts:new Date().toISOString(),rpe:currentRpe||'—',qty,nota:'Stock inicial'}] : [] });
+    toast(`Material agregado: ${nombre}`);
+  }
+  saveMateriales(arr);
+  document.getElementById('maName').value=''; document.getElementById('maQty').value='';
+  document.getElementById('maUnit').value=''; document.getElementById('maMinStock').value='';
+}
+
+function usarMaterial(id){
+  if(!currentRpe){ toast('Ingresa tu RPE primero','err'); return; }
+  const arr = getMateriales();
+  const m = arr.find(x=>x.id===id);
+  if(!m) return;
+  const inputEl = document.getElementById('matuse_'+id);
+  const notaEl  = document.getElementById('matnota_'+id);
+  const cant = parseFloat(inputEl?.value)||0;
+  if(cant<=0){ toast('Ingresa una cantidad mayor a 0','err'); return; }
+  if(cant>m.stock){ toast(`Stock insuficiente. Disponible: ${m.stock} ${m.unidad}`,'err'); return; }
+  m.stock = Math.round((m.stock - cant)*1000)/1000;
+  m.log.unshift({ts:new Date().toISOString(),rpe:currentRpe,qty:-cant,nota:notaEl?.value.trim()||'Uso en zona'});
+  if(m.log.length>50) m.log=m.log.slice(0,50);
+  saveMateriales(arr);
+  toast(`✓ −${cant} ${m.unidad} de "${m.nombre}". Stock restante: ${m.stock} ${m.unidad}`);
+  if(inputEl) inputEl.value='';
+  if(notaEl)  notaEl.value='';
+}
+
+function deleteMaterial(id){
+  if(!confirm('¿Eliminar este material del control de zona?')) return;
+  saveMateriales(getMateriales().filter(m=>m.id!==id));
+  toast('Material eliminado');
+}
+
+function importarDesdeRecepcion(){
+  if(!currentZona){ toast('Selecciona tu zona primero','err'); return; }
+  const orders = JSON.parse(localStorage.getItem(KEY_ORDERS)||'[]');
+  const misRec = orders.filter(o=>zonaYaRecibio(o,currentZona));
+  if(!misRec.length){ toast('No hay recepciones registradas para esta zona','err'); return; }
+  const ultima = [...misRec].sort((a,b)=>{
+    const ra=a.recepciones?.find(r=>r.zona.toUpperCase()===currentZona.toUpperCase());
+    const rb=b.recepciones?.find(r=>r.zona.toUpperCase()===currentZona.toUpperCase());
+    return new Date(rb?.ts||0)-new Date(ra?.ts||0);
+  })[0];
+  const rec=ultima.recepciones.find(r=>r.zona.toUpperCase()===currentZona.toUpperCase());
+  if(!rec?.productos?.length){ toast('La última recepción no tiene detalle de productos','err'); return; }
+  const arr=getMateriales(); let added=0,updated=0;
+  rec.productos.forEach(p=>{
+    if(p.recibido<=0) return;
+    const existe=arr.find(m=>m.nombre.toLowerCase()===p.nombre.toLowerCase());
+    if(existe){
+      existe.stock=Math.round((existe.stock+p.recibido)*1000)/1000;
+      existe.log.unshift({ts:new Date().toISOString(),rpe:currentRpe||'—',qty:p.recibido,nota:`Importado de ${ultima.id}`});
+      updated++;
+    } else {
+      arr.push({id:'mat_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        nombre:p.nombre,unidad:p.unidad,stock:p.recibido,minStock:0,
+        log:[{ts:new Date().toISOString(),rpe:currentRpe||'—',qty:p.recibido,nota:`Importado de ${ultima.id}`}]});
+      added++;
+    }
+  });
+  saveMateriales(arr);
+  toast(`✓ Importado de ${ultima.id}: ${added} nuevos, ${updated} actualizados`);
+}
+
+function exportMatCSV(){
+  if(!currentZona){ toast('Selecciona zona primero','err'); return; }
+  const arr=getMateriales();
+  if(!arr.length){ toast('No hay materiales registrados','err'); return; }
+  const rows=[['Zona','Producto','Unidad','Stock Actual','Stock Mínimo','Fecha','RPE','Movimiento','Nota']];
+  arr.forEach(m=>{
+    if(m.log.length) m.log.forEach(l=>rows.push([currentZona,m.nombre,m.unidad,m.stock,m.minStock,
+      new Date(l.ts).toLocaleString('es-MX'),l.rpe,l.qty,l.nota||'']));
+    else rows.push([currentZona,m.nombre,m.unidad,m.stock,m.minStock,'','','','']);
+  });
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`SICL_mat_${currentZona}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function renderMateriales(){
+  if(!currentZona) return;
+  const arr=getMateriales();
+  const today=new Date().toDateString();
+  const movHoy=arr.reduce((n,m)=>n+m.log.filter(l=>new Date(l.ts).toDateString()===today).length,0);
+  const bajos=arr.filter(m=>m.minStock>0&&m.stock<=m.minStock).length;
+  document.getElementById('mrTotal').textContent   =arr.length;
+  document.getElementById('mrUsadoHoy').textContent=movHoy;
+  document.getElementById('mrBajos').textContent   =bajos;
+  const grid=document.getElementById('matGrid');
+  if(!arr.length){
+    grid.innerHTML='<div class="mat-empty">No hay materiales. Agrégalos arriba o importa desde la última recepción.</div>';
+    return;
+  }
+  grid.innerHTML=arr.map(m=>{
+    const pct     =m.minStock>0?Math.min(100,Math.round((m.stock/(m.minStock*3||1))*100)):100;
+    const bajo    =m.minStock>0&&m.stock<=m.minStock;
+    const agotado =m.stock<=0;
+    const barColor=agotado?'var(--danger)':bajo?'var(--warn)':'var(--accent)';
+    const valClass=agotado?'mat-stock-danger':bajo?'mat-stock-warn':'';
+    const logsHtml=m.log.slice(0,8).map(l=>`
+      <div class="mat-log-entry">
+        <span>${new Date(l.ts).toLocaleString('es-MX',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})} · ${l.nota||''} · ${l.rpe}</span>
+        <span class="mat-log-qty" style="${l.qty>0?'color:var(--accent)':''}">${l.qty>0?'+':''}${l.qty} ${m.unidad}</span>
+      </div>`).join('');
+    return `<div class="mat-card">
+      <button class="mat-del-btn" onclick="deleteMaterial('${m.id}')" title="Eliminar">✕</button>
+      <div class="mat-card-name">${m.nombre}</div>
+      <div class="mat-card-meta">${m.unidad}${m.minStock>0?' · mín: '+m.minStock+' '+m.unidad:''}</div>
+      <div class="mat-stock-row">
+        <span class="mat-stock-label">Stock</span>
+        <span class="mat-stock-val ${valClass}">${m.stock}</span>
+        <span class="mat-stock-unit">${m.unidad}</span>
+        ${agotado?`<span class="chip-warn-sm" style="margin-left:auto">AGOTADO</span>`:bajo?`<span class="chip-warn-sm" style="margin-left:auto">⚠ BAJO</span>`:''}
+      </div>
+      ${m.minStock>0?`<div class="mat-bar"><div class="mat-bar-fill" style="width:${pct}%;background:${barColor}"></div></div>`:''}
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:0.58rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem">Descontar uso del día:</div>
+      <div class="mat-use-row" style="margin-bottom:0.4rem">
+        <input class="mat-use-input" id="matuse_${m.id}" type="number" min="0.1" step="0.1" placeholder="0" />
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:0.7rem;color:var(--muted)">${m.unidad}</span>
+        <button class="mat-use-btn" onclick="usarMaterial('${m.id}')">− USAR</button>
+      </div>
+      <div class="mat-use-row" style="margin-bottom:0.65rem">
+        <input class="mat-add-input" id="matnota_${m.id}" placeholder="Nota (opcional)" style="flex:1;font-size:0.75rem;padding:0.28rem 0.5rem" />
+      </div>
+      ${m.log.length?`<details style="margin-top:0.4rem">
+        <summary style="font-family:'IBM Plex Mono',monospace;font-size:0.6rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;user-select:none">
+          Historial (${m.log.length} mov.)</summary>
+        <div class="mat-log">${logsHtml}</div>
+      </details>`:''}
+    </div>`;
+  }).join('');
+}
+
+// Hook onZoneChange para refrescar materiales
+const _origZoneChange = onZoneChange;
+onZoneChange = function(){
+  _origZoneChange();
+  renderMateriales();
+};
+(function(){ if(currentZona) renderMateriales(); })();
+</script>
+
+  <!-- ═══ REGISTRO SERVICE WORKER ═══ -->
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] Service Worker registrado:', reg.scope))
+          .catch(err => console.warn('[PWA] SW error:', err));
+      });
+    }
+
+    // Banner de instalación
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'flex';
+    });
+    window.addEventListener('appinstalled', () => {
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'none';
+      deferredPrompt = null;
+    });
+    function installApp(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        deferredPrompt = null;
+        const banner = document.getElementById('installBanner');
+        if(banner) banner.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>

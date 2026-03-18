@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#030d18">
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DATASYS">
+<link rel="apple-touch-icon" id="apple-touch-icon-tag" href="imagenes/logo_datasys.png">
+<link rel="icon" id="favicon-tag" type="image/png" href="imagenes/logo_datasys.png">
+<script>
+// Genera favicon e icono PWA con fondo negro + logo datasys
+(function(){
+  function genIcon(size, callback){
+    var canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    var ctx = canvas.getContext('2d');
+    // Fondo negro
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, size, size);
+    // Logo centrado
+    var img = new Image();
+    img.onload = function(){
+      var pad = size * 0.12;
+      ctx.drawImage(img, pad, pad, size - pad*2, size - pad*2);
+      callback(canvas.toDataURL('image/png'));
+    };
+    img.onerror = function(){ callback(null); };
+    img.src = 'imagenes/logo_datasys.png';
+  }
+  window.addEventListener('DOMContentLoaded', function(){
+    genIcon(180, function(url){
+      if(!url) return;
+      var ati = document.getElementById('apple-touch-icon-tag');
+      if(ati) ati.href = url;
+      var fav = document.getElementById('favicon-tag');
+      if(fav) fav.href = url;
+    });
+  });
+})();
+</script>
+<meta name="description" content="DATASYS — Ecosistema tecnológico: IA, Biotech, Apps, Bolsa, Ciberseguridad y más.">
+<script src="tracker.js"></script>
+
+<!-- ARIA — scripts de bases de conocimiento ahora sólo en aria.html -->
+<title>DATASYS — Innovate. Integrate. Automate.</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --c:#00e5ff;--c2:#00b8d9;--bg:#030d18;--bg2:#060f1c;--bg3:#0a1828;
+  --txt:#dff0f8;--dim:#8eb8cc;--gold:#f0c040;--red:#c8282a;--green:#3d8c6e;
+  --glow:0 0 16px rgba(0,229,255,.45);--glow2:0 0 32px rgba(0,229,255,.6);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;font-size:16px;}
+body{font-family:'Rajdhani',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden;}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,.008) 3px,rgba(0,229,255,.008) 4px);pointer-events:none;z-index:9000;}
+a{text-decoration:none;color:inherit;}
+img{max-width:100%;height:auto;}
+
+/* ── TOPBAR ── */
+#topbar{position:fixed;top:0;left:0;right:0;height:58px;z-index:999;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:rgba(3,13,24,.97);border-bottom:1px solid rgba(0,229,255,.2);backdrop-filter:blur(14px);}
+.tb-logo{display:flex;align-items:center;gap:10px;}
+.tb-logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 8px rgba(0,229,255,.6));}
+.tb-logo-txt{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:4px;color:var(--c);text-shadow:var(--glow);}
+.tb-menu-btn{width:42px;height:42px;background:rgba(0,229,255,.06);border:1px solid rgba(0,229,255,.22);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;border-radius:4px;}
+.tb-menu-btn span{display:block;width:20px;height:1.5px;background:var(--c);transition:all .3s;}
+.tb-menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+.tb-menu-btn.open span:nth-child(2){opacity:0;}
+.tb-menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+/* ── DRAWER MENU ── */
+#drawer{position:fixed;top:58px;left:0;right:0;bottom:0;z-index:998;background:rgba(3,13,24,.98);border-top:1px solid rgba(0,229,255,.15);transform:translateX(-100%);transition:transform .35s cubic-bezier(.4,0,.2,1);overflow-y:auto;padding:20px 0;}
+#drawer.open{transform:translateX(0);}
+.dr-item{display:flex;align-items:center;gap:14px;padding:16px 24px;border-bottom:1px solid rgba(0,229,255,.06);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:1.05rem;letter-spacing:2px;color:var(--dim);transition:all .2s;cursor:pointer;}
+.dr-item:active{background:rgba(0,229,255,.06);color:var(--c);}
+.dr-ico{font-size:1.4rem;width:32px;text-align:center;}
+.dr-lbl{flex:1;}
+.dr-arr{font-size:.8rem;opacity:.4;}
+.dr-aria{margin:16px 20px 0;padding:14px;font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;width:calc(100% - 40px);display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:var(--glow);}
+
+/* ── HERO ── */
+.hero{position:relative;min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:78px 20px 40px;overflow:hidden;text-align:center;}
+.h-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);background-size:40px 40px;animation:gd 22s linear infinite;}
+@keyframes gd{0%{background-position:0 0;}100%{background-position:40px 40px;}}
+.h-amb{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 40%,rgba(0,40,70,.7) 0%,transparent 70%);}
+.h-logo-wrap{position:relative;width:130px;height:130px;margin:0 auto 24px;}
+.h-logo{width:100%;height:100%;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 28px rgba(0,229,255,.55));animation:lp 8s ease-in-out infinite;}
+@keyframes lp{0%,100%{filter:drop-shadow(0 0 20px rgba(0,229,255,.4));}50%{filter:drop-shadow(0 0 44px rgba(0,229,255,.8));}}
+.h-ring{position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(0,229,255,.2);animation:rp 3s ease-in-out infinite;}
+.h-ring:nth-child(2){inset:-20px;animation-delay:.6s;border-color:rgba(0,229,255,.1);}
+.h-ring:nth-child(3){inset:-36px;animation-delay:1.2s;border-color:rgba(0,229,255,.05);}
+@keyframes rp{0%,100%{transform:scale(1);opacity:.6;}50%{transform:scale(1.04);opacity:1;}}
+.h-pre{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:4px;color:var(--c);opacity:.6;margin-bottom:10px;}
+.h-title{font-family:'Orbitron',sans-serif;font-size:clamp(2.4rem,12vw,4rem);font-weight:900;color:var(--c);letter-spacing:8px;text-shadow:var(--glow2);line-height:1;margin-bottom:10px;}
+.h-sub{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:5px;color:var(--dim);margin-bottom:32px;}
+
+/* PLATFORM CARDS GRID */
+.h-grid-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:420px;margin:0 auto 28px;}
+.hc{display:flex;flex-direction:column;align-items:center;gap:5px;padding:16px 8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.25);border-radius:8px;cursor:pointer;transition:all .25s;text-decoration:none;position:relative;overflow:hidden;}
+.hc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:0;transition:opacity .25s;}
+.hc:active{background:rgba(0,229,255,.15);border-color:var(--c);transform:scale(.96);box-shadow:0 0 18px rgba(0,229,255,.25);}
+.hc:active::before{opacity:1;}
+.hc-num{font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:2px;color:var(--c);opacity:.4;align-self:flex-start;padding-left:2px;}
+.hc-ico{font-size:1.85rem;filter:drop-shadow(0 0 8px rgba(0,229,255,.35));}
+.hc-lbl{font-family:'Orbitron',sans-serif;font-size:.44rem;letter-spacing:1px;color:var(--c);text-align:center;line-height:1.5;font-weight:700;}
+.hc-arr{font-size:.5rem;color:var(--c);opacity:.4;margin-top:1px;}
+
+.h-cta{padding:14px 32px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;display:inline-block;box-shadow:var(--glow);text-decoration:none;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);}
+.h-cta:active{filter:brightness(.9);}
+.h-scroll{margin-top:24px;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.3;}
+.h-scroll span{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:4px;color:var(--dim);}
+.h-scroll-line{width:1px;height:22px;background:linear-gradient(180deg,var(--c),transparent);}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:rgba(0,229,255,.08);border-top:1px solid rgba(0,229,255,.12);border-bottom:1px solid rgba(0,229,255,.12);}
+.stat{background:var(--bg2);padding:24px 16px;text-align:center;}
+.stat-n{font-family:'Orbitron',sans-serif;font-size:2rem;font-weight:900;color:var(--c);text-shadow:var(--glow);}
+.stat-l{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:2.5px;color:var(--dim);margin-top:4px;line-height:1.5;}
+
+/* ── SECTION HEAD ── */
+.sec-h{text-align:center;padding:48px 20px 32px;}
+.sec-pre{font-family:'Share Tech Mono',monospace;font-size:.54rem;letter-spacing:4px;color:var(--c);opacity:.55;margin-bottom:10px;}
+.sec-ttl{font-family:'Orbitron',sans-serif;font-size:1.5rem;font-weight:900;color:var(--txt);letter-spacing:3px;position:relative;display:inline-block;}
+.sec-ttl::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:50%;height:2px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.sec-sub{font-size:.92rem;color:var(--dim);line-height:1.8;margin-top:22px;max-width:340px;margin-left:auto;margin-right:auto;}
+
+/* ── PLATFORM CARDS ── */
+.plat-list{display:flex;flex-direction:column;gap:2px;padding:0 0 2px;}
+.plat-card{display:flex;align-items:center;gap:16px;padding:18px 20px;background:var(--bg2);border:1px solid rgba(0,229,255,.1);text-decoration:none;position:relative;overflow:hidden;transition:all .2s;}
+.plat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c);transform:scaleY(0);transition:transform .3s;}
+.plat-card:active::before{transform:scaleY(1);}
+.plat-card:active{background:rgba(0,229,255,.05);}
+.c-gold::before{background:var(--gold);}
+.c-gold .pc-num,.c-gold .pc-ttl{color:var(--gold);}
+.c-red::before{background:var(--red);}
+.c-red .pc-num,.c-red .pc-ttl{color:#e05050;}
+.c-green::before{background:var(--green);}
+.c-green .pc-num,.c-green .pc-ttl{color:var(--green);}
+.pc-ico{font-size:2rem;flex-shrink:0;width:44px;text-align:center;}
+.pc-body{flex:1;min-width:0;}
+.pc-num{font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:var(--c);opacity:.5;}
+.pc-ttl{font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;color:var(--c);letter-spacing:1px;margin:2px 0;}
+.pc-desc{font-size:.8rem;color:var(--dim);line-height:1.6;font-weight:400;}
+.pc-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px;}
+.pc-tag{font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.2px;padding:2px 7px;border:1px solid rgba(0,229,255,.15);color:rgba(0,229,255,.5);}
+.c-gold .pc-tag{border-color:rgba(240,192,64,.2);color:rgba(240,192,64,.55);}
+.c-red .pc-tag{border-color:rgba(200,40,42,.2);color:rgba(224,80,80,.5);}
+.c-green .pc-tag{border-color:rgba(61,140,110,.2);color:rgba(61,140,110,.6);}
+.pc-badge{position:absolute;top:10px;right:14px;font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:1.5px;padding:2px 8px;}
+.b-live{background:rgba(0,229,255,.1);border:1px solid var(--c);color:var(--c);}
+.b-inv{background:rgba(200,40,42,.85);color:#fff;font-weight:700;}
+.b-new{background:var(--gold);color:var(--bg);font-weight:700;}
+.pc-arr{font-size:1.1rem;color:var(--c);opacity:.4;flex-shrink:0;}
+
+/* ── BANNER ── */
+.banner{position:relative;overflow:hidden;height:200px;margin:2px 0;}
+.banner-img{width:100%;height:100%;object-fit:cover;filter:brightness(.12) saturate(.4);}
+.banner-over{position:absolute;inset:0;background:linear-gradient(180deg,var(--bg) 0%,transparent 20%,transparent 80%,var(--bg) 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:0 20px;}
+.banner-pre{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:4px;color:var(--c);opacity:.65;}
+.banner-ttl{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:var(--txt);letter-spacing:3px;line-height:1.3;}
+.banner-cta{margin-top:4px;padding:10px 24px;font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;letter-spacing:2px;color:var(--c);background:transparent;border:1px solid rgba(0,229,255,.4);text-decoration:none;display:inline-block;}
+.banner-cta:active{background:rgba(0,229,255,.1);}
+
+/* ── CTA BLOCK ── */
+.cta-block{background:rgba(0,229,255,.03);border-top:1px solid rgba(0,229,255,.1);border-bottom:1px solid rgba(0,229,255,.1);padding:40px 20px;text-align:center;}
+.cta-block h3{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;color:var(--c);letter-spacing:2px;margin-bottom:12px;line-height:1.3;}
+.cta-block p{font-size:.9rem;color:var(--dim);line-height:1.75;margin-bottom:24px;}
+.btn-stack{display:flex;flex-direction:column;gap:10px;}
+.btn-m{padding:14px 24px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:2px;text-align:center;text-decoration:none;display:block;border:none;cursor:pointer;}
+.btn-m.p{background:var(--c);color:var(--bg);}
+.btn-m.p:active{filter:brightness(.9);}
+.btn-m.o{background:transparent;color:var(--c);border:1px solid rgba(0,229,255,.35);}
+.btn-m.o:active{background:rgba(0,229,255,.08);}
+
+/* ── FOOTER ── */
+footer{background:var(--bg2);border-top:1px solid rgba(0,229,255,.1);padding:32px 20px 24px;}
+.ft-logo-m{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.ft-logo-m img{width:38px;height:38px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 8px rgba(0,229,255,.4));}
+.ft-logo-m span{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:900;letter-spacing:4px;color:var(--c);}
+.ft-tag{font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:3px;color:var(--dim);opacity:.4;margin-bottom:16px;}
+.ft-links-m{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;}
+.ft-link-m{font-size:.85rem;color:var(--dim);opacity:.55;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.ft-link-m:active{color:var(--c);opacity:1;}
+.ft-contact{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;padding:16px;background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.08);}
+.ft-ci{font-size:.82rem;color:var(--dim);display:flex;align-items:center;gap:8px;}
+.ft-divider{height:1px;background:rgba(0,229,255,.07);margin:16px 0;}
+.ft-copy{font-size:.7rem;color:rgba(142,184,204,.28);text-align:center;}
+
+/* ── ARIA BOT ── */
+.aria-fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background:var(--bg2);border:2px solid var(--c);cursor:pointer;z-index:990;display:flex;align-items:center;justify-content:center;box-shadow:var(--glow2);animation:ff 3s ease-in-out infinite;overflow:hidden;}
+@keyframes ff{0%,100%{transform:translateY(0);box-shadow:var(--glow);}50%{transform:translateY(-6px);box-shadow:var(--glow2);}}
+.aria-fab img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.aria-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:var(--c);color:var(--bg);font-size:.48rem;font-weight:900;display:flex;align-items:center;justify-content:center;}
+.aria-panel{position:fixed;bottom:88px;right:16px;left:16px;max-height:72svh;background:rgba(3,13,24,.98);border:1px solid rgba(0,229,255,.28);backdrop-filter:blur(20px);z-index:989;display:none;flex-direction:column;border-radius:8px 8px 0 0;box-shadow:0 -8px 40px rgba(0,229,255,.1);}
+.aria-panel.open{display:flex;}
+.ap-head{padding:12px 16px;background:rgba(0,229,255,.05);border-bottom:1px solid rgba(0,229,255,.12);display:flex;align-items:center;gap:10px;flex-shrink:0;border-radius:8px 8px 0 0;}
+.ap-av{width:38px;height:38px;border-radius:50%;border:2px solid var(--c);object-fit:cover;}
+.ap-nm{font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--c);letter-spacing:2px;}
+.ap-st{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:#00ff88;display:flex;align-items:center;gap:4px;}
+.st-dot{width:5px;height:5px;border-radius:50%;background:#00ff88;animation:bl 1.5s ease-in-out infinite;}
+@keyframes bl{0%,100%{opacity:1;}50%{opacity:.15;}}
+.ap-close{margin-left:auto;background:none;border:none;color:var(--dim);font-size:1.1rem;cursor:pointer;padding:4px 8px;}
+.ap-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.cm{max-width:90%;padding:9px 12px;font-size:.85rem;line-height:1.6;border-radius:4px;}
+.cm.bot{background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.18);color:var(--txt);align-self:flex-start;}
+.cm.usr{background:rgba(0,229,255,.13);border:1px solid rgba(0,229,255,.3);color:var(--c);align-self:flex-end;}
+.ap-quick{display:flex;flex-wrap:wrap;gap:5px;padding:8px 12px;flex-shrink:0;border-top:1px solid rgba(0,229,255,.08);}
+.qb{padding:6px 10px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);color:var(--c);font-family:'Rajdhani',sans-serif;font-size:.78rem;cursor:pointer;border-radius:3px;}
+.qb:active{background:rgba(0,229,255,.15);}
+.ap-inp{padding:10px 12px;border-top:1px solid rgba(0,229,255,.12);display:flex;gap:7px;flex-shrink:0;}
+.ap-input{flex:1;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);color:var(--txt);font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:10px 12px;border-radius:4px;outline:none;}
+.ap-send{padding:10px 14px;background:rgba(0,229,255,.1);border:1px solid var(--c);color:var(--c);cursor:pointer;border-radius:4px;font-size:.9rem;}
+.ap-send:active{background:var(--c);color:var(--bg);}
+.td{display:flex;gap:4px;align-items:center;}
+.td span{width:6px;height:6px;border-radius:50%;background:var(--c);opacity:.4;animation:tda 1s ease-in-out infinite;}
+.td span:nth-child(2){animation-delay:.2s;}.td span:nth-child(3){animation-delay:.4s;}
+@keyframes tda{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:1;transform:scale(1.3);}}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+
+/* ── APP DOWNLOAD SECTION ── */
+.app-dl-section{background:linear-gradient(135deg,rgba(0,229,255,.04) 0%,rgba(0,40,70,.6) 50%,rgba(3,13,24,1) 100%);border-top:1px solid rgba(0,229,255,.18);border-bottom:1px solid rgba(0,229,255,.18);padding:44px 20px;position:relative;overflow:hidden;}
+.app-dl-section::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);background-size:32px 32px;pointer-events:none;}
+.app-dl-pre{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:4px;color:var(--c);opacity:.6;margin-bottom:10px;}
+.app-dl-title{font-family:'Orbitron',sans-serif;font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:3px;line-height:1.2;margin-bottom:10px;}
+.app-dl-sub{font-size:.9rem;color:var(--dim);line-height:1.7;margin-bottom:28px;}
+.app-dl-badges{display:flex;flex-direction:column;gap:12px;margin-bottom:20px;}
+.app-badge{display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:10px;text-decoration:none;transition:all .25s;position:relative;overflow:hidden;cursor:pointer;}
+.app-badge::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,.04);opacity:0;transition:opacity .2s;}
+.app-badge:active::after{opacity:1;}
+.app-badge.ios{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid rgba(255,255,255,.15);}
+.app-badge.android{background:linear-gradient(135deg,#0d2818,#0f3d1f);border:1px solid rgba(61,200,100,.25);}
+.app-badge.pwa{background:linear-gradient(135deg,#030d18,#0a1828);border:1px solid rgba(0,229,255,.3);}
+.ab-icon{font-size:2rem;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(0,229,255,.3));}
+.app-badge.ios .ab-icon{filter:drop-shadow(0 0 8px rgba(255,255,255,.2));}
+.app-badge.android .ab-icon{filter:drop-shadow(0 0 8px rgba(61,200,100,.4));}
+.ab-text{flex:1;}
+.ab-sub{font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:2px;color:rgba(255,255,255,.4);margin-bottom:2px;}
+.app-badge.android .ab-sub{color:rgba(61,200,100,.6);}
+.app-badge.pwa .ab-sub{color:rgba(0,229,255,.6);}
+.ab-name{font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#fff;letter-spacing:1px;}
+.app-badge.android .ab-name{color:#4fce74;}
+.app-badge.pwa .ab-name{color:var(--c);}
+.ab-arr{font-size:1rem;color:rgba(255,255,255,.25);flex-shrink:0;}
+.app-badge.pwa .ab-arr{color:rgba(0,229,255,.5);}
+.app-dl-note{font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;color:var(--dim);opacity:.45;line-height:1.9;text-align:center;}
+
+/* ── BANNER INSTALACIÓN PWA ── */
+#pwa-install-bar{position:fixed;bottom:0;left:0;right:0;z-index:9800;background:rgba(3,13,24,.98);border-top:1px solid rgba(0,229,255,.3);padding:14px 18px;display:none;align-items:center;gap:12px;backdrop-filter:blur(16px);box-shadow:0 -8px 40px rgba(0,229,255,.12);}
+#pwa-install-bar.show{display:flex;}
+.pib-icon{width:40px;height:40px;border-radius:10px;background:var(--c);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.pib-text{flex:1;}
+.pib-title{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;color:var(--c);letter-spacing:1.5px;}
+.pib-sub{font-family:'Share Tech Mono',monospace;font-size:.44rem;color:var(--dim);opacity:.6;margin-top:2px;}
+.pib-btn{padding:9px 16px;font-family:'Orbitron',sans-serif;font-size:.52rem;font-weight:700;letter-spacing:2px;background:var(--c);color:var(--bg);border:none;cursor:pointer;border-radius:4px;flex-shrink:0;}
+.pib-close{background:none;border:none;color:var(--dim);font-size:1.1rem;cursor:pointer;padding:4px;flex-shrink:0;opacity:.5;}
+
+/* ── iOS INSTALL MODAL ── */
+#ios-modal{position:fixed;inset:0;z-index:9900;background:rgba(3,13,24,.96);backdrop-filter:blur(20px);display:none;align-items:flex-end;justify-content:center;}
+#ios-modal.show{display:flex;}
+.ios-sheet{background:#0a1828;border:1px solid rgba(0,229,255,.28);border-radius:16px 16px 0 0;padding:24px 22px 40px;width:100%;max-width:480px;}
+.ios-handle{width:36px;height:4px;background:rgba(0,229,255,.25);border-radius:2px;margin:0 auto 20px;}
+.ios-title{font-family:'Orbitron',sans-serif;font-size:.88rem;font-weight:900;color:var(--c);letter-spacing:2px;margin-bottom:6px;}
+.ios-sub{font-size:.85rem;color:var(--dim);line-height:1.65;margin-bottom:22px;}
+.ios-steps{display:flex;flex-direction:column;gap:14px;margin-bottom:24px;}
+.ios-step{display:flex;align-items:flex-start;gap:12px;}
+.ios-step-n{width:26px;height:26px;border-radius:50%;background:rgba(0,229,255,.1);border:1px solid rgba(0,229,255,.3);color:var(--c);font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.ios-step-txt{font-size:.85rem;color:var(--dim);line-height:1.6;}
+.ios-step-txt b{color:#fff;}
+.ios-close{width:100%;padding:13px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:2px;background:transparent;border:1px solid rgba(0,229,255,.3);color:var(--c);cursor:pointer;border-radius:6px;}</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header id="topbar">
+  <a class="tb-logo" href="index_mobile.html">
+    <img src="imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
+    <span class="tb-logo-txt">DATASYS</span>
+  </a>
+  <div class="tb-menu-btn" id="menuBtn" onclick="toggleMenu()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </div>
+</header>
+
+<!-- DRAWER -->
+<nav id="drawer">
+  <a class="dr-item" href="Clientes/clientes_datasys_mobile.html" data-track="Área de Clientes" onclick="if(window.logNav)logNav('Clientes');if(window.DATASYS_cloudPut)try{window.dispatchEvent(new Event('beforeunload'));}catch(e){}" style="color:var(--c);border-bottom:1px solid rgba(0,229,255,.15);margin-bottom:6px;"><span class="dr-ico">👥</span><span class="dr-lbl">Área de Clientes</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/analisis_datos_datasys_mobile.html"><span class="dr-ico">📊</span><span class="dr-lbl">Análisis de Datos</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/biotecnologia_inversores_datasys_mobile.html"><span class="dr-ico">🧬</span><span class="dr-lbl">Biotecnología · Serie A</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/apps_datasys_mobile.html"><span class="dr-ico">📱</span><span class="dr-lbl">Desarrollo de Apps</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/bolsa_us_datasys_mobile.html"><span class="dr-ico">📈</span><span class="dr-lbl">Bolsa de Valores</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/automatizacion_datasys_mobile.html"><span class="dr-ico">🤖</span><span class="dr-lbl">Automatización Industrial</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/inventario_virtual_datasys_mobile.html"><span class="dr-ico">📦</span><span class="dr-lbl">Inventario Virtual</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/ciberseguridad_datasys_mobile.html"><span class="dr-ico">🔐</span><span class="dr-lbl">Ciberseguridad SOC 24/7</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/consultoria_datasys_mobile.html"><span class="dr-ico">🎯</span><span class="dr-lbl">Consultoría & Conferencias</span><span class="dr-arr">›</span></a>
+  <a class="dr-item" href="mobile/revista_datasys_mobile.html"><span class="dr-ico">📰</span><span class="dr-lbl">Revista Tech Virtual</span><span class="dr-arr">›</span></a>
+  <button class="dr-aria" onclick="toggleMenu();toggleAria()">⚡ ARIA — ASISTENTE IA</button>
+  <a class="dr-item" href="#descargar-app" onclick="toggleMenu()" style="color:#00ff88;border-top:1px solid rgba(0,255,136,.12);margin-top:6px;"><span class="dr-ico">📲</span><span class="dr-lbl">Descargar App</span><span class="dr-arr">›</span></a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="h-grid"></div>
+  <div class="h-amb"></div>
+  <div class="h-logo-wrap">
+    <div class="h-ring"></div><div class="h-ring"></div><div class="h-ring"></div>
+    <img class="h-logo" src="imagenes/3d.png" alt="DATASYS" onerror="this.style.opacity='.2'">
+  </div>
+  <div class="h-pre">// DATASYS · ECOSISTEMA TECNOLÓGICO</div>
+  <h1 class="h-title">DATASYS</h1>
+  <p class="h-sub">INNOVATE &nbsp;·&nbsp; INTEGRATE &nbsp;·&nbsp; AUTOMATE</p>
+
+  <div class="h-grid-cards">
+    <a class="hc" href="mobile/analisis_datos_datasys_mobile.html"><div class="hc-num">01</div><div class="hc-ico">📊</div><div class="hc-lbl">Análisis<br>de Datos</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/biotecnologia_inversores_datasys_mobile.html"><div class="hc-num">02</div><div class="hc-ico">🧬</div><div class="hc-lbl">Biotech<br>Serie A</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/apps_datasys_mobile.html"><div class="hc-num">03</div><div class="hc-ico">📱</div><div class="hc-lbl">Apps &<br>Software</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/bolsa_us_datasys_mobile.html"><div class="hc-num">04</div><div class="hc-ico">📈</div><div class="hc-lbl">Bolsa de<br>Valores</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/automatizacion_datasys_mobile.html"><div class="hc-num">05</div><div class="hc-ico">🤖</div><div class="hc-lbl">Automa-<br>tización</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/inventario_virtual_datasys_mobile.html"><div class="hc-num">06</div><div class="hc-ico">📦</div><div class="hc-lbl">Inventario<br>Virtual</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/ciberseguridad_datasys_mobile.html"><div class="hc-num">07</div><div class="hc-ico">🔐</div><div class="hc-lbl">Ciber-<br>seguridad</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/consultoria_datasys_mobile.html"><div class="hc-num">08</div><div class="hc-ico">🎯</div><div class="hc-lbl">Consultoría<br>& Conf.</div><div class="hc-arr">›</div></a>
+    <a class="hc" href="mobile/revista_datasys_mobile.html"><div class="hc-num">09</div><div class="hc-ico">📰</div><div class="hc-lbl">Revista<br>Tech</div><div class="hc-arr">›</div></a>
+  </div>
+
+  <a class="h-cta" href="mobile/consultoria_datasys_mobile.html#contacto">SESIÓN GRATUITA →</a>
+  <div class="h-scroll"><span>DESLIZA</span><div class="h-scroll-line"></div></div>
+</section>
+
+<!-- STATS -->
+<div class="stats reveal">
+  <div class="stat"><div class="stat-n">500+</div><div class="stat-l">PROYECTOS<br>COMPLETADOS</div></div>
+  <div class="stat"><div class="stat-n">18</div><div class="stat-l">PAÍSES CON<br>PRESENCIA</div></div>
+  <div class="stat"><div class="stat-n">98%</div><div class="stat-l">SATISFACCIÓN<br>CLIENTES</div></div>
+  <div class="stat"><div class="stat-n">9</div><div class="stat-l">PLATAFORMAS<br>ACTIVAS</div></div>
+</div>
+
+<!-- SECTION HEAD -->
+<div class="sec-h reveal">
+  <div class="sec-pre">// ECOSISTEMA COMPLETO</div>
+  <h2 class="sec-ttl">NUESTRAS PLATAFORMAS</h2>
+  <p class="sec-sub">9 plataformas especializadas con IA integrada para transformar cada área de tu organización.</p>
+</div>
+
+<!-- PLATFORM LIST -->
+<div class="plat-list">
+  <a class="plat-card reveal" href="mobile/analisis_datos_datasys_mobile.html">
+    <div class="pc-ico">📊</div>
+    <div class="pc-body">
+      <div class="pc-num">// 01</div>
+      <div class="pc-ttl">ANÁLISIS DE DATOS</div>
+      <div class="pc-desc">Dashboards en tiempo real, ML y modelos predictivos para decisiones estratégicas.</div>
+      <div class="pc-tags"><span class="pc-tag">ML · BI</span><span class="pc-tag">REAL-TIME</span><span class="pc-tag">PREDICTIVO</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card c-gold reveal" href="mobile/biotecnologia_inversores_datasys_mobile.html">
+    <div class="pc-badge b-inv">SERIE A</div>
+    <div class="pc-ico">🧬</div>
+    <div class="pc-body">
+      <div class="pc-num">// 02</div>
+      <div class="pc-ttl">BIOTECNOLOGÍA</div>
+      <div class="pc-desc">Biodynamic AI™ + robótica. Ronda Serie A abierta: $5M USD · Pre-money $18M.</div>
+      <div class="pc-tags"><span class="pc-tag">BIODYNAMIC AI</span><span class="pc-tag">SERIE A $5M</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card reveal" href="mobile/apps_datasys_mobile.html">
+    <div class="pc-ico">📱</div>
+    <div class="pc-body">
+      <div class="pc-num">// 03</div>
+      <div class="pc-ttl">DESARROLLO DE APPS</div>
+      <div class="pc-desc">Apps móviles y web de alto rendimiento con integración IoT y cloud enterprise.</div>
+      <div class="pc-tags"><span class="pc-tag">iOS · ANDROID</span><span class="pc-tag">PWA</span><span class="pc-tag">IoT</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card reveal" href="mobile/bolsa_us_datasys_mobile.html">
+    <div class="pc-badge b-live">🔴 EN VIVO</div>
+    <div class="pc-ico">📈</div>
+    <div class="pc-body">
+      <div class="pc-num">// 04</div>
+      <div class="pc-ttl">BOLSA DE VALORES</div>
+      <div class="pc-desc">Analítica financiera con IA. Trading algorítmico y market insights en tiempo real.</div>
+      <div class="pc-tags"><span class="pc-tag">NYSE · NASDAQ</span><span class="pc-tag">ALGO TRADING</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card reveal" href="mobile/automatizacion_datasys_mobile.html">
+    <div class="pc-ico">🤖</div>
+    <div class="pc-body">
+      <div class="pc-num">// 05</div>
+      <div class="pc-ttl">AUTOMATIZACIÓN INDUSTRIAL</div>
+      <div class="pc-desc">Robots inteligentes e Industria 4.0 para optimización de líneas de producción.</div>
+      <div class="pc-tags"><span class="pc-tag">INDUSTRIA 4.0</span><span class="pc-tag">IIoT</span><span class="pc-tag">RPA</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card c-green reveal" href="mobile/inventario_virtual_datasys_mobile.html">
+    <div class="pc-ico">📦</div>
+    <div class="pc-body">
+      <div class="pc-num">// 06</div>
+      <div class="pc-ttl">INVENTARIO VIRTUAL</div>
+      <div class="pc-desc">Blockchain + gemelo digital de supply chain. Trazabilidad y stock predictivo en tiempo real.</div>
+      <div class="pc-tags"><span class="pc-tag">BLOCKCHAIN</span><span class="pc-tag">SUPPLY CHAIN</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card c-red reveal" href="mobile/ciberseguridad_datasys_mobile.html">
+    <div class="pc-badge" style="background:rgba(200,40,42,.15);border:1px solid var(--red);color:#e05050;font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:1.5px;padding:2px 8px;position:absolute;top:10px;right:14px;">🔴 SOC 24/7</div>
+    <div class="pc-ico">🔐</div>
+    <div class="pc-body">
+      <div class="pc-num">// 07</div>
+      <div class="pc-ttl">CIBERSEGURIDAD</div>
+      <div class="pc-desc">SOC 24/7 con IA, Zero Trust, pentest Red Team y cumplimiento ISO 27001 · GDPR.</div>
+      <div class="pc-tags"><span class="pc-tag">ZERO TRUST</span><span class="pc-tag">SOC AI</span><span class="pc-tag">PENTEST</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card reveal" href="mobile/consultoria_datasys_mobile.html">
+    <div class="pc-ico">🎯</div>
+    <div class="pc-body">
+      <div class="pc-num">// 08</div>
+      <div class="pc-ttl">CONSULTORÍA & CONFERENCIAS</div>
+      <div class="pc-desc">Consultoría estratégica en transformación digital. Live Conferences globales y C-Suite Advisory.</div>
+      <div class="pc-tags"><span class="pc-tag">C-SUITE</span><span class="pc-tag">LIVE CONF.</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+
+  <a class="plat-card reveal" href="mobile/revista_datasys_mobile.html">
+    <div class="pc-badge b-new">NUEVO</div>
+    <div class="pc-ico">📰</div>
+    <div class="pc-body">
+      <div class="pc-num">// 09</div>
+      <div class="pc-ttl">REVISTA TECH VIRTUAL</div>
+      <div class="pc-desc">Artículo tecnológico diferente cada día de forma autónoma. Suscripción mensual disponible.</div>
+      <div class="pc-tags"><span class="pc-tag">DIARIO</span><span class="pc-tag">AUTO AI</span></div>
+    </div>
+    <div class="pc-arr">›</div>
+  </a>
+</div>
+
+<!-- BANNER -->
+<div class="banner reveal">
+  <img class="banner-img" src="imagenes/consultoria_01.jpeg" alt="" onerror="this.style.display='none'">
+  <div class="banner-over">
+    <div class="banner-pre">// 9 PLATAFORMAS · UN ECOSISTEMA</div>
+    <div class="banner-ttl">CONECTANDO EL<br>FUTURO TECNOLÓGICO</div>
+    <a class="banner-cta" href="mobile/consultoria_datasys_mobile.html">AGENDAR CONSULTORÍA →</a>
+  </div>
+</div>
+
+<!-- CTA BLOCK -->
+<div class="cta-block reveal">
+  <h3>¿LISTO PARA TRANSFORMAR<br>TU EMPRESA?</h3>
+  <p>Sesión estratégica gratuita de 90 minutos. Identificamos las 3 iniciativas de mayor impacto con consultores C-Suite.</p>
+  <div class="btn-stack">
+    <a class="btn-m p" href="mobile/consultoria_datasys_mobile.html#contacto">SESIÓN GRATUITA →</a>
+    <a class="btn-m o" href="mobile/revista_datasys_mobile.html">LEER REVISTA TECH</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<!-- ══ DESCARGA DE APP ══ -->
+<div class="app-dl-section reveal" id="descargar-app">
+  <div class="app-dl-pre">// DATASYS · APP OFICIAL</div>
+  <div class="app-dl-title">LLÉVATE DATASYS<br>EN TU BOLSILLO</div>
+  <p class="app-dl-sub">Accede a las 10 plataformas, ARIA y todas las herramientas desde tu iPhone, Mac o Android. Instalación en segundos.</p>
+
+  <div class="app-dl-badges">
+    <!-- iOS / Mac -->
+    <div class="app-badge ios" onclick="showIosModal()">
+      <div class="ab-icon">🍎</div>
+      <div class="ab-text">
+        <div class="ab-sub">DESCARGAR EN</div>
+        <div class="ab-name">iPhone &amp; Mac</div>
+      </div>
+      <div class="ab-arr">›</div>
+    </div>
+
+    <!-- Android -->
+    <div class="app-badge android" onclick="installAndroid()">
+      <div class="ab-icon">🤖</div>
+      <div class="ab-text">
+        <div class="ab-sub">DESCARGAR EN</div>
+        <div class="ab-name">Android</div>
+      </div>
+      <div class="ab-arr" id="android-arr">›</div>
+    </div>
+
+    <!-- PWA directa -->
+    <div class="app-badge pwa" id="pwa-btn" onclick="installPWA()" style="display:none;">
+      <div class="ab-icon">⚡</div>
+      <div class="ab-text">
+        <div class="ab-sub">INSTALAR AHORA</div>
+        <div class="ab-name">Instalar App</div>
+      </div>
+      <div class="ab-arr">↓</div>
+    </div>
+  </div>
+
+  <div class="app-dl-note">
+    Sin tienda. Sin APK externo. Instalación nativa vía PWA certificada.<br>
+    Funciona offline · Notificaciones · Acceso directo desde pantalla inicio
+  </div>
+</div>
+
+<!-- BANNER INFERIOR INSTALACIÓN (Android/Chrome) -->
+<div id="pwa-install-bar">
+  <div class="pib-icon">⚡</div>
+  <div class="pib-text">
+    <div class="pib-title">INSTALAR DATASYS</div>
+    <div class="pib-sub">App disponible · Toca para instalar</div>
+  </div>
+  <button class="pib-btn" onclick="installPWA()">INSTALAR</button>
+  <button class="pib-close" onclick="document.getElementById('pwa-install-bar').classList.remove('show')">✕</button>
+</div>
+
+<!-- MODAL iOS -->
+<div id="ios-modal" onclick="if(event.target===this)closeIosModal()">
+  <div class="ios-sheet">
+    <div class="ios-handle"></div>
+    <div class="ios-title">📱 INSTALAR EN iPHONE / MAC</div>
+    <p class="ios-sub">Añade DATASYS a tu pantalla de inicio para tener acceso instantáneo como una app nativa.</p>
+    <div class="ios-steps">
+      <div class="ios-step">
+        <div class="ios-step-n">1</div>
+        <div class="ios-step-txt">Toca el botón <b>Compartir</b> <span style="font-size:1.1rem;">⬆️</span> en la barra inferior de Safari</div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-n">2</div>
+        <div class="ios-step-txt">Desliza hacia abajo y toca <b>"Añadir a pantalla de inicio"</b></div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-n">3</div>
+        <div class="ios-step-txt">Confirma con <b>"Añadir"</b> — DATASYS aparecerá como app en tu pantalla</div>
+      </div>
+      <div class="ios-step">
+        <div class="ios-step-n">✓</div>
+        <div class="ios-step-txt" style="color:#00ff88;"><b>En Mac:</b> Safari → Archivo → Añadir al Dock</div>
+      </div>
+    </div>
+    <button class="ios-close" onclick="closeIosModal()">ENTENDIDO ✓</button>
+  </div>
+</div>
+
+<!-- ══ MODAL ACUSE DE RECIBO ══ -->
+<div id="acuseModal" style="position:fixed;inset:0;z-index:99100;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.96);backdrop-filter:blur(16px);">
+  <div style="background:#05101e;border:1px solid rgba(0,229,255,.38);max-width:500px;width:94%;padding:0;animation:acuseIn .4s both;position:relative;">
+    <style>@keyframes acuseIn{0%{opacity:0;transform:scale(.93) translateY(18px);}100%{opacity:1;transform:none;}}</style>
+    <div style="padding:16px 22px 12px;border-bottom:1px solid rgba(0,229,255,.13);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">✓ MENSAJE ENVIADO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#00e5ff;letter-spacing:2px;">ACUSE DE RECIBO</div>
+      </div>
+      <button onclick="closeAcuse()" style="background:none;border:none;color:#aaa;font-size:1.4rem;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.13);margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;">FOLIO</span>
+        <span id="acuse_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:#00e5ff;"></span>
+        <span id="acuse_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.5;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">NOMBRE</span><span id="acuse_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">EMAIL</span><span id="acuse_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#00e5ff;font-weight:600;word-break:break-all;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">TELÉFONO</span><span id="acuse_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">SERVICIO</span><span id="acuse_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f5c842;font-weight:600;"></span></div>
+        <div style="padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;display:block;margin-bottom:3px;">MENSAJE</span><span id="acuse_msg" style="font-family:'Rajdhani',sans-serif;font-size:.85rem;color:#fff;line-height:1.6;"></span></div>
+      </div>
+      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.43rem;color:#00ff88;line-height:2;margin-bottom:14px;">
+        Mensaje enviado a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="94f7fbfae0f5f7e0fbd4f0f5e0f5e7ede7baf9ec">[email&#160;protected]</a><br>
+        Tiempo de respuesta: menos de 24 horas hábiles
+      </div>
+      <button onclick="closeAcuse()" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid #00e5ff;color:#00e5ff;cursor:pointer;">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ SECCIÓN CONTACTO ══ -->
+<div class="form-sec reveal" id="contacto" style="background:var(--ink2,#060f1c);border-top:1px solid rgba(0,229,255,.15);padding:48px 20px;">
+  <div style="font-family:'Share Tech Mono',monospace;font-size:.48rem;letter-spacing:3px;color:#00e5ff;opacity:.7;margin-bottom:8px;">// CONTACTO · DATASYS</div>
+  <div style="font-family:'Orbitron',sans-serif;font-size:1.35rem;font-weight:900;color:#fff;line-height:1.2;margin-bottom:12px;">Solicita tu<br>consulta gratuita</div>
+  <p style="font-family:'Rajdhani',sans-serif;font-size:.95rem;color:#8899aa;line-height:1.7;margin-bottom:28px;">Nuestros especialistas te contactan con una propuesta personalizada en menos de 24 horas.</p>
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px;">
+    <div style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.2rem;">⚡</span><div><div style="font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;color:#00e5ff;letter-spacing:2px;margin-bottom:3px;">RESPUESTA EN 24 HORAS</div><div style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#8899aa;">Un especialista te contacta con propuesta personalizada.</div></div></div>
+    <div style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.2rem;">🎯</span><div><div style="font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;color:#00e5ff;letter-spacing:2px;margin-bottom:3px;">DEMO PERSONALIZADA</div><div style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#8899aa;">Mostramos la plataforma con datos de tu industria.</div></div></div>
+    <div style="display:flex;gap:12px;align-items:flex-start;"><span style="font-size:1.2rem;">🔐</span><div><div style="font-family:'Orbitron',sans-serif;font-size:.56rem;font-weight:700;color:#00e5ff;letter-spacing:2px;margin-bottom:3px;">CONFIDENCIALIDAD TOTAL</div><div style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#8899aa;">NDA disponible. Tus datos se tratan con máxima discreción.</div></div></div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:13px;">
+    <div><label style="display:block;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:#aaa;margin-bottom:5px;">NOMBRE COMPLETO *</label><input id="cf_name" type="text" placeholder="Tu nombre completo..." style="width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:11px 14px;outline:none;box-sizing:border-box;"></div>
+    <div><label style="display:block;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:#aaa;margin-bottom:5px;">CORREO ELECTRÓNICO *</label><input id="cf_email" type="email" placeholder="tu@empresa.com" style="width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:11px 14px;outline:none;box-sizing:border-box;"></div>
+    <div><label style="display:block;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:#aaa;margin-bottom:5px;">TELÉFONO</label><input id="cf_phone" type="tel" placeholder="+52 55 0000 0000" style="width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:11px 14px;outline:none;box-sizing:border-box;"></div>
+    <div><label style="display:block;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:#aaa;margin-bottom:5px;">SERVICIO *</label>
+      <select id="cf_service" style="width:100%;background:#060f1c;border:1px solid rgba(0,229,255,.2);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:11px 14px;outline:none;box-sizing:border-box;">
+        <option value="">-- Selecciona un servicio --</option>
+        <option>Análisis de Datos &amp; BI</option><option>Biotecnología</option><option>Desarrollo de Apps</option>
+        <option>Bolsa de Valores &amp; FinTech</option><option>Automatización Industrial</option>
+        <option>Inventario Virtual</option><option>Ciberseguridad SOC 24/7</option>
+        <option>Consultoría &amp; Conferencias</option><option>Revista Tech</option><option>Consulta General</option>
+      </select>
+    </div>
+    <div><label style="display:block;font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2px;color:#aaa;margin-bottom:5px;">MENSAJE *</label><textarea id="cf_message" rows="4" placeholder="Describe tu proyecto o necesidad..." style="width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);color:#fff;font-family:'Rajdhani',sans-serif;font-size:.95rem;padding:11px 14px;outline:none;resize:vertical;box-sizing:border-box;"></textarea></div>
+    <div id="cf_error" style="display:none;font-family:'Share Tech Mono',monospace;font-size:.48rem;color:#e05050;padding:8px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.06);"></div>
+    <button id="cf_btn" onclick="sendContactForm()" style="width:100%;padding:13px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:3px;background:#00e5ff;color:#030d18;border:none;cursor:pointer;">ENVIAR SOLICITUD ⟶</button>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-logo-m">
+    <img src="imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
+    <span>DATASYS</span>
+  </div>
+  <div class="ft-tag">INNOVATE · INTEGRATE · AUTOMATE</div>
+  <div class="ft-links-m">
+    <a class="ft-link-m" href="mobile/analisis_datos_datasys_mobile.html">› Análisis de Datos</a>
+    <a class="ft-link-m" href="mobile/biotecnologia_inversores_datasys_mobile.html">› Biotecnología · Serie A</a>
+    <a class="ft-link-m" href="mobile/apps_datasys_mobile.html">› Desarrollo de Apps</a>
+    <a class="ft-link-m" href="mobile/bolsa_us_datasys_mobile.html">› Bolsa de Valores</a>
+    <a class="ft-link-m" href="mobile/automatizacion_datasys_mobile.html">› Automatización Industrial</a>
+    <a class="ft-link-m" href="mobile/inventario_virtual_datasys_mobile.html">› Inventario Virtual</a>
+    <a class="ft-link-m" href="mobile/ciberseguridad_datasys_mobile.html">› Ciberseguridad SOC 24/7</a>
+    <a class="ft-link-m" href="mobile/consultoria_datasys_mobile.html">› Consultoría & Conferencias</a>
+    <a class="ft-link-m" href="mobile/revista_datasys_mobile.html">› Revista Tech Virtual</a>
+  </div>
+  <div class="ft-contact">
+    <div class="ft-ci">📍 Ciudad de México, México</div>
+    <div class="ft-ci">📧 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="73101c1d071210071c3317120712000a005d101c1e">[email&#160;protected]</a></div>
+    <div class="ft-ci">📞 +52 (55) 1234-5678</div>
+    <div class="ft-ci">⚡ ARIA · Asistente IA 24/7</div>
+    <div class="ft-ci" style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(0,229,255,.08);">
+      <a href="#descargar-app" style="color:#00ff88;display:flex;align-items:center;gap:6px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:1.5px;">📲 DESCARGAR APP →</a>
+    </div>
+  </div>
+  <div class="ft-divider"></div>
+  <div class="ft-copy">© 2026 DATASYS Global · Todos los derechos reservados</div>
+</footer>
+
+<!-- ARIA FAB → abre aria.html -->
+<a class="aria-fab" href="aria.html" title="Abrir ARIA — Asistente IA">
+  <img src="imagenes/logo.png" alt="ARIA" onerror="this.outerHTML='<span style=font-size:1.4rem>🤖</span>'">
+  <div class="aria-badge">AI</div>
+</a>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+/* ══ FORMULARIO REAL — FORMSPREE (meelpnqr) ══ */
+function sendContactForm(){
+  var name    = document.getElementById('cf_name')    ? document.getElementById('cf_name').value.trim()    : '';
+  var email   = document.getElementById('cf_email')   ? document.getElementById('cf_email').value.trim()   : '';
+  var phone   = document.getElementById('cf_phone')   ? document.getElementById('cf_phone').value.trim()   : '';
+  var srvEl   = document.getElementById('cf_service');
+  var service = srvEl ? srvEl.value : '';
+  var msgEl   = document.getElementById('cf_message') || document.getElementById('cf_address');
+  var message = msgEl ? msgEl.value.trim() : '';
+  var errEl   = document.getElementById('cf_error');
+  var btn     = document.getElementById('cf_btn');
+  if(errEl) errEl.style.display = 'none';
+  if(!name){
+    if(errEl){ errEl.textContent='Por favor ingresa tu nombre.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){ errEl.textContent='Por favor ingresa un correo electrónico válido.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!service){
+    if(errEl){ errEl.textContent='Por favor selecciona un servicio.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!message){
+    if(errEl){ errEl.textContent='Por favor escribe tu mensaje.'; errEl.style.display='block'; }
+    return;
+  }
+  var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+  var fecha = new Date().toLocaleString('es-MX', {
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  var origTxt = btn ? btn.textContent : '';
+  if(btn){
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    btn.style.background = 'rgba(0,229,255,.1)';
+    btn.style.color = '#00e5ff';
+  }
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:name, email:email, phone:phone||'N/A',
+      service:service, message:message,
+      folio:folio, fecha:fecha, _replyto:email
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+  .then(function(res){
+    if(res.ok){
+      ['cf_name','cf_email','cf_phone','cf_message','cf_address'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      if(srvEl) srvEl.value = '';
+      var am = document.getElementById('acuseModal');
+      if(am){
+        document.getElementById('acuse_folio').textContent   = folio;
+        document.getElementById('acuse_fecha').textContent   = fecha;
+        document.getElementById('acuse_nombre').textContent  = name;
+        document.getElementById('acuse_email').textContent   = email;
+        document.getElementById('acuse_phone').textContent   = phone || '—';
+        document.getElementById('acuse_service').textContent = service;
+        document.getElementById('acuse_msg').textContent     = message;
+        am.style.display = 'flex';
+      }
+      if(typeof window._dsMarkFormSent==='function') window._dsMarkFormSent(service);
+      if(btn){
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'rgba(0,255,136,.1)';
+        btn.style.color = '#00ff88';
+        btn.style.border = '1px solid #00ff88';
+        setTimeout(function(){
+          btn.textContent = origTxt;
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.border = '';
+        }, 8000);
+      }
+    } else {
+      if(errEl){ errEl.textContent='Error al enviar. Por favor intenta de nuevo.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+    }
+  })
+  .catch(function(){
+    if(errEl){ errEl.textContent='Error de conexión. Verifica tu red e intenta de nuevo.'; errEl.style.display='block'; }
+    if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+  });
+}
+function closeAcuse(){
+  var m = document.getElementById('acuseModal');
+  if(m) m.style.display = 'none';
+}
+var sendForm = sendContactForm;
+var sendDemo = sendContactForm;
+function submitForm(btn){ sendContactForm(); }
+function subscribePrint(btn){ sendContactForm(); }
+
+</script><script>
+// MENU
+function toggleMenu(){
+  const d=document.getElementById('drawer'),b=document.getElementById('menuBtn');
+  d.classList.toggle('open'); b.classList.toggle('open');
+  document.body.style.overflow=d.classList.contains('open')?'hidden':'';
+}
+
+// REVEAL
+const obs=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('vis');obs.unobserve(en.target);}}),{threshold:.06});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ARIA → redirige a aria.html
+function toggleAria(){ window.location.href = 'aria.html'; }
+
+// INIT
+window.addEventListener('DOMContentLoaded', function(){
+  const obs2 = new IntersectionObserver(e=>e.forEach(en=>{
+    if(en.isIntersecting){en.target.classList.add('vis');obs2.unobserve(en.target);}
+  }), {threshold:.06});
+  document.querySelectorAll('.reveal').forEach(el=>obs2.observe(el));
+});
+
+/* ══ PWA — INSTALACIÓN ══ */
+var pwaInstallEvent = null;
+var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+var isAndroid = /android/i.test(navigator.userAgent);
+var isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+var isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+// Capturar el evento beforeinstallprompt (Android/Chrome)
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault();
+  pwaInstallEvent = e;
+  // Mostrar banner inferior y botón PWA directo
+  document.getElementById('pwa-install-bar').classList.add('show');
+  var pwaBtn = document.getElementById('pwa-btn');
+  if(pwaBtn) pwaBtn.style.display = 'flex';
+});
+
+// Si ya está instalada, ocultar sección
+window.addEventListener('appinstalled', function(){
+  pwaInstallEvent = null;
+  document.getElementById('pwa-install-bar').classList.remove('show');
+  var btn = document.getElementById('pwa-btn');
+  if(btn){ btn.querySelector('.ab-name').textContent = '¡App Instalada! ✓'; btn.style.borderColor='rgba(0,255,136,.4)'; }
+});
+
+function installPWA(){
+  if(pwaInstallEvent){
+    pwaInstallEvent.prompt();
+    pwaInstallEvent.userChoice.then(function(r){
+      if(r.outcome==='accepted'){
+        document.getElementById('pwa-install-bar').classList.remove('show');
+      }
+      pwaInstallEvent = null;
+    });
+  } else if(isIOS || isSafari){
+    showIosModal();
+  } else {
+    // Fallback: instrucciones genéricas
+    showIosModal();
+  }
+}
+
+function installAndroid(){
+  if(pwaInstallEvent){
+    installPWA();
+  } else if(isStandalone){
+    var arr = document.getElementById('android-arr');
+    if(arr) arr.textContent = '✓';
+    alert('¡DATASYS ya está instalada en este dispositivo!');
+  } else {
+    // Mostrar instrucciones Chrome Android
+    document.getElementById('android-arr').textContent = '⏳';
+    // Intentar guía manual
+    showAndroidGuide();
+  }
+}
+
+function showAndroidGuide(){
+  if(pwaInstallEvent){ installPWA(); return; }
+  // Si Chrome no disparó el evento, dar instrucciones manuales
+  var msg = '📲 Para instalar en Android:\n\n1. Abre este sitio en Chrome\n2. Toca el menú ⋮ (tres puntos)\n3. Selecciona "Añadir a pantalla de inicio"\n4. ¡Listo! DATASYS aparecerá como app';
+  alert(msg);
+}
+
+function showIosModal(){
+  document.getElementById('ios-modal').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeIosModal(){
+  document.getElementById('ios-modal').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+// Ajustar botones según plataforma detectada
+window.addEventListener('DOMContentLoaded', function(){
+  if(isStandalone){
+    // Ya instalada — ocultar sección completa
+    var sec = document.getElementById('descargar-app');
+    if(sec) sec.style.display = 'none';
+    return;
+  }
+  if(isIOS){
+    // En iOS mostrar solo el badge de iOS prominente
+    var pwaBtn = document.getElementById('pwa-btn');
+    if(pwaBtn){ pwaBtn.style.display='flex'; pwaBtn.querySelector('.ab-name').textContent='Añadir a Inicio'; }
+  }
+});
+
+// Registrar Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>

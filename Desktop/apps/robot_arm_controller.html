@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>RoboArm 2D Controller</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#060a10;--surface:#0d1520;--panel:#0f1e30;
+  --border:#1a3a5c;--accent:#00d4ff;--accent2:#00ff9d;
+  --accent3:#ff6b35;--warn:#ffcc00;--text:#c8e8ff;--dim:#4a7a9b;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;min-height:100%;background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;overflow-y:auto;overscroll-behavior-y:contain;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(rgba(0,212,255,.04)1px,transparent 1px),
+  linear-gradient(90deg,rgba(0,212,255,.04)1px,transparent 1px);
+  background-size:28px 28px;pointer-events:none;z-index:0;}
+
+.app{position:relative;z-index:1;width:100%;max-width:480px;
+  margin:0 auto;display:flex;flex-direction:column;}
+
+/* ── HEADER ── */
+.hdr{padding:8px 14px 6px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--border);
+  background:rgba(0,212,255,.04);}
+.logo{font-family:'Orbitron',sans-serif;font-size:15px;font-weight:900;
+  letter-spacing:.12em;color:var(--accent);text-shadow:0 0 10px var(--accent);}
+.logo b{color:var(--accent2);}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);
+  box-shadow:0 0 8px var(--accent2);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.badge{font-size:9px;padding:3px 8px;border-radius:20px;
+  border:1px solid var(--accent);color:var(--accent);letter-spacing:.1em;}
+.hdr-r{display:flex;align-items:center;gap:10px;}
+
+/* ── EXTRA VIEWS ── */
+.views-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;border-radius:8px;overflow:hidden;}
+.subview{position:relative;background:#060d18;border-radius:8px;overflow:hidden;
+  border:1px solid var(--border);}
+.subview canvas{display:block;width:100%;}
+.sv-label{position:absolute;top:5px;left:50%;transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif;font-size:8px;letter-spacing:.12em;
+  color:var(--accent2);opacity:.8;pointer-events:none;white-space:nowrap;}
+
+/* ── CANVAS VIEWER ── */
+.view{position:relative;border-bottom:1px solid var(--border);background:#070e1a;}
+#cv{display:block;width:100%;}
+.corner{position:absolute;width:16px;height:16px;border-color:var(--accent);
+  border-style:solid;opacity:.5;pointer-events:none;}
+.corner.tl{top:6px;left:6px;border-width:2px 0 0 2px;}
+.corner.tr{top:6px;right:6px;border-width:2px 2px 0 0;}
+.corner.bl{bottom:6px;left:6px;border-width:0 0 2px 2px;}
+.corner.br{bottom:6px;right:6px;border-width:0 2px 2px 0;}
+.vtitle{position:absolute;top:8px;left:50%;transform:translateX(-50%);
+  font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.14em;
+  color:var(--accent2);text-shadow:0 0 7px var(--accent2);pointer-events:none;}
+.vstep{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);
+  font-size:10px;color:var(--accent);letter-spacing:.06em;
+  font-family:'Orbitron',sans-serif;pointer-events:none;white-space:nowrap;}
+
+/* ── COORDS BAR ── */
+.cbar{display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--border);border-bottom:1px solid var(--border);}
+.ci{background:var(--surface);padding:5px 6px;text-align:center;}
+.ci-l{font-size:8px;letter-spacing:.1em;color:var(--dim);text-transform:uppercase;}
+.ci-v{font-family:'Orbitron',sans-serif;font-size:12px;font-weight:700;margin-top:1px;}
+.ci-v.x{color:#ff5555;}.ci-v.y{color:var(--accent2);}.ci-v.z{color:var(--accent);}
+
+/* ── CONTROLS ── */
+.ctrl{padding:10px;padding-bottom:24px;display:flex;flex-direction:column;gap:9px;}
+.stitle{font-family:'Orbitron',sans-serif;font-size:9px;letter-spacing:.18em;
+  color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:7px;}
+.stitle::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* sequence button */
+.btn-seq{width:100%;padding:12px 14px;border-radius:10px;
+  border:1px solid rgba(0,255,157,.4);
+  background:linear-gradient(135deg,rgba(0,255,157,.08),rgba(0,212,255,.05));
+  color:var(--text);cursor:pointer;display:flex;align-items:center;gap:12px;
+  transition:all .15s;user-select:none;-webkit-user-select:none;text-align:left;}
+.btn-seq:active,.btn-seq.run{border-color:var(--accent2);
+  box-shadow:0 0 16px rgba(0,255,157,.3);}
+.si{font-size:22px;color:var(--accent2);display:inline-block;
+  filter:drop-shadow(0 0 5px var(--accent2));}
+.btn-seq.run .si{animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.st1{font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+  letter-spacing:.07em;color:var(--accent2);}
+.st2{font-size:10px;color:var(--dim);margin-top:2px;}
+
+.sprog{width:100%;display:none;}
+.sbar-bg{width:100%;height:5px;border-radius:3px;background:var(--surface);
+  border:1px solid var(--border);overflow:hidden;}
+.sbar{height:100%;width:0%;
+  background:linear-gradient(90deg,var(--accent2),var(--accent));
+  border-radius:3px;transition:width .25s;box-shadow:0 0 6px var(--accent2);}
+.slbl{font-size:10px;color:var(--accent);margin-top:4px;text-align:center;
+  font-family:'Orbitron',sans-serif;letter-spacing:.05em;}
+
+/* dpad */
+.dpad-wrap{display:flex;gap:8px;align-items:flex-start;}
+.dpad{display:grid;grid-template-columns:repeat(3,52px);
+  grid-template-rows:repeat(3,52px);gap:4px;flex-shrink:0;}
+.bc{border-radius:8px;border:1px solid var(--border);background:var(--panel);
+  color:var(--text);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:1px;transition:all .1s;
+  user-select:none;-webkit-user-select:none;}
+.bc:active,.bc.on{background:#0d2a40;border-color:var(--accent);
+  box-shadow:0 0 9px rgba(0,212,255,.35);transform:scale(.92);}
+.bl{font-size:7px;letter-spacing:.08em;color:var(--dim);}
+.bc.hb{border-color:rgba(255,107,53,.4);background:rgba(255,107,53,.07);}
+.bc.hb:active{border-color:var(--accent3);}
+.vb-wrap{display:flex;flex-direction:column;gap:4px;flex:1;}
+.vb{flex:1;min-height:58px;border-radius:8px;border:1px solid var(--border);
+  background:var(--panel);color:var(--text);font-size:19px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:1px;transition:all .1s;
+  user-select:none;-webkit-user-select:none;}
+.vb:active,.vb.on{background:#0a2a1e;border-color:var(--accent2);
+  box-shadow:0 0 9px rgba(0,255,157,.3);transform:scale(.97);}
+.vbl{font-size:7px;letter-spacing:.08em;color:var(--dim);}
+
+/* gripper */
+.gr-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.gb{padding:12px 6px;border-radius:8px;border:1px solid rgba(255,204,0,.3);
+  background:rgba(255,204,0,.05);color:var(--warn);
+  font-family:'Orbitron',sans-serif;font-size:11px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:3px;transition:all .1s;
+  user-select:none;-webkit-user-select:none;}
+.gb .gi{font-size:20px;}
+.gb:active,.gb.on{background:rgba(255,204,0,.18);border-color:var(--warn);
+  box-shadow:0 0 10px rgba(255,204,0,.3);}
+
+/* reset */
+.rst{width:100%;padding:10px;border-radius:8px;
+  border:1px solid rgba(255,107,53,.4);background:rgba(255,107,53,.06);
+  color:var(--accent3);font-family:'Orbitron',sans-serif;font-size:11px;
+  font-weight:700;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;
+  transition:all .15s;user-select:none;-webkit-user-select:none;}
+.rst:active{background:rgba(255,107,53,.2);box-shadow:0 0 12px rgba(255,107,53,.4);}
+
+/* log */
+.logbox{background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:6px 10px;font-size:10px;color:var(--dim);height:80px;
+  overflow-y:auto;line-height:1.8;}
+.logbox span{display:block;}
+.logbox em{color:var(--accent2);font-style:normal;}
+
+/* ── FIX TOUCH SCROLL ── */
+.bc, .vb, .gb, .btn-seq, .rst{touch-action:none;}
+.ctrl{touch-action:pan-y;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="hdr">
+    <div class="logo">ROBO<b>ARM</b></div>
+    <div class="hdr-r">
+      <div class="badge">ONLINE</div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- 2D CANVAS -->
+  <div class="view" id="view">
+    <canvas id="cv"></canvas>
+    <div class="corner tl"></div><div class="corner tr"></div>
+    <div class="corner bl"></div><div class="corner br"></div>
+    <div class="vtitle">BRAZO ROBÓTICO — VISTA 2D</div>
+    <div class="vstep" id="vstep"></div>
+  </div>
+
+  <!-- COORDS -->
+  <div class="cbar">
+    <div class="ci"><div class="ci-l">X · Izq/Der</div><div class="ci-v x" id="vx">+0.0</div></div>
+    <div class="ci"><div class="ci-l">Y · Arr/Aba</div><div class="ci-v y" id="vy">+0.0</div></div>
+    <div class="ci"><div class="ci-l">Z · Fre/Atr</div><div class="ci-v z" id="vz">+0.0</div></div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="ctrl">
+
+    <div class="stitle">Secuencia automática</div>
+    <button class="btn-seq" id="bseq" onclick="runSeq()">
+      <span class="si" id="sicon">▶</span>
+      <div>
+        <div class="st1">RECOGER TORNILLO → CAJA</div>
+        <div class="st2">Secuencia completa automática · 11 pasos</div>
+      </div>
+    </button>
+    <div class="sprog" id="sprog">
+      <div class="sbar-bg"><div class="sbar" id="sbar"></div></div>
+      <div class="slbl" id="slbl">Iniciando...</div>
+    </div>
+
+    <!-- EXTRA VIEWS: TOP + SIDE -->
+    <div class="views-row">
+      <div class="subview" id="sv-top">
+        <canvas id="cv-top"></canvas>
+        <div class="sv-label">VISTA SUPERIOR (X·Z)</div>
+      </div>
+      <div class="subview" id="sv-side">
+        <canvas id="cv-side"></canvas>
+        <div class="sv-label">VISTA LATERAL (Z·Y)</div>
+      </div>
+    </div>
+
+    <div class="stitle">Movimiento de posición</div>
+    <div class="dpad-wrap">
+      <div class="dpad">
+        <div></div>
+        <button class="bc" ontouchstart="mv('z',-1,this,event)" ontouchend="sv(this)" onmousedown="mv('z',-1,this)" onmouseup="sv(this)" onmouseleave="sv(this)">▲<div class="bl">FRENTE</div></button>
+        <div></div>
+        <button class="bc" ontouchstart="mv('x',-1,this,event)" ontouchend="sv(this)" onmousedown="mv('x',-1,this)" onmouseup="sv(this)" onmouseleave="sv(this)">◀<div class="bl">IZQ</div></button>
+        <button class="bc hb" onclick="goHome()">⌂<div class="bl">HOME</div></button>
+        <button class="bc" ontouchstart="mv('x',1,this,event)" ontouchend="sv(this)" onmousedown="mv('x',1,this)" onmouseup="sv(this)" onmouseleave="sv(this)">▶<div class="bl">DER</div></button>
+        <div></div>
+        <button class="bc" ontouchstart="mv('z',1,this,event)" ontouchend="sv(this)" onmousedown="mv('z',1,this)" onmouseup="sv(this)" onmouseleave="sv(this)">▼<div class="bl">ATRÁS</div></button>
+        <div></div>
+      </div>
+      <div class="vb-wrap">
+        <button class="vb" ontouchstart="mv('y',1,this,event)" ontouchend="sv(this)" onmousedown="mv('y',1,this)" onmouseup="sv(this)" onmouseleave="sv(this)">↑<div class="vbl">ARRIBA</div></button>
+        <button class="vb" ontouchstart="mv('y',-1,this,event)" ontouchend="sv(this)" onmousedown="mv('y',-1,this)" onmouseup="sv(this)" onmouseleave="sv(this)">↓<div class="vbl">ABAJO</div></button>
+      </div>
+    </div>
+
+    <div class="stitle">Control de garra</div>
+    <div class="gr-row">
+      <button class="gb" ontouchstart="setGrip(true,this,event)" ontouchend="ugp(this)" onmousedown="setGrip(true,this)" onmouseup="ugp(this)"><div class="gi">🤲</div>ABRIR</button>
+      <button class="gb" ontouchstart="setGrip(false,this,event)" ontouchend="ugp(this)" onmousedown="setGrip(false,this)" onmouseup="ugp(this)"><div class="gi">✊</div>CERRAR</button>
+    </div>
+
+    <button class="rst" onclick="resetAll()">⟳ &nbsp;RESET POSICIÓN</button>
+    <div class="stitle">Registro</div>
+    <div class="logbox" id="logbox"></div>
+  </div>
+</div>
+
+<script>
+'use strict';
+// ══════════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════════
+const S = { x:0, y:0, z:0, gripOpen:true, step:.3, lim:4 };
+let mvInt = null, seqRunning = false, raf = 0;
+
+// ══════════════════════════════════════════════════════════
+//  CANVAS SETUP
+// ══════════════════════════════════════════════════════════
+const cv  = document.getElementById('cv');
+const ctx = cv.getContext('2d');
+const vw  = document.getElementById('view');
+
+function resize(){
+  const W = vw.clientWidth;
+  const H = Math.round(W * .58);      // aspect ~16:9.3
+  cv.width  = W;
+  cv.height = H;
+  vw.style.height = H + 'px';
+}
+resize();
+window.addEventListener('resize', resize);
+
+// ══════════════════════════════════════════════════════════
+//  SCENE OBJECTS (in world coords, pixels)
+//  Origin = base center of arm, bottom of canvas
+// ══════════════════════════════════════════════════════════
+
+// smooth interpolated arm state (display)
+const arm = {
+  x: 0,   // horizontal offset of whole arm
+  y: 0,   // vertical lift
+  gripOpen: 1   // 0=closed 1=open
+};
+
+// Screw world position (canvas pixels)
+let screwHeld = false;
+let screwInBox= false;
+
+// ══════════════════════════════════════════════════════════
+//  DRAW HELPERS
+// ══════════════════════════════════════════════════════════
+function line(x1,y1,x2,y2,color,w=2){
+  ctx.strokeStyle=color; ctx.lineWidth=w;
+  ctx.lineCap='round';
+  ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+}
+function circle(x,y,r,fill,stroke,sw=2){
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke();}
+}
+function rect(x,y,w,h,fill,stroke,sw=1.5,rx=3){
+  ctx.beginPath();
+  ctx.roundRect(x,y,w,h,[rx]);
+  if(fill){ctx.fillStyle=fill;ctx.fill();}
+  if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=sw;ctx.stroke();}
+}
+function glow(x,y,r,color){
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,color); g.addColorStop(1,'transparent');
+  ctx.fillStyle=g;
+  ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+}
+
+// ══════════════════════════════════════════════════════════
+//  DRAW SCENE
+// ══════════════════════════════════════════════════════════
+let tick = 0;
+
+function draw(){
+  const W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+
+  // — Background gradient —
+  const bg = ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#070e1a');
+  bg.addColorStop(1,'#040810');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // — Floor line —
+  const floorY = H - 22;
+  line(0, floorY, W, floorY, 'rgba(0,212,255,.18)', 1);
+
+  // Scale factor based on canvas width
+  const sc = W / 400;
+
+  // ── Coordinate system ─────────────────────────────────
+  // Canvas: Y increases downward. Arm: Y positive = UP → subtract in canvas.
+  const baseX  = W * .5;          // arm base pivot (fixed, horizontal center)
+  const baseY  = floorY;
+  const xScale = W * .13;         // px per unit of S.x
+  const yScale = 22 * sc;         // px per unit of S.y (positive = upward in canvas)
+
+  // — Arm segment lengths —
+  const seg1H = 68 * sc;
+  const seg2H = 58 * sc;
+  const seg3H = 44 * sc;
+
+  // arm.y positive → brazo SUBE → en canvas restamos
+  const liftY = arm.y * yScale;
+  const bendX = arm.x * xScale * 0.55;
+
+  // Key joint positions
+  const p0 = { x: baseX,         y: baseY };
+  const p1 = { x: baseX,         y: baseY - seg1H };
+  const p2 = { x: baseX + bendX, y: baseY - seg1H - seg2H - liftY * .35 };
+  const p3 = { x: baseX + bendX, y: baseY - seg1H - seg2H - seg3H - liftY };
+
+  // Gripper tip = bottom tip of fingers (what actually touches the screw)
+  const fingerH  = 18 * sc;
+  const tipH     = 10 * sc;
+  const palmOff  = 7 * sc;
+  const gripTipX = p3.x;
+  const gripTipY = p3.y + palmOff + fingerH + tipH;  // bottom of finger tips
+
+  // — Screw rest position (world X = -1.6, closer to arm) —
+  const scrRestX = baseX + (-1.6) * xScale;
+  const scrRestY = floorY - 72 * sc;   // raised much higher
+
+  // — Box world pos — right side (world X = +2.0) —
+  const boxX = baseX + 2.0 * xScale - 26 * sc;
+  const boxY = floorY - 14 * sc;
+  const boxW = 52 * sc, boxH = 34 * sc;
+
+  // ── Draw screw (if not in box) ────────────────────────
+  if(!screwInBox){
+    // When held: screw head aligns exactly with gripper tip
+    const sx = screwHeld ? gripTipX          : scrRestX;
+    const sy = screwHeld ? gripTipY - 28*sc  : scrRestY;
+
+    // glow
+    glow(sx, sy+4, 20*sc, 'rgba(0,212,255,.12)');
+    // shaft
+    line(sx, sy, sx, sy+28*sc, '#aabbdd', 2.5*sc);
+    // head
+    rect(sx-9*sc, sy-7*sc, 18*sc, 10*sc, '#ccddee', '#00d4ff', 1.5*sc, 2);
+    // slot line
+    line(sx-5*sc, sy-2*sc, sx+5*sc, sy-2*sc, '#445566', 1.5*sc);
+    // tip triangle
+    ctx.beginPath();
+    ctx.moveTo(sx, sy+33*sc);
+    ctx.lineTo(sx-3*sc, sy+28*sc);
+    ctx.lineTo(sx+3*sc, sy+28*sc);
+    ctx.closePath();
+    ctx.fillStyle='#aabbdd'; ctx.fill();
+    // label
+    ctx.fillStyle='rgba(0,212,255,.7)';
+    ctx.font=`${8*sc}px 'Orbitron',sans-serif`;
+    ctx.textAlign='center';
+    ctx.fillText('TORNILLO', sx, sy - 12*sc);
+  }
+
+  // ── Draw box ──────────────────────────────────────────
+  // shadow
+  glow(boxX+boxW*.5, boxY+boxH+4, 28*sc, 'rgba(0,255,157,.1)');
+  // outer box
+  rect(boxX, boxY, boxW, boxH, '#3d1a06', '#d4a055', 2*sc, 3);
+  // inner floor
+  rect(boxX+4*sc, boxY+boxH-10*sc, boxW-8*sc, 8*sc, '#1e0d04', null, 0, 2);
+  // left plank line
+  line(boxX+4*sc, boxY+4*sc, boxX+4*sc, boxY+boxH-4*sc, 'rgba(180,130,60,.35)', 1*sc);
+  // right plank line
+  line(boxX+boxW-4*sc, boxY+4*sc, boxX+boxW-4*sc, boxY+boxH-4*sc, 'rgba(180,130,60,.35)', 1*sc);
+  // open top rim glow
+  ctx.strokeStyle='rgba(0,255,157,.4)'; ctx.lineWidth=1.5*sc;
+  ctx.beginPath(); ctx.moveTo(boxX,boxY); ctx.lineTo(boxX+boxW,boxY); ctx.stroke();
+  // label
+  ctx.fillStyle='rgba(0,255,157,.7)';
+  ctx.font=`${8*sc}px 'Orbitron',sans-serif`;
+  ctx.textAlign='center';
+  ctx.fillText('CAJA', boxX+boxW*.5, boxY - 8*sc);
+  // screw inside box
+  if(screwInBox){
+    const ix=boxX+boxW*.5, iy=boxY+boxH-14*sc;
+    line(ix-12*sc, iy, ix+12*sc, iy, '#aabbdd', 3*sc);
+    rect(ix-7*sc, iy-6*sc, 14*sc, 7*sc, '#ccddee', '#00d4ff', 1.5*sc, 2);
+    ctx.fillStyle='rgba(0,255,157,.5)';
+    ctx.font=`${7*sc}px 'Share Tech Mono',monospace`;
+    ctx.textAlign='center';
+    ctx.fillText('✔ depositado', ix, iy+14*sc);
+  }
+
+  // — BASE PLATFORM —
+  rect(baseX - 32*sc, floorY, 64*sc, 12*sc, '#0c1e30', '#00aadd', 1.5*sc, 4);
+  rect(baseX - 20*sc, floorY-6*sc, 40*sc, 8*sc, '#0a1825', '#00d4ff', 1.5*sc, 3);
+  circle(baseX, floorY-2, 8*sc, '#00bbdd', '#004466', 1.5*sc);
+
+  // — SEGMENT 1 (thick) —
+  // outer glow
+  ctx.shadowColor='rgba(0,180,255,.25)'; ctx.shadowBlur=8;
+  line(p0.x, p0.y-4*sc, p1.x, p1.y, '#1a4a6e', 14*sc);
+  ctx.shadowBlur=0;
+  line(p0.x, p0.y-4*sc, p1.x, p1.y, '#2a6090', 10*sc);
+  line(p0.x, p0.y-4*sc, p1.x, p1.y, '#3a80b0', 6*sc);
+  // accent stripes
+  const s1mid = { x:(p0.x+p1.x)*.5, y:(p0.y+p1.y)*.5 };
+  line(s1mid.x-5*sc, s1mid.y, s1mid.x+5*sc, s1mid.y, '#00ff9d', 2*sc);
+
+  // — JOINT 1 —
+  circle(p1.x, p1.y, 9*sc, '#0a2030', '#00d4ff', 2*sc);
+  circle(p1.x, p1.y, 5*sc, '#00aadd', null);
+  glow(p1.x, p1.y, 16*sc, 'rgba(0,212,255,.18)');
+
+  // — SEGMENT 2 —
+  ctx.shadowColor='rgba(0,180,255,.2)'; ctx.shadowBlur=6;
+  line(p1.x, p1.y, p2.x, p2.y, '#1a4060', 11*sc);
+  ctx.shadowBlur=0;
+  line(p1.x, p1.y, p2.x, p2.y, '#2a6088', 8*sc);
+  line(p1.x, p1.y, p2.x, p2.y, '#3a80a8', 5*sc);
+  const s2mid = { x:(p1.x+p2.x)*.5, y:(p1.y+p2.y)*.5 };
+  line(s2mid.x-4*sc, s2mid.y, s2mid.x+4*sc, s2mid.y, '#00ff9d', 1.5*sc);
+
+  // — JOINT 2 —
+  circle(p2.x, p2.y, 7*sc, '#0a2030', '#00d4ff', 2*sc);
+  circle(p2.x, p2.y, 4*sc, '#00aadd', null);
+  glow(p2.x, p2.y, 13*sc, 'rgba(0,212,255,.15)');
+
+  // — SEGMENT 3 (forearm) —
+  ctx.shadowColor='rgba(0,180,255,.15)'; ctx.shadowBlur=5;
+  line(p2.x, p2.y, p3.x, p3.y, '#154050', 8*sc);
+  ctx.shadowBlur=0;
+  line(p2.x, p2.y, p3.x, p3.y, '#2a6080', 5.5*sc);
+  line(p2.x, p2.y, p3.x, p3.y, '#3590a0', 3.5*sc);
+
+  // — WRIST JOINT —
+  circle(p3.x, p3.y, 6*sc, '#0a2030', '#00d4ff', 1.5*sc);
+  circle(p3.x, p3.y, 3*sc, '#00aadd', null);
+  glow(p3.x, p3.y, 12*sc, 'rgba(0,212,255,.15)');
+
+  // — LED pulse on wrist —
+  const ledPulse = .5 + Math.sin(tick*.12)*.5;
+  circle(p3.x, p3.y, 2.5*sc, `rgba(0,255,157,${ledPulse})`, null);
+
+  // — GRIPPER —
+  const gO      = arm.gripOpen;             // 0=closed 1=open
+  const gSpread = 8*sc + gO * 9*sc;
+  const palmY   = p3.y + palmOff;
+
+  // Palm body
+  rect(p3.x - 7*sc, p3.y + 3*sc, 14*sc, 6*sc, '#1a4060', '#2a80a0', 1.5*sc, 2);
+
+  // Left finger
+  ctx.shadowColor='rgba(255,100,30,.3)'; ctx.shadowBlur=5;
+  rect(p3.x - gSpread - 4*sc, palmY,             6*sc, fingerH, '#8b3a1a', '#ff7040', 1.5*sc, 2);
+  rect(p3.x - gSpread - 3.5*sc, palmY+fingerH,   5*sc, tipH,    '#aa4a25', '#ff8050', 1.5*sc, 1);
+  // Right finger
+  rect(p3.x + gSpread - 2*sc,   palmY,             6*sc, fingerH, '#8b3a1a', '#ff7040', 1.5*sc, 2);
+  rect(p3.x + gSpread - 1.5*sc, palmY+fingerH,     5*sc, tipH,    '#aa4a25', '#ff8050', 1.5*sc, 1);
+  ctx.shadowBlur=0;
+
+  // Grip state label
+  ctx.fillStyle = gO > .5 ? 'rgba(0,255,157,.6)' : 'rgba(255,110,40,.7)';
+  ctx.font=`${7*sc}px 'Share Tech Mono',monospace`;
+  ctx.textAlign='center';
+  ctx.fillText(gO>.5?'ABIERTA':'CERRADA', p3.x, p3.y - 14*sc);
+
+  // ── Coordinate HUD ───────────────────────────────────
+  ctx.fillStyle='rgba(0,212,255,.35)';
+  ctx.font=`${8*sc}px 'Share Tech Mono',monospace`;
+  ctx.textAlign='left';
+  ctx.fillText(`X:${S.x.toFixed(1)} Y:${S.y.toFixed(1)} Z:${S.z.toFixed(1)}`, 10, 20*sc);
+
+  tick++;
+}
+
+// ══════════════════════════════════════════════════════════
+//  ANIMATION LOOP
+// ══════════════════════════════════════════════════════════
+function loop(){
+  const sp = .28;
+  arm.x     += (S.x - arm.x)     * sp;
+  arm.y     += (S.y - arm.y)     * sp;
+  arm.gripOpen += ((S.gripOpen ? 1 : 0) - arm.gripOpen) * sp;
+  draw();
+  requestAnimationFrame(loop);
+}
+loop();
+
+// ══════════════════════════════════════════════════════════
+//  SUB-VIEW: VISTA SUPERIOR (X·Z) — top down
+// ══════════════════════════════════════════════════════════
+const cvT  = document.getElementById('cv-top');
+const ctxT = cvT.getContext('2d');
+const svT  = document.getElementById('sv-top');
+
+const cvS  = document.getElementById('cv-side');
+const ctxS = cvS.getContext('2d');
+const svS  = document.getElementById('sv-side');
+
+function resizeSubs(){
+  const W = svT.clientWidth;
+  const H = Math.round(W * .72);
+  [cvT, cvS].forEach(c => { c.width=W; c.height=H; });
+  [svT, svS].forEach(v => { v.style.height=H+'px'; });
+}
+resizeSubs();
+window.addEventListener('resize', resizeSubs);
+
+// shared helpers for sub-views
+function lineC(c,x1,y1,x2,y2,color,w=1.5){
+  c.strokeStyle=color; c.lineWidth=w; c.lineCap='round';
+  c.beginPath(); c.moveTo(x1,y1); c.lineTo(x2,y2); c.stroke();
+}
+function circC(c,x,y,r,fill,stroke,sw=1.5){
+  c.beginPath(); c.arc(x,y,r,0,Math.PI*2);
+  if(fill){c.fillStyle=fill;c.fill();}
+  if(stroke){c.strokeStyle=stroke;c.lineWidth=sw;c.stroke();}
+}
+function rectC(c,x,y,w,h,fill,stroke,sw=1.5,rx=2){
+  c.beginPath(); c.roundRect(x,y,w,h,[rx]);
+  if(fill){c.fillStyle=fill;c.fill();}
+  if(stroke){c.strokeStyle=stroke;c.lineWidth=sw;c.stroke();}
+}
+
+function drawTop(){
+  const W=cvT.width, H=cvT.height;
+  const c=ctxT;
+  c.clearRect(0,0,W,H);
+
+  // bg
+  c.fillStyle='#060d18'; c.fillRect(0,0,W,H);
+
+  // grid
+  c.strokeStyle='rgba(0,212,255,.07)'; c.lineWidth=1;
+  for(let i=0;i<W;i+=W/8){ c.beginPath();c.moveTo(i,0);c.lineTo(i,H);c.stroke(); }
+  for(let i=0;i<H;i+=H/6){ c.beginPath();c.moveTo(0,i);c.lineTo(W,i);c.stroke(); }
+
+  const sc   = W/200;
+  const cx   = W*.5;   // world X=0
+  const cz   = H*.5;   // world Z=0
+  const xSc  = W*.13;
+  const zSc  = H*.14;
+
+  // axes
+  lineC(c, 0,cz, W,cz, 'rgba(255,85,85,.3)', 1);
+  lineC(c, cx,0, cx,H, 'rgba(0,212,255,.3)', 1);
+  c.fillStyle='rgba(255,85,85,.5)'; c.font=`${7*sc}px 'Share Tech Mono',monospace`;
+  c.textAlign='right'; c.fillText('X',W-3,cz-3);
+  c.fillStyle='rgba(0,212,255,.5)'; c.textAlign='center'; c.fillText('Z',cx+4,10);
+
+  // arm footprint (base circle)
+  circC(c, cx,cz, 7*sc, '#0a2030','#00d4ff', 1.5);
+
+  // arm tip projection (X, Z)
+  const tx = cx + arm.x * xSc;
+  const tz = cz - S.z * zSc;
+  // trace line from base to tip
+  lineC(c, cx,cz, tx,tz, '#2a6090', 3*sc);
+  lineC(c, cx,cz, tx,tz, '#3a80b0', 1.5*sc);
+  // joint dots
+  const j1x=cx, j1z=cz;
+  const j2x=cx + arm.x*xSc*.5, j2z=cz - S.z*zSc*.4;
+  circC(c, j1x,j1z, 5*sc, '#0a2030','#00d4ff', 1.5);
+  circC(c, j2x,j2z, 4*sc, '#0a2030','#00bbdd', 1.5);
+  // gripper tip
+  circC(c, tx,tz, 4*sc, '#ff7040','#ff9060', 1.5);
+  // glow
+  const gl=c.createRadialGradient(tx,tz,0,tx,tz,10*sc);
+  gl.addColorStop(0,'rgba(255,112,64,.25)'); gl.addColorStop(1,'transparent');
+  c.fillStyle=gl; c.beginPath(); c.arc(tx,tz,10*sc,0,Math.PI*2); c.fill();
+
+  // screw (top view = dot)
+  if(!screwInBox){
+    const sx2 = cx + (-1.6)*xSc;
+    const sz2 = cz;
+    circC(c, sx2,sz2, 4*sc, '#ccddee','#00d4ff', 1.5);
+    c.fillStyle='rgba(0,212,255,.6)'; c.font=`${6*sc}px 'Orbitron',monospace`;
+    c.textAlign='center'; c.fillText('T',sx2,sz2-6*sc);
+  }
+
+  // box (top view = rectangle)
+  const bx2 = cx + 2.0*xSc - 14*sc;
+  const bz2 = cz - 10*sc;
+  rectC(c, bx2,bz2, 28*sc,20*sc, '#3d1a06','#d4a055', 1.5*sc);
+  c.fillStyle='rgba(0,255,157,.6)'; c.font=`${6*sc}px 'Orbitron',monospace`;
+  c.textAlign='center'; c.fillText('CAJA', bx2+14*sc, bz2-4*sc);
+}
+
+function drawSide(){
+  const W=cvS.width, H=cvS.height;
+  const c=ctxS;
+  c.clearRect(0,0,W,H);
+
+  // bg
+  c.fillStyle='#060d18'; c.fillRect(0,0,W,H);
+
+  // grid
+  c.strokeStyle='rgba(0,212,255,.07)'; c.lineWidth=1;
+  for(let i=0;i<W;i+=W/8){ c.beginPath();c.moveTo(i,0);c.lineTo(i,H);c.stroke(); }
+  for(let i=0;i<H;i+=H/6){ c.beginPath();c.moveTo(0,i);c.lineTo(W,i);c.stroke(); }
+
+  const sc   = W/200;
+  const flY  = H - 16;
+  const cx   = W*.5;   // Z=0 center
+  const zSc  = W*.13;
+  const ySc  = 22*sc;
+
+  // floor line
+  lineC(c, 0,flY, W,flY, 'rgba(0,212,255,.18)', 1);
+
+  // axes labels
+  c.fillStyle='rgba(0,212,255,.5)'; c.font=`${7*sc}px 'Share Tech Mono',monospace`;
+  c.textAlign='right'; c.fillText('Z',W-3,flY-3);
+  c.fillStyle='rgba(0,255,157,.5)'; c.textAlign='left'; c.fillText('Y',3,12);
+
+  // base
+  rectC(c, cx-16*sc,flY, 32*sc,8*sc, '#0c1e30','#00aadd', 1.5*sc, 2);
+
+  // arm segments in Z·Y plane
+  const seg1H = 68*sc, seg2H = 58*sc, seg3H = 44*sc;
+  const liftY = arm.y * ySc;
+  const bendZ = S.z * zSc * .55;
+
+  const q0 = { x:cx,       y:flY };
+  const q1 = { x:cx,       y:flY - seg1H };
+  const q2 = { x:cx+bendZ, y:flY - seg1H - seg2H - liftY*.35 };
+  const q3 = { x:cx+bendZ, y:flY - seg1H - seg2H - seg3H - liftY };
+
+  // seg1
+  c.shadowColor='rgba(0,180,255,.2)'; c.shadowBlur=6;
+  lineC(c, q0.x,q0.y-3*sc, q1.x,q1.y, '#1a4a6e', 10*sc);
+  c.shadowBlur=0;
+  lineC(c, q0.x,q0.y-3*sc, q1.x,q1.y, '#3a80b0', 5*sc);
+
+  // joint1
+  circC(c, q1.x,q1.y, 7*sc, '#0a2030','#00d4ff', 1.5);
+  circC(c, q1.x,q1.y, 4*sc, '#00aadd', null);
+
+  // seg2
+  lineC(c, q1.x,q1.y, q2.x,q2.y, '#2a6088', 8*sc);
+  lineC(c, q1.x,q1.y, q2.x,q2.y, '#3a80a8', 4*sc);
+
+  // joint2
+  circC(c, q2.x,q2.y, 5*sc, '#0a2030','#00d4ff', 1.5);
+  circC(c, q2.x,q2.y, 3*sc, '#00aadd', null);
+
+  // seg3
+  lineC(c, q2.x,q2.y, q3.x,q3.y, '#2a6080', 5*sc);
+  lineC(c, q2.x,q2.y, q3.x,q3.y, '#3590a0', 3*sc);
+
+  // wrist
+  circC(c, q3.x,q3.y, 5*sc, '#0a2030','#00d4ff', 1.5);
+  circC(c, q3.x,q3.y, 2.5*sc, '#00aadd', null);
+
+  // gripper (side view: single line with gap)
+  const gO=arm.gripOpen, gSp=5*sc + gO*5*sc;
+  const palmY2=q3.y+6*sc, fH=14*sc;
+  rectC(c, q3.x-5*sc,q3.y+2*sc, 10*sc,5*sc, '#1a4060','#2a80a0', 1.5*sc, 1);
+  lineC(c, q3.x-1*sc,palmY2, q3.x-1*sc,palmY2+fH, '#ff7040', 3*sc);
+  lineC(c, q3.x+1*sc,palmY2, q3.x+1*sc,palmY2+fH, '#ff7040', 3*sc);
+
+  // screw side view
+  if(!screwInBox){
+    const ssz = cx;
+    const ssy = flY - 72*sc;
+    lineC(c, ssz,ssy, ssz,ssy+22*sc, '#aabbdd', 2.5*sc);
+    rectC(c, ssz-7*sc,ssy-5*sc, 14*sc,8*sc, '#ccddee','#00d4ff', 1.5*sc, 1);
+  }
+
+  // box side view
+  const bsz = cx + S.z*zSc + 10*sc;
+  rectC(c, W*.72-14*sc,flY-26*sc, 28*sc,26*sc, '#3d1a06','#d4a055', 1.5*sc, 2);
+}
+
+function loopSubs(){
+  drawTop();
+  drawSide();
+  requestAnimationFrame(loopSubs);
+}
+loopSubs();
+
+// ══════════════════════════════════════════════════════════
+//  MANUAL CONTROLS
+// ══════════════════════════════════════════════════════════
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+
+function mv(ax,dir,btn,e){
+  if(e) e.preventDefault();
+  sv();
+  btn.classList.add('on');
+  const go=()=>{ S[ax]=clamp(S[ax]+dir*S.step,-S.lim,S.lim); updD(); addLog({'x':'X→'+(dir>0?'DER':'IZQ'),'y':'Y→'+(dir>0?'ARRIBA':'ABAJO'),'z':'Z→'+(dir>0?'FRENTE':'ATRÁS')}[ax]); };
+  go(); mvInt=setInterval(go,50);
+}
+function sv(btn){ if(btn) btn.classList.remove('on'); clearInterval(mvInt); mvInt=null; }
+function setGrip(open,btn,e){ if(e) e.preventDefault(); btn.classList.add('on'); S.gripOpen=open; updD(); addLog('GARRA '+(open?'ABIERTA':'CERRADA')); }
+function ugp(btn){ btn.classList.remove('on'); }
+function goHome(){ S.x=0;S.y=0;S.z=0; updD(); addLog('HOME POSITION'); }
+
+function resetAll(){
+  S.x=0;S.y=0;S.z=0;S.gripOpen=true;
+  screwHeld=false; screwInBox=false;
+  document.getElementById('logbox').innerHTML='';
+  document.getElementById('vstep').textContent='';
+  updD(); addLog('SISTEMA REINICIADO');
+}
+
+function updD(){
+  const f=v=>(v>=0?'+':'')+v.toFixed(1);
+  document.getElementById('vx').textContent=f(S.x);
+  document.getElementById('vy').textContent=f(S.y);
+  document.getElementById('vz').textContent=f(S.z);
+}
+
+let lc=0;
+function addLog(msg){
+  lc++;
+  if(lc%4!==1) return;
+  const el=document.getElementById('logbox');
+  const ts=new Date().toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const ln=document.createElement('span');
+  ln.innerHTML=`<em>${ts}</em> › ${msg}`;
+  el.appendChild(ln);
+  el.scrollTop=el.scrollHeight;
+  if(el.children.length>40) el.removeChild(el.firstChild);
+}
+
+// ══════════════════════════════════════════════════════════
+//  AUTO SEQUENCE
+// ══════════════════════════════════════════════════════════
+// Each keyframe: target state + duration + optional callback
+const SEQ = [
+  { x:-2.9, y: 0,   z:0,  g:true,  d:900,  lbl:'① Moviendo izquierda X=-2.9' },
+  { x:-2.9, y:-4.0, z:0,  g:true,  d:900,  lbl:'② Bajando Y=-4.0 sobre tornillo' },
+  { x:-2.9, y:-4.0, z:0,  g:false, d:650,  lbl:'③ Cerrando garra — Agarrando!',
+    cb:()=>{ screwHeld=true; addLog('TORNILLO CAPTURADO'); }},
+  { x:-2.9, y:-3.1, z:0,  g:false, d:800,  lbl:'④ Subiendo Y=-3.1 con tornillo' },
+  { x: 4.0, y:-3.1, z:0,  g:false, d:1100, lbl:'⑤ Moviendo derecha X=+4.0' },
+  { x: 4.0, y:-3.1, z:0,  g:true,  d:650,  lbl:'⑥ Abriendo garra — Soltando!',
+    cb:()=>{ setTimeout(()=>{ screwHeld=false; screwInBox=true; addLog('✔ TORNILLO SOLTADO'); }, 550); }},
+  { x: 0,   y: 0,   z:0,  g:true,  d:900,  lbl:'✔ Regresando a HOME',
+    cb:()=>{ addLog('SECUENCIA COMPLETADA ✔'); }},
+];
+
+function eio(t){ return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; }
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+function animTo(kf, done){
+  const s0={x:S.x,y:S.y,z:S.z}; const t0=performance.now();
+  (function tick(now){
+    const raw=Math.min((now-t0)/kf.d,1), e=eio(raw);
+    S.x=lerp(s0.x,kf.x,e); S.y=lerp(s0.y,kf.y,e); S.z=lerp(s0.z,kf.z,e);
+    if(raw>.5) S.gripOpen=kf.g;
+    updD();
+    raw<1?requestAnimationFrame(tick):(S.x=kf.x,S.y=kf.y,S.z=kf.z,S.gripOpen=kf.g,done&&done());
+  })(t0);
+}
+
+function runSeq(){
+  if(seqRunning) return;
+  screwHeld=false; screwInBox=false;
+  S.x=0;S.y=0;S.z=0;S.gripOpen=true; updD();
+
+  seqRunning=true;
+  const btn=document.getElementById('bseq');
+  btn.classList.add('run');
+  document.getElementById('sicon').textContent='⟳';
+  document.getElementById('sprog').style.display='block';
+
+  let step=0;
+  function next(){
+    if(step>=SEQ.length){
+      seqRunning=false;
+      btn.classList.remove('run');
+      document.getElementById('sicon').textContent='▶';
+      document.getElementById('slbl').textContent='✔ ¡Completado!';
+      document.getElementById('sbar').style.width='100%';
+      document.getElementById('vstep').textContent='';
+      setTimeout(()=>{ document.getElementById('sprog').style.display='none'; },3000);
+      return;
+    }
+    const kf=SEQ[step];
+    document.getElementById('sbar').style.width=Math.round(step/SEQ.length*100)+'%';
+    document.getElementById('slbl').textContent=kf.lbl;
+    document.getElementById('vstep').textContent=kf.lbl;
+    if(kf.cb) kf.cb();
+    step++;
+    animTo(kf, ()=>setTimeout(next,120));
+  }
+  next();
+}
+
+updD();
+addLog('SISTEMA LISTO — HOME');
+
+// Prevent page scroll when touching control buttons
+document.querySelectorAll('.bc,.vb,.gb').forEach(el => {
+  el.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+  el.addEventListener('touchmove',  e => e.preventDefault(), { passive: false });
+});
+
+// ══════════════════════════════════════════════════════════
+//  KEYBOARD CONTROLS
+//  ← → : X (izq/der)   ↑ ↓ : Y (sube/baja)
+//  W S  : Z (frente/atrás)   G : abrir garra   H : cerrar garra
+//  Space: HOME   R: Reset
+// ══════════════════════════════════════════════════════════
+const keyMap = {
+  ArrowLeft:  { ax:'x', dir:-1 },
+  ArrowRight: { ax:'x', dir: 1 },
+  ArrowUp:    { ax:'y', dir: 1 },
+  ArrowDown:  { ax:'y', dir:-1 },
+  w:          { ax:'z', dir:-1 },
+  W:          { ax:'z', dir:-1 },
+  s:          { ax:'z', dir: 1 },
+  S:          { ax:'z', dir: 1 },
+};
+const keysHeld = {};
+let kbInterval = null;
+
+function kbTick(){
+  let moved = false;
+  for(const key in keysHeld){
+    const m = keyMap[key];
+    if(m){ S[m.ax] = clamp(S[m.ax] + m.dir * S.step, -S.lim, S.lim); moved = true; }
+  }
+  if(moved) updD();
+}
+
+document.addEventListener('keydown', e => {
+  if(e.repeat) return;
+  if(keyMap[e.key]){
+    e.preventDefault();
+    keysHeld[e.key] = true;
+    if(!kbInterval) kbInterval = setInterval(kbTick, 50);
+    addLog({x:'X→'+(keyMap[e.key].dir>0?'DER':'IZQ'),y:'Y→'+(keyMap[e.key].dir>0?'ARRIBA':'ABAJO'),z:'Z→'+(keyMap[e.key].dir>0?'ATRÁS':'FRENTE')}[keyMap[e.key].ax]);
+  }
+  if(e.key === 'g' || e.key === 'G'){ S.gripOpen=true;  updD(); addLog('GARRA ABIERTA'); }
+  if(e.key === 'h' || e.key === 'H'){ S.gripOpen=false; updD(); addLog('GARRA CERRADA'); }
+  if(e.key === ' ')  { e.preventDefault(); goHome(); }
+  if(e.key === 'r' || e.key === 'R'){ resetAll(); }
+});
+
+document.addEventListener('keyup', e => {
+  delete keysHeld[e.key];
+  if(Object.keys(keysHeld).length === 0 && kbInterval){
+    clearInterval(kbInterval); kbInterval = null;
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+//  MOUSE DRAG ON CANVAS — arrastrar para mover X/Y
+//  Drag horizontal → X    Drag vertical → Y (invertido)
+//  Shift + drag → Z
+// ══════════════════════════════════════════════════════════
+let drag = null;
+
+function getPos(e){
+  const r = cv.getBoundingClientRect();
+  const cx = (e.clientX ?? e.touches[0].clientX) - r.left;
+  const cy = (e.clientY ?? e.touches[0].clientY) - r.top;
+  return { cx, cy };
+}
+
+cv.style.cursor = 'grab';
+
+cv.addEventListener('mousedown', e => {
+  drag = { ...getPos(e), sx: S.x, sy: S.y, sz: S.z, shift: e.shiftKey };
+  cv.style.cursor = 'grabbing';
+  e.preventDefault();
+});
+
+window.addEventListener('mousemove', e => {
+  if(!drag) return;
+  const { cx, cy } = getPos(e);
+  const dx = cx - drag.cx;
+  const dy = cy - drag.cy;
+  const sens = 0.018;
+  if(drag.shift){
+    S.z = clamp(drag.sz + dx * sens, -S.lim, S.lim);
+  } else {
+    S.x = clamp(drag.sx + dx * sens, -S.lim, S.lim);
+    S.y = clamp(drag.sy - dy * sens, -S.lim, S.lim);
+  }
+  updD();
+});
+
+window.addEventListener('mouseup', () => {
+  if(drag){ drag = null; cv.style.cursor = 'grab'; }
+});
+
+// Touch drag on canvas
+cv.addEventListener('touchstart', e => {
+  if(e.touches.length === 1){
+    drag = { cx: e.touches[0].clientX, cy: e.touches[0].clientY,
+             sx: S.x, sy: S.y, sz: S.z, shift: false };
+    e.preventDefault();
+  }
+}, { passive: false });
+
+cv.addEventListener('touchmove', e => {
+  if(!drag || e.touches.length !== 1) return;
+  const dx = e.touches[0].clientX - drag.cx;
+  const dy = e.touches[0].clientY - drag.cy;
+  const sens = 0.018;
+  S.x = clamp(drag.sx + dx * sens, -S.lim, S.lim);
+  S.y = clamp(drag.sy - dy * sens, -S.lim, S.lim);
+  updD();
+  e.preventDefault();
+}, { passive: false });
+
+cv.addEventListener('touchend', () => { drag = null; }, { passive: false });
+
+// ── Tooltip de atajos de teclado ─────────────────────────
+(function injectKbHint(){
+  const hint = document.createElement('div');
+  hint.id = 'kb-hint';
+  hint.innerHTML =
+    '<span style="color:var(--accent2);font-family:Orbitron,sans-serif;font-size:8px;letter-spacing:.12em;">CONTROLES</span>' +
+    '<div style="margin-top:5px;line-height:1.9;font-size:9px;color:var(--dim);">' +
+    '⬅ ➡  X (izq/der)&nbsp;&nbsp;&nbsp;⬆ ⬇  Y (sube/baja)<br>' +
+    'W / S &nbsp; Z (frente/atrás)&nbsp;&nbsp;&nbsp;G / H &nbsp; Garra<br>' +
+    'Space &nbsp; HOME &nbsp;&nbsp;&nbsp; R &nbsp; Reset<br>' +
+    '<span style="color:var(--accent);">Mouse:</span> arrastrar en canvas = X/Y &nbsp;|&nbsp; Shift+arrastrar = Z' +
+    '</div>';
+  hint.style.cssText =
+    'background:var(--panel);border:1px solid var(--border);border-radius:8px;' +
+    'padding:8px 12px;margin:0 10px 8px;';
+  const ctrl = document.querySelector('.ctrl');
+  ctrl.insertBefore(hint, ctrl.firstChild.nextSibling.nextSibling);
+})();
+</script>
+</body>
+</html>

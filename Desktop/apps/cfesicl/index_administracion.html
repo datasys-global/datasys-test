@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+  <!-- ═══ PWA ═══ -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="CFE·SICL">
+  <link rel="apple-touch-icon" href="icons/icon-152.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <meta name="msapplication-TileImage" content="icons/icon-144.png">
+  <meta name="msapplication-TileColor" content="#060a06">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CFE·SICL — Administración</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --surface: #111214;
+    --card: #181a1e;
+    --border: #2a2d33;
+    --accent: #00e5a0;
+    --accent2: #0099ff;
+    --warn: #ff6b35;
+    --danger: #ff3355;
+    --text: #e8eaed;
+    --muted: #6b7280;
+    --grid: rgba(0,229,160,0.04);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+  .logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1.8rem;
+    letter-spacing: 4px;
+    color: var(--accent);
+  }
+  .logo span { color: var(--text); }
+  .logo .cfe { color: #ffe033; }
+  .badge-admin {
+    background: var(--accent);
+    color: var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-nav { display: flex; gap: 0.5rem; }
+  .nav-link {
+    padding: 6px 14px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+  }
+  .nav-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  main {
+    position: relative; z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  .full-width { grid-column: 1 / -1; }
+
+  /* ── SECTIONS ── */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .section::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+  }
+  .section-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── FORMS ── */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 0.75rem; }
+  .form-group label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .form-group input, .form-group select, .form-group textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.6rem 0.85rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus { border-color: var(--accent); }
+  .form-group select option { background: var(--surface); }
+
+  /* ── BUTTONS ── */
+  .btn {
+    padding: 0.65rem 1.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--black);
+  }
+  .btn-primary:hover { background: #00ffb3; transform: translateY(-1px); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+  }
+  .btn-secondary:hover { background: rgba(0,229,160,0.08); }
+  .btn-danger {
+    background: var(--danger);
+    color: #fff;
+  }
+  .btn-danger:hover { background: #ff5577; }
+  .btn-warn {
+    background: var(--warn);
+    color: #fff;
+  }
+  .btn-sm { padding: 0.35rem 0.85rem; font-size: 0.65rem; letter-spacing: 1.5px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead tr { border-bottom: 1px solid var(--border); }
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+  }
+  td { padding: 0.65rem 0.75rem; border-bottom: 1px solid rgba(42,45,51,0.5); }
+  tr:hover td { background: rgba(255,255,255,0.015); }
+  .mono { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; }
+
+  /* ── STATUS CHIPS ── */
+  .chip {
+    display: inline-block;
+    padding: 2px 10px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .chip-ok { background: rgba(0,229,160,0.12); color: var(--accent); }
+  .chip-warn { background: rgba(255,107,53,0.15); color: var(--warn); }
+  .chip-low { background: rgba(255,51,85,0.15); color: var(--danger); }
+  .chip-pending { background: rgba(0,153,255,0.15); color: var(--accent2); }
+  .chip-done { background: rgba(100,100,100,0.2); color: var(--muted); }
+
+  /* ── STAT CARDS ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 1rem 1.25rem;
+  }
+  .stat-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.58rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.4rem;
+  }
+  .stat-value {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.2rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+  .stat-unit { font-size: 0.75rem; color: var(--muted); margin-left: 4px; }
+
+  /* ── UPLOAD AREA ── */
+  .upload-area {
+    border: 2px dashed var(--border);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .upload-area:hover, .upload-area.drag-over {
+    border-color: var(--accent);
+    background: rgba(0,229,160,0.03);
+  }
+  .upload-area input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .upload-icon { font-size: 2rem; margin-bottom: 0.5rem; opacity: 0.5; }
+  .upload-text { font-size: 0.85rem; color: var(--muted); }
+  .upload-text strong { color: var(--accent); }
+
+  /* ── ORDER BUILDER ── */
+  .order-products { display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem; }
+  .order-product-row {
+    display: grid; grid-template-columns: 2fr 1fr auto auto;
+    gap: 0.5rem; align-items: center;
+    background: var(--surface);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+  }
+  .order-product-row .prod-name { font-size: 0.85rem; }
+  .order-product-row .prod-qty {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 0.3rem 0.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    width: 80px;
+    outline: none;
+  }
+  .order-product-row .prod-qty:focus { border-color: var(--accent); }
+  .zones-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.4rem; margin-bottom: 1rem; }
+  .zone-btn {
+    padding: 0.5rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.72rem;
+    font-family: 'IBM Plex Mono', monospace;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    text-transform: uppercase;
+  }
+  .zone-btn.selected {
+    background: rgba(0,229,160,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── NOTIFICATIONS ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+    display: flex; flex-direction: column; gap: 0.5rem;
+  }
+  .toast-item {
+    background: var(--card);
+    border-left: 3px solid var(--accent);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 0.75rem 1.25rem;
+    font-size: 0.82rem;
+    font-family: 'IBM Plex Mono', monospace;
+    max-width: 340px;
+    animation: toastIn 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .toast-item.err { border-left-color: var(--danger); }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.25rem; }
+  .tab {
+    padding: 0.65rem 1.25rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--muted);
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── RPE INPUT ── */
+  #rpeBar {
+    position: sticky; top: 56px; left: 0; right: 0; z-index: 90;
+    background: rgba(10,10,10,0.97);
+    border-bottom: 2px solid var(--border);
+    padding: 0.5rem 2rem;
+    display: flex; align-items: center; gap: 1rem;
+    font-size: 0.78rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  #rpeBar label {
+    color: var(--accent);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    font-weight: 600;
+  }
+  #rpeInput {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    color: var(--accent);
+    padding: 0.35rem 0.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    outline: none;
+    width: 180px;
+    transition: border-color 0.2s;
+  }
+  #rpeInput:focus { border-color: var(--accent); }
+  #rpeName { color: var(--accent2); font-weight: 600; min-width: 140px; font-size: 0.8rem; }
+  main { padding-top: 0.5rem; }
+
+  .empty-state {
+    text-align: center; padding: 2rem;
+    color: var(--muted); font-size: 0.82rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .divider { width: 1px; background: var(--border); margin: 0 0.5rem; }
+
+  /* ── LOGIN GATE ── */
+  #loginGate {
+    position:fixed; inset:0; z-index:9999;
+    background:var(--black);
+    display:flex; align-items:center; justify-content:center; padding:1.5rem;
+  }
+  #loginGate::before {
+    content:''; position:absolute; inset:0;
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:40px 40px;
+  }
+  .login-box {
+    position:relative; z-index:1;
+    background:var(--card); border:1px solid var(--border);
+    padding:2.5rem 2rem; width:100%; max-width:380px; text-align:center;
+  }
+  .login-box::before {
+    content:''; position:absolute; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+  }
+  .login-logo { font-family:'Bebas Neue',cursive; font-size:2.2rem; letter-spacing:6px; color:var(--accent); line-height:1; }
+  .login-logo .cfe { color:#ffe033; }
+  .login-logo span { color:var(--text); }
+  .login-sub { font-family:'IBM Plex Mono',monospace; font-size:0.58rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin:0.4rem 0 2rem; }
+  .login-lbl { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); text-align:left; margin-bottom:0.4rem; display:block; }
+  .login-input {
+    width:100%; background:var(--surface); border:2px solid var(--border);
+    color:var(--text); padding:0.85rem 1rem; font-family:'IBM Plex Mono',monospace;
+    font-size:1.1rem; letter-spacing:6px; outline:none; text-align:center;
+    transition:border-color 0.2s; margin-bottom:1.25rem;
+  }
+  .login-input:focus { border-color:var(--accent); }
+  .login-input.shake { animation:shake 0.35s ease; border-color:var(--danger) !important; }
+  @keyframes shake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)}
+    40%{transform:translateX(8px)} 60%{transform:translateX(-5px)} 80%{transform:translateX(5px)}
+  }
+  .login-btn {
+    width:100%; padding:0.9rem; background:var(--accent); color:var(--black);
+    font-family:'IBM Plex Mono',monospace; font-size:0.85rem; font-weight:600;
+    letter-spacing:3px; text-transform:uppercase; border:none; cursor:pointer; transition:background 0.2s;
+  }
+  .login-btn:hover { background:#00ffb3; }
+  .login-err { font-family:'IBM Plex Mono',monospace; font-size:0.7rem; color:var(--danger); margin-top:0.75rem; min-height:1.1rem; letter-spacing:1px; }
+  .login-back { display:block; margin-top:1.25rem; font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); text-decoration:none; transition:color 0.2s; }
+  .login-back:hover { color:var(--accent); }
+
+  /* ── CFE COLOR ── */
+  .cfe { color: #ffe033; }
+
+  /* ── MOBILE RESPONSIVE ── */
+  @media (max-width:700px) {
+    main { grid-template-columns:1fr !important; padding:0.75rem; gap:0.85rem; }
+    .full-width { grid-column:1 !important; }
+    .stats-row { grid-template-columns:repeat(2,1fr) !important; gap:0.6rem !important; }
+    .stat-value { font-size:1.7rem !important; }
+    .stat-card { padding:0.75rem !important; }
+    .form-row { grid-template-columns:1fr !important; }
+    .order-product-row { grid-template-columns:1fr 65px auto auto !important; }
+    .zones-grid { grid-template-columns:repeat(2,1fr) !important; }
+    table { font-size:0.72rem; }
+    th,td { padding:0.4rem 0.45rem !important; }
+    .section { padding:1rem; }
+    #rpeInput { width:120px !important; }
+    .table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    header { height:50px !important; padding:0 0.85rem !important; }
+    .logo { font-size:1.3rem !important; letter-spacing:2px !important; }
+    #rpeBar { padding:0.4rem 0.85rem !important; }
+    main { padding-top:0 !important; }
+    .btn { padding:0.55rem 1rem !important; font-size:0.68rem !important; }
+    .btn-sm { padding:0.3rem 0.7rem !important; font-size:0.6rem !important; }
+  }
+  @media (max-width:420px) {
+    .stats-row { grid-template-columns:repeat(2,1fr) !important; }
+    .stat-value { font-size:1.5rem !important; }
+    .zones-grid { grid-template-columns:repeat(2,1fr) !important; }
+    main { padding:0.5rem !important; }
+    .logo { font-size:1.1rem !important; }
+  }
+
+</style>
+</head>
+<body>
+<!-- LOGIN GATE -->
+<div id="loginGate">
+  <div class="login-box">
+    <div class="login-logo">CFE&middot;<span style="color:#ffe033">SICL</span><span>&middot;ADMIN</span></div>
+    <div class="login-sub">Servicios Generales &mdash; Acceso restringido</div>
+    <label class="login-lbl">Clave de acceso</label>
+    <input class="login-input" id="loginInput" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" maxlength="30"
+      onkeydown="if(event.key==='Enter') checkLogin()" />
+    <button class="login-btn" onclick="checkLogin()">INGRESAR</button>
+    <div class="login-err" id="loginErr"></div>
+    <a class="login-back" href="index_clave.html">&larr; Volver al portal</a>
+  </div>
+</div>
+
+<header>
+  <div style="display:flex;align-items:center;gap:1rem">
+    <div class="logo">CFE·<span style="color:#ffe033">SICL</span><span>·ADMIN</span></div>
+    <div class="badge-admin">Administrador</div>
+  </div>
+  <a href="index_clave.html" style="font-family:'IBM Plex Mono',monospace;font-size:0.62rem;letter-spacing:1.5px;color:var(--muted);text-decoration:none;text-transform:uppercase;border:1px solid var(--border);padding:5px 12px;transition:all 0.2s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">← Portal</a>
+</header>
+
+<div id="rpeBar">
+  <label>Tu RPE:</label>
+  <input id="rpeInput" placeholder="Escribe tu RPE aquí" maxlength="20" />
+  <div class="divider" style="height:20px"></div>
+  <div id="rpeName">— Ingresa tu RPE</div>
+</div>
+
+<main>
+
+  <!-- STATS -->
+  <div class="full-width" style="margin-top:0.5rem">
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-label">Productos</div>
+        <div class="stat-value" id="statProds">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Órdenes Activas</div>
+        <div class="stat-value" id="statOrders">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">En Tránsito</div>
+        <div class="stat-value" id="statTransit">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Entregadas</div>
+        <div class="stat-value" id="statDelivered">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INVENTARIO -->
+  <div class="section">
+    <div class="section-title">Inventario</div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab(this,'tabCarga')">Cargar CSV</div>
+      <div class="tab" onclick="switchTab(this,'tabManual')">Manual</div>
+    </div>
+
+    <div class="tab-content active" id="tabCarga">
+      <div class="upload-area" id="uploadArea">
+        <input type="file" accept=".csv,.xlsx,.txt" id="fileInput" onchange="handleFile(this)">
+        <div class="upload-icon">📦</div>
+        <div class="upload-text"><strong>Haz clic o arrastra</strong> un archivo CSV aquí</div>
+        <div class="upload-text" style="font-size:0.72rem;margin-top:0.25rem">Columnas: nombre, cantidad, unidad, categoria</div>
+      </div>
+      <div id="previewArea" style="margin-top:1rem"></div>
+    </div>
+
+    <div class="tab-content" id="tabManual">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nombre del Producto</label>
+          <input id="pNombre" placeholder="Cloro 5L" />
+        </div>
+        <div class="form-group">
+          <label>Cantidad</label>
+          <input id="pCantidad" type="number" placeholder="20" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Unidad</label>
+          <select id="pUnidad">
+            <option>lt</option><option>kg</option><option>pza</option><option>caja</option><option>galón</option><option>saco</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Categoría</label>
+          <input id="pCategoria" placeholder="Desinfectante" />
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="addProductManual()">+ AGREGAR</button>
+    </div>
+  </div>
+
+  <!-- TABLA INVENTARIO -->
+  <div class="section">
+    <div class="section-title">Existencias Actuales</div>
+    <div class="table-wrap">
+      <table id="invTable">
+        <thead>
+          <tr>
+            <th>Producto</th><th>Categoría</th><th>Existencia</th><th>Unidad</th><th>Estado</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="invBody">
+          <tr><td colspan="6"><div class="empty-state">Sin productos cargados</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CREAR ORDEN -->
+  <div class="section full-width">
+    <div class="section-title">Generar Orden de Despacho</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+
+      <div>
+        <div class="form-group">
+          <label>Transportista</label>
+          <input id="oTransportista" placeholder="Nombre del transportista" />
+        </div>
+        <div class="form-group">
+          <label>RPE Transportista</label>
+          <input id="oRpe" placeholder="RPE123" />
+        </div>
+        <div class="form-group">
+          <label>Zonas destino (seleccionar una o más)</label>
+          <div class="zones-grid" id="zonesGrid"></div>
+        </div>
+        <div class="form-group">
+          <label>Notas</label>
+          <textarea id="oNotas" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.6rem;font-family:inherit;font-size:0.85rem;resize:vertical;min-height:60px;outline:none" placeholder="Instrucciones adicionales..."></textarea>
+        </div>
+      </div>
+
+      <div>
+        <div class="form-group">
+          <label>Productos a despachar</label>
+        </div>
+        <div class="order-products" id="orderProducts">
+          <div class="empty-state">Agrega productos del inventario →</div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="addOrderProduct()" style="margin-bottom:1rem">+ AGREGAR PRODUCTO</button>
+        <br>
+        <button class="btn btn-primary" onclick="createOrder()">GENERAR ORDEN ▶</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ÓRDENES -->
+  <div class="section full-width">
+    <div class="section-title">Registro de Órdenes</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID Orden</th><th>Fecha</th><th>Transportista</th><th>Productos</th><th>Zonas</th><th>Estado</th><th>Recepciones (Zona · Receptor · RPE)</th><th>RPE Admin</th>
+          </tr>
+        </thead>
+        <tbody id="ordersBody">
+          <tr><td colspan="7"><div class="empty-state">Sin órdenes generadas</div></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="margin-top:1rem;display:flex;gap:0.75rem">
+      <button class="btn btn-secondary btn-sm" onclick="exportData()">⬇ EXPORTAR JSON</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportCSV()">⬇ EXPORTAR CSV</button>
+    </div>
+  </div>
+
+  <!-- CONSUMO DE MATERIAL POR ZONA -->
+  <div class="section full-width">
+    <div class="section-title">📊 Consumo de Material por Zona</div>
+    <div style="display:flex;gap:0.75rem;margin-bottom:1.25rem;flex-wrap:wrap;align-items:center">
+      <select id="matZonaSelect" onchange="loadMatAdmin()"
+        style="background:var(--surface);border:1px solid var(--border);color:var(--accent);padding:0.4rem 0.75rem;font-family:'IBM Plex Mono',monospace;font-size:0.82rem;outline:none;cursor:pointer">
+        <option value="">— Todas las zonas —</option>
+        <option>NEZA33</option><option>PALMAS</option><option>AGRICULTURA</option>
+        <option>CHIMALHUACAN</option><option>LA PAZ</option><option>SUB ESTACION</option>
+      </select>
+      <button class="btn btn-secondary btn-sm" onclick="loadMatAdmin()">↺ ACTUALIZAR</button>
+      <button class="btn btn-secondary btn-sm" onclick="exportMatAdminCSV()" style="margin-left:auto">⬇ EXPORTAR CSV CONSUMO</button>
+    </div>
+    <div id="matAdminContainer">
+      <div class="empty-state">Selecciona una zona o carga todas para ver el consumo</div>
+    </div>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+/* ===== CONSTANTES ===== */
+const ZONAS = ['NEZA33','PALMAS','AGRICULTURA','CHIMALHUACAN','LA PAZ','SUB ESTACION'];
+const KEY_INV = 'sicl_inventory';
+const KEY_ORDERS = 'sicl_orders';
+const KEY_LOG = 'sicl_log';
+
+/* ===== STATE ===== */
+let inventory = [];
+let orders = [];
+let selectedZones = new Set();
+let orderItems = [];
+
+/* ===== INIT ===== */
+function init() {
+  inventory = JSON.parse(localStorage.getItem(KEY_INV) || '[]');
+  orders    = JSON.parse(localStorage.getItem(KEY_ORDERS) || '[]');
+  renderInventory();
+  renderOrders();
+  renderStats();
+  buildZonesGrid();
+}
+
+/* ===== RPE BAR ===== */
+document.getElementById('rpeInput').addEventListener('input', function() {
+  const v = this.value.trim();
+  document.getElementById('rpeName').textContent = v ? `✓ ${v}` : '—';
+  this.style.borderColor = v ? 'var(--accent)' : 'var(--border)';
+  localStorage.setItem('sicl_current_rpe', v);
+});
+(function(){
+  const saved = localStorage.getItem('sicl_current_rpe') || '';
+  const inp = document.getElementById('rpeInput');
+  inp.value = saved;
+  document.getElementById('rpeName').textContent = saved ? `✓ ${saved}` : '— Ingresa tu RPE';
+  inp.style.borderColor = saved ? 'var(--accent)' : 'var(--border)';
+})();
+
+function getRpe() {
+  return document.getElementById('rpeInput').value.trim();
+}
+
+/* ===== SAVE ===== */
+function save() {
+  localStorage.setItem(KEY_INV, JSON.stringify(inventory));
+  localStorage.setItem(KEY_ORDERS, JSON.stringify(orders));
+}
+function logEvent(msg) {
+  const logs = JSON.parse(localStorage.getItem(KEY_LOG) || '[]');
+  const rpe = getRpe() || 'ADMIN';
+  logs.push({ ts: new Date().toISOString(), rpe, msg });
+  localStorage.setItem(KEY_LOG, JSON.stringify(logs));
+}
+
+/* ===== TABS ===== */
+function switchTab(el, targetId) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(targetId).classList.add('active');
+}
+
+/* ===== STATS ===== */
+function renderStats() {
+  document.getElementById('statProds').textContent = inventory.length;
+  document.getElementById('statOrders').textContent = orders.filter(o=>o.status==='pendiente').length;
+  document.getElementById('statTransit').textContent = orders.filter(o=>o.status==='en_transito').length;
+  document.getElementById('statDelivered').textContent = orders.filter(o=>o.status==='entregado'||o.status==='entregado_faltante').length;
+}
+
+/* ===== INVENTORY ===== */
+function renderInventory() {
+  const tbody = document.getElementById('invBody');
+  if(!inventory.length){
+    tbody.innerHTML='<tr><td colspan="6"><div class="empty-state">Sin productos cargados</div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = inventory.map((p,i)=>{
+    const pct = p.existencia / (p.original||p.existencia||1);
+    const chip = p.existencia === 0 ? 'chip-low' : pct < 0.2 ? 'chip-warn' : 'chip-ok';
+    const label = p.existencia === 0 ? 'AGOTADO' : pct < 0.2 ? 'BAJO' : 'OK';
+    return `<tr>
+      <td class="mono">${p.nombre}</td>
+      <td>${p.categoria||'—'}</td>
+      <td class="mono" style="color:var(--accent)">${p.existencia}</td>
+      <td>${p.unidad}</td>
+      <td><span class="chip ${chip}">${label}</span></td>
+      <td><button class="btn btn-danger btn-sm" onclick="removeProduct(${i})">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function addProductManual() {
+  const n = document.getElementById('pNombre').value.trim();
+  const c = parseFloat(document.getElementById('pCantidad').value);
+  const u = document.getElementById('pUnidad').value;
+  const cat = document.getElementById('pCategoria').value.trim();
+  if(!n || isNaN(c) || c<=0){ toast('Completa nombre y cantidad','err'); return; }
+  const p = { id: Date.now(), nombre:n, existencia:c, original:c, unidad:u, categoria:cat||'General' };
+  inventory.push(p);
+  save(); renderInventory(); renderStats();
+  logEvent(`Producto agregado: ${n} x${c} ${u}`);
+  toast(`✓ ${n} agregado al inventario`);
+  ['pNombre','pCantidad','pCategoria'].forEach(id=>document.getElementById(id).value='');
+}
+
+function removeProduct(i) {
+  const p = inventory[i];
+  inventory.splice(i,1);
+  save(); renderInventory(); renderStats();
+  logEvent(`Producto eliminado: ${p.nombre}`);
+  toast(`Eliminado: ${p.nombre}`,'err');
+}
+
+/* ===== FILE UPLOAD ===== */
+function handleFile(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const lines = e.target.result.split('\n').filter(l=>l.trim());
+    const preview = [];
+    const header = lines[0].toLowerCase().split(/[,;]/);
+    const iNom  = header.findIndex(h=>h.includes('nombre')||h.includes('product'));
+    const iCant = header.findIndex(h=>h.includes('cant')||h.includes('qty')||h.includes('stock')||h.includes('exist'));
+    const iUnit = header.findIndex(h=>h.includes('unid')||h.includes('unit'));
+    const iCat  = header.findIndex(h=>h.includes('cat'));
+    for(let i=1;i<lines.length;i++){
+      const cols = lines[i].split(/[,;]/);
+      if(!cols[0]?.trim()) continue;
+      const p = {
+        id: Date.now()+i,
+        nombre:    (cols[iNom>=0?iNom:0]||'').trim(),
+        existencia: parseFloat(cols[iCant>=0?iCant:1]) || 0,
+        unidad:    (cols[iUnit>=0?iUnit:2]||'pza').trim(),
+        categoria: (cols[iCat>=0?iCat:3]||'General').trim(),
+      };
+      p.original = p.existencia;
+      if(p.nombre) preview.push(p);
+    }
+    const pa = document.getElementById('previewArea');
+    if(!preview.length){ pa.innerHTML='<div class="empty-state">No se encontraron productos válidos</div>'; return; }
+    pa.innerHTML = `<div style="font-size:0.78rem;color:var(--muted);margin-bottom:0.5rem;font-family:var(--mono)">${preview.length} productos detectados</div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Nombre</th><th>Cant</th><th>Unidad</th><th>Categoría</th></tr></thead>
+      <tbody>${preview.map(p=>`<tr><td>${p.nombre}</td><td class="mono">${p.existencia}</td><td>${p.unidad}</td><td>${p.categoria}</td></tr>`).join('')}</tbody>
+    </table></div>
+    <button class="btn btn-primary btn-sm" style="margin-top:0.75rem" onclick="confirmImport()">✓ CONFIRMAR IMPORTACIÓN</button>`;
+    window._previewProducts = preview;
+  };
+  reader.readAsText(file);
+}
+function confirmImport() {
+  if(!window._previewProducts?.length) return;
+  inventory = [...inventory, ...window._previewProducts];
+  save(); renderInventory(); renderStats();
+  logEvent(`Importación: ${window._previewProducts.length} productos cargados`);
+  toast(`✓ ${window._previewProducts.length} productos importados`);
+  document.getElementById('previewArea').innerHTML='';
+  window._previewProducts=null;
+}
+
+/* ===== ZONES ===== */
+function buildZonesGrid() {
+  document.getElementById('zonesGrid').innerHTML = ZONAS.map(z=>
+    `<div class="zone-btn" onclick="toggleZone(this,'${z}')">${z}</div>`
+  ).join('');
+}
+function toggleZone(el, z) {
+  if(selectedZones.has(z)){ selectedZones.delete(z); el.classList.remove('selected'); }
+  else { selectedZones.add(z); el.classList.add('selected'); }
+}
+
+/* ===== ORDER PRODUCTS ===== */
+function addOrderProduct() {
+  if(!inventory.length){ toast('Carga productos al inventario primero','err'); return; }
+  const id = Date.now();
+  orderItems.push({ uid: id, prodId: null, qty: 0 });
+  const container = document.getElementById('orderProducts');
+  if(container.querySelector('.empty-state')) container.innerHTML='';
+  const row = document.createElement('div');
+  row.className='order-product-row'; row.id=`oprow_${id}`;
+  row.innerHTML = `
+    <select class="form-group" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:0.4rem 0.5rem;font-family:inherit;font-size:0.82rem;outline:none" onchange="setOrderProd(${id},this)">
+      <option value="">-- Seleccionar --</option>
+      ${inventory.map(p=>`<option value="${p.id}">${p.nombre} (${p.existencia} ${p.unidad})</option>`).join('')}
+    </select>
+    <input class="prod-qty" type="number" min="1" placeholder="Cant." onchange="setOrderQty(${id},this)" />
+    <span id="opunit_${id}" style="font-size:0.72rem;color:var(--muted);font-family:monospace;min-width:30px"></span>
+    <button class="btn btn-danger btn-sm" onclick="removeOrderItem(${id})">✕</button>
+  `;
+  container.appendChild(row);
+}
+function setOrderProd(uid, sel) {
+  const item = orderItems.find(i=>i.uid===uid);
+  if(!item) return;
+  item.prodId = parseInt(sel.value);
+  const prod = inventory.find(p=>p.id===item.prodId);
+  document.getElementById(`opunit_${uid}`).textContent = prod ? prod.unidad : '';
+}
+function setOrderQty(uid, inp) {
+  const item = orderItems.find(i=>i.uid===uid);
+  if(item) item.qty = parseFloat(inp.value)||0;
+}
+function removeOrderItem(uid) {
+  orderItems = orderItems.filter(i=>i.uid!==uid);
+  document.getElementById(`oprow_${uid}`)?.remove();
+  if(!orderItems.length) document.getElementById('orderProducts').innerHTML='<div class="empty-state">Agrega productos del inventario →</div>';
+}
+
+/* ===== CREATE ORDER ===== */
+function createOrder() {
+  const transportista = document.getElementById('oTransportista').value.trim();
+  const rpeTransp     = document.getElementById('oRpe').value.trim();
+  const notas         = document.getElementById('oNotas').value.trim();
+  const rpeAdmin      = getRpe();
+
+  if(!rpeAdmin) {
+    const inp = document.getElementById('rpeInput');
+    inp.style.borderColor = 'var(--danger)';
+    inp.focus();
+    inp.placeholder = '← REQUERIDO';
+    toast('⚠ Ingresa tu RPE en la barra superior','err');
+    return;
+  }
+  if(!transportista)   { toast('Especifica el transportista','err'); return; }
+  if(!selectedZones.size) { toast('Selecciona al menos una zona destino','err'); return; }
+  if(!orderItems.length)  { toast('Agrega al menos un producto','err'); return; }
+
+  // Validate items
+  for(const item of orderItems){
+    const prod = inventory.find(p=>p.id===item.prodId);
+    if(!prod){ toast('Selecciona producto en todos los renglones','err'); return; }
+    if(item.qty<=0){ toast(`Cantidad inválida para ${prod.nombre}`,'err'); return; }
+    if(item.qty > prod.existencia){ toast(`Insuficiente: ${prod.nombre} (${prod.existencia} ${prod.unidad} disponibles)`,'err'); return; }
+  }
+
+  // Deduct from inventory
+  const productos = [];
+  for(const item of orderItems){
+    const prod = inventory.find(p=>p.id===item.prodId);
+    prod.existencia -= item.qty;
+    productos.push({ id: prod.id, nombre: prod.nombre, cantidad: item.qty, unidad: prod.unidad });
+  }
+
+  const order = {
+    id: `ORD-${Date.now()}`,
+    fecha: new Date().toISOString(),
+    transportista,
+    rpeTransportista: rpeTransp,
+    zonas: [...selectedZones],
+    productos,
+    notas,
+    status: 'pendiente',
+    rpeAdmin,
+    nombreAdmin: document.getElementById('rpeName').textContent.replace('✓ ','').trim(),
+    historial: [{ ts: new Date().toISOString(), accion: 'CREADA', rpe: rpeAdmin }]
+  };
+
+  orders.push(order);
+  save(); renderInventory(); renderOrders(); renderStats();
+  logEvent(`Orden ${order.id} creada → ${transportista} | Zonas: ${[...selectedZones].join(', ')} | Prods: ${productos.map(p=>p.nombre).join(', ')}`);
+  toast(`✓ Orden ${order.id} generada`);
+
+  // Reset
+  orderItems=[];
+  selectedZones.clear();
+  document.getElementById('orderProducts').innerHTML='<div class="empty-state">Agrega productos del inventario →</div>';
+  document.getElementById('oTransportista').value='';
+  document.getElementById('oRpe').value='';
+  document.getElementById('oNotas').value='';
+  buildZonesGrid();
+}
+
+/* ===== RENDER ORDERS ===== */
+function renderOrders() {
+  const tbody = document.getElementById('ordersBody');
+  if(!orders.length){
+    tbody.innerHTML='<tr><td colspan="8"><div class="empty-state">Sin órdenes generadas</div></td></tr>';
+    return;
+  }
+  const sorted = [...orders].reverse();
+  tbody.innerHTML = sorted.map(o=>{
+    const chipMap  = { pendiente:'chip-pending', en_transito:'chip-warn', parcial:'chip-pending', entregado:'chip-ok', entregado_faltante:'chip-warn', cancelado:'chip-low' };
+    const labelMap = { pendiente:'PENDIENTE', en_transito:'EN TRÁNSITO', parcial:'PARCIAL', entregado:'ENTREGADO', entregado_faltante:'ENTREGADO C/FALTANTE', cancelado:'CANCELADO' };
+
+    // Detalle de recepciones por zona
+    const recepcionesHTML = o.recepciones?.length
+      ? o.recepciones.map(r => {
+          const prods = r.productos
+            ? r.productos.map(p => `${p.nombre} ${p.recibido}/${p.esperado}${p.unidad}`).join(', ')
+            : o.productos.map(p=>`${p.nombre} ×${p.cantidad}${p.unidad}`).join(', ');
+          const faltantes = r.productos?.filter(p=>p.faltante>0).map(p=>`${p.nombre} -${p.faltante}${p.unidad}`).join(', ');
+          return `<div style="margin-bottom:3px">
+            <span style="color:var(--accent)">${r.zona}</span>
+            · <span style="color:var(--text)">${r.receptor}</span>
+            · RPE:<span style="color:var(--accent2)">${r.rpe}</span>
+            · <span style="font-size:0.68rem;color:var(--muted)">${new Date(r.ts).toLocaleString('es-MX')}</span>
+            ${faltantes ? `<br><span style="color:var(--warn);font-size:0.68rem">⚠ Faltó: ${faltantes}</span>` : ''}
+          </div>`;
+        }).join('')
+      : '<span style="color:var(--muted)">—</span>';
+
+    return `<tr>
+      <td class="mono" style="color:var(--accent2)">${o.id}</td>
+      <td class="mono" style="font-size:0.75rem">${new Date(o.fecha).toLocaleString('es-MX')}</td>
+      <td>${o.transportista}<br><span style="font-size:0.7rem;color:var(--muted);font-family:monospace">RPE: ${o.rpeTransportista||'—'}</span></td>
+      <td style="font-size:0.78rem">${o.productos.map(p=>`${p.nombre} ×${p.cantidad}${p.unidad}`).join('<br>')}</td>
+      <td style="font-size:0.75rem">${o.zonas.join(', ')}</td>
+      <td><span class="chip ${chipMap[o.status]||'chip-pending'}">${labelMap[o.status]||o.status}</span></td>
+      <td style="font-size:0.72rem;font-family:monospace">${recepcionesHTML}</td>
+      <td style="font-size:0.72rem;color:var(--muted);font-family:monospace">${o.rpeAdmin}</td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===== EXPORT ===== */
+function exportData() {
+  const data = { inventory, orders, log: JSON.parse(localStorage.getItem(KEY_LOG)||'[]') };
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=`sicl_backup_${Date.now()}.json`;
+  a.click();
+  toast('✓ JSON exportado');
+}
+
+function exportCSV() {
+  const BOM = '\uFEFF';
+  const cols = [
+    'ID Orden',
+    'Fecha',
+    'Nombre Admin',
+    'RPE Transportista',
+    'Nombre Transportista',
+    'RPE Receptor',
+    'Nombre Receptor',
+    'Zonas',
+    'Productos Recibidos',
+    'Faltantes',
+    'Devoluciones al Admin',
+    'Observaciones'
+  ];
+
+  const rows = [];
+
+  orders.forEach(o => {
+    if(o.recepciones?.length){
+      o.recepciones.forEach(r => {
+        const prodRecibidos = r.productos
+          ? r.productos.map(p=>`${p.nombre} ${p.recibido}/${p.esperado}${p.unidad}`).join(' | ')
+          : o.productos.map(p=>`${p.nombre} x${p.cantidad}${p.unidad}`).join(' | ');
+
+        const faltantes = r.productos?.filter(p=>p.faltante>0)
+          .map(p=>`${p.nombre} -${p.faltante}${p.unidad}`).join(' | ') || '';
+
+        const devoluciones = r.devoluciones?.length
+          ? r.devoluciones.map(d=>`${d.nombre} +${d.cantidad}${d.unidad}`).join(' | ')
+          : '';
+
+        rows.push([
+          o.id,
+          new Date(o.fecha).toLocaleString('es-MX'),
+          o.nombreAdmin     || '',
+          o.rpeTransportista|| '',
+          o.transportista   || '',
+          r.rpe             || '',
+          r.receptor        || '',
+          r.zona            || o.zonas.join(' | '),
+          prodRecibidos,
+          faltantes,
+          devoluciones,
+          r.obs             || ''
+        ]);
+      });
+    } else {
+      rows.push([
+        o.id,
+        new Date(o.fecha).toLocaleString('es-MX'),
+        o.nombreAdmin     || '',
+        o.rpeTransportista|| '',
+        o.transportista   || '',
+        '', '', o.zonas.join(' | '),
+        o.productos.map(p=>`${p.nombre} x${p.cantidad}${p.unidad}`).join(' | '),
+        '', '', ''
+      ]);
+    }
+  });
+
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  let csv = BOM + cols.map(esc).join(',') + '\n';
+  rows.forEach(r => { csv += r.map(esc).join(',') + '\n'; });
+
+  const blob = new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `sicl_ordenes_${Date.now()}.csv`;
+  a.click();
+  toast('✓ CSV exportado');
+}
+
+/* ===== TOAST ===== */
+function toast(msg, type='') {
+  const el = document.createElement('div');
+  el.className='toast-item'+(type==='err'?' err':'');
+  el.textContent = msg;
+  document.getElementById('toast').appendChild(el);
+  setTimeout(()=>el.remove(), 3500);
+}
+
+
+/* ===== LOGIN GATE ===== */
+const ACCESS_KEY = 'cfe';
+(function(){
+  const ok = sessionStorage.getItem('sicl_admin_auth');
+  if(ok === '1') { document.getElementById('loginGate').style.display='none'; }
+  else { document.body.style.overflow='hidden'; }
+})();
+function checkLogin(){
+  const val = document.getElementById('loginInput').value.trim().toLowerCase();
+  const errEl = document.getElementById('loginErr');
+  if(val === ACCESS_KEY){
+    sessionStorage.setItem('sicl_admin_auth','1');
+    document.getElementById('loginGate').style.display='none';
+    document.body.style.overflow='';
+    errEl.textContent='';
+  } else {
+    errEl.textContent='Clave incorrecta';
+    const inp = document.getElementById('loginInput');
+    inp.classList.remove('shake');
+    void inp.offsetWidth;
+    inp.classList.add('shake');
+    inp.value='';
+    setTimeout(()=>{ inp.classList.remove('shake'); errEl.textContent=''; },2000);
+  }
+}
+
+/* ===== CONSUMO DE MATERIAL POR ZONA ===== */
+const ZONAS_MAT = ['NEZA33','PALMAS','AGRICULTURA','CHIMALHUACAN','LA PAZ','SUB ESTACION'];
+
+function loadMatAdmin(){
+  const zonaFiltro = document.getElementById('matZonaSelect').value.toUpperCase();
+  const zonasVer   = zonaFiltro ? [zonaFiltro] : ZONAS_MAT;
+  const container  = document.getElementById('matAdminContainer');
+
+  // Recopilar datos de todas las zonas seleccionadas
+  const allData = zonasVer.map(z => {
+    try { return { zona: z, items: JSON.parse(localStorage.getItem('sicl_mat_'+z)||'[]') }; }
+    catch(_){ return { zona: z, items: [] }; }
+  }).filter(d => d.items.length > 0);
+
+  if(!allData.length){
+    container.innerHTML = '<div class="empty-state">No hay registros de material para '+(zonaFiltro||'ninguna zona')+'</div>';
+    return;
+  }
+
+  container.innerHTML = allData.map(d => {
+    const today = new Date().toDateString();
+    const consumoTotal = d.items.reduce((sum, m) => {
+      const usado = m.log.filter(l=>l.qty<0).reduce((s,l)=>s+Math.abs(l.qty),0);
+      return sum + usado;
+    }, 0);
+    const movHoy = d.items.reduce((n,m)=>n+m.log.filter(l=>new Date(l.ts).toDateString()===today).length,0);
+    const bajos  = d.items.filter(m=>m.minStock>0&&m.stock<=m.minStock).length;
+
+    const itemsHTML = d.items.map(m => {
+      const totalUsado  = m.log.filter(l=>l.qty<0).reduce((s,l)=>s+Math.abs(l.qty),0);
+      const totalEntrado = m.log.filter(l=>l.qty>0).reduce((s,l)=>s+l.qty,0);
+      const bajo    = m.minStock>0 && m.stock<=m.minStock;
+      const agotado = m.stock<=0;
+      const logReciente = m.log.slice(0,5).map(l=>`
+        <tr style="font-size:0.72rem">
+          <td style="color:var(--muted);font-family:monospace">${new Date(l.ts).toLocaleString('es-MX',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
+          <td style="color:var(--muted);font-family:monospace">${l.rpe}</td>
+          <td style="font-family:monospace;color:${l.qty>0?'var(--accent)':'var(--warn)'};font-weight:600">${l.qty>0?'+':''}${l.qty} ${m.unidad}</td>
+          <td style="color:var(--muted)">${l.nota||'—'}</td>
+        </tr>`).join('');
+      return `
+        <tr>
+          <td>${m.nombre}</td>
+          <td class="mono">${m.unidad}</td>
+          <td class="mono" style="color:var(--accent)">${m.stock}</td>
+          <td class="mono" style="color:var(--warn)">${Math.round(totalUsado*100)/100}</td>
+          <td class="mono" style="color:var(--accent2)">${Math.round(totalEntrado*100)/100}</td>
+          <td><span class="chip ${agotado?'chip-low':bajo?'chip-warn':'chip-ok'}">${agotado?'AGOTADO':bajo?'BAJO':'OK'}</span></td>
+          <td>
+            ${m.log.length?`<details><summary style="cursor:pointer;font-family:monospace;font-size:0.62rem;color:var(--muted);letter-spacing:1px">VER ${Math.min(5,m.log.length)} MOV.</summary>
+              <table style="width:100%;margin-top:0.4rem;border-top:1px solid var(--border)">
+                <thead><tr style="font-size:0.58rem">
+                  <th style="color:var(--muted);font-family:monospace;padding:0.2rem 0.4rem;text-align:left">FECHA</th>
+                  <th style="color:var(--muted);font-family:monospace;padding:0.2rem 0.4rem;text-align:left">RPE</th>
+                  <th style="color:var(--muted);font-family:monospace;padding:0.2rem 0.4rem;text-align:left">MOV.</th>
+                  <th style="color:var(--muted);font-family:monospace;padding:0.2rem 0.4rem;text-align:left">NOTA</th>
+                </tr></thead>
+                <tbody>${logReciente}</tbody>
+              </table>
+            </details>`:'<span style="color:var(--muted);font-size:0.7rem">Sin movimientos</span>'}
+          </td>
+        </tr>`;
+    }).join('');
+
+    return `
+      <div style="margin-bottom:1.5rem">
+        <div style="display:flex;align-items:center;gap:1rem;margin-bottom:0.75rem;flex-wrap:wrap">
+          <div style="font-family:'Bebas Neue',cursive;font-size:1.3rem;letter-spacing:3px;color:var(--accent)">${d.zona}</div>
+          <div style="display:flex;gap:1rem">
+            <div><span style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--warn)">${d.items.length}</span>
+              <span style="font-family:monospace;font-size:0.58rem;color:var(--muted);letter-spacing:1px;margin-left:4px">PRODUCTOS</span></div>
+            <div><span style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--accent2)">${movHoy}</span>
+              <span style="font-family:monospace;font-size:0.58rem;color:var(--muted);letter-spacing:1px;margin-left:4px">MOV. HOY</span></div>
+            ${bajos>0?`<div><span style="font-family:'Bebas Neue',cursive;font-size:1.2rem;color:var(--danger)">${bajos}</span>
+              <span style="font-family:monospace;font-size:0.58rem;color:var(--muted);letter-spacing:1px;margin-left:4px">BAJO MÍNIMO</span></div>`:''}
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Producto</th><th>Unidad</th><th>Stock Actual</th><th>Total Usado</th><th>Total Entrado</th><th>Estado</th><th>Últimos Movimientos</th>
+            </tr></thead>
+            <tbody>${itemsHTML}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('<hr style="border:none;border-top:1px solid var(--border);margin:1rem 0">');
+}
+
+function exportMatAdminCSV(){
+  const zonaFiltro = document.getElementById('matZonaSelect').value.toUpperCase();
+  const zonasVer   = zonaFiltro ? [zonaFiltro] : ZONAS_MAT;
+  const rows = [['Zona','Producto','Unidad','Stock Actual','Stock Mínimo','Fecha','RPE','Movimiento','Nota']];
+  let total = 0;
+  zonasVer.forEach(z => {
+    try{
+      const items = JSON.parse(localStorage.getItem('sicl_mat_'+z)||'[]');
+      items.forEach(m => {
+        if(m.log.length){
+          m.log.forEach(l=>{ rows.push([z,m.nombre,m.unidad,m.stock,m.minStock,
+            new Date(l.ts).toLocaleString('es-MX'),l.rpe,l.qty,l.nota||'']); total++; });
+        } else {
+          rows.push([z,m.nombre,m.unidad,m.stock,m.minStock,'','','','']); total++;
+        }
+      });
+    }catch(_){}
+  });
+  if(total===0){ toast('No hay datos de material para exportar','err'); return; }
+  const csv=rows.map(r=>r.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`SICL_consumo_${zonaFiltro||'TODAS'}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast(`✓ CSV exportado: ${total} registros`);
+}
+
+init();
+</script>
+
+  <!-- ═══ REGISTRO SERVICE WORKER ═══ -->
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('[PWA] Service Worker registrado:', reg.scope))
+          .catch(err => console.warn('[PWA] SW error:', err));
+      });
+    }
+
+    // Banner de instalación
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'flex';
+    });
+    window.addEventListener('appinstalled', () => {
+      const banner = document.getElementById('installBanner');
+      if(banner) banner.style.display = 'none';
+      deferredPrompt = null;
+    });
+    function installApp(){
+      if(!deferredPrompt) return;
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        deferredPrompt = null;
+        const banner = document.getElementById('installBanner');
+        if(banner) banner.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>

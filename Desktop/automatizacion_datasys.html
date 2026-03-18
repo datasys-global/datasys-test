@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS · Automatización Industrial — Robótica & IA</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&family=Exo+2:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg:    #00060c;
+  --bg2:   #000d18;
+  --bg3:   #010f1e;
+  --panel: rgba(0,8,18,.97);
+  --c:     #00e5ff;
+  --c2:    #008fb3;
+  --g:     #00ff88;
+  --g2:    #00cc66;
+  --amber: #ffaa00;
+  --rose:  #ff2d55;
+  --steel: #6fa8bc;
+  --bord:  rgba(0,229,255,.1);
+  --bord2: rgba(0,229,255,.26);
+  --text:  #b8d8e8;
+  --dim:   #2e5568;
+  --glow:  0 0 22px rgba(0,229,255,.32);
+  --glow2: 0 0 50px rgba(0,229,255,.55);
+  --gglow: 0 0 22px rgba(0,255,136,.35);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Exo 2',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;cursor:none;}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9997;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,229,255,.004) 2px,rgba(0,229,255,.004) 3px);}
+
+/* CURSOR */
+#cA{width:16px;height:16px;border:1.5px solid var(--c);border-radius:50%;position:fixed;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);mix-blend-mode:screen;}
+#cB{width:3px;height:3px;background:var(--c);border-radius:50%;position:fixed;z-index:99998;pointer-events:none;transform:translate(-50%,-50%);box-shadow:0 0 6px var(--c);transition:left .07s,top .07s;}
+
+/* NAV */
+.nav{position:fixed;top:0;left:0;right:0;height:60px;z-index:1000;display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:rgba(0,6,12,.97);border-bottom:1px solid var(--bord);backdrop-filter:blur(20px);}
+.nav::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.35;}
+.nav-l{display:flex;align-items:center;gap:12px;}
+.nav-logo{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:900;color:var(--c);letter-spacing:5px;text-shadow:var(--glow);}
+.nav-pipe{width:1px;height:24px;background:var(--bord2);}
+.nav-crumb{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:2px;color:var(--dim);}
+.nav-crumb span{color:var(--c);}
+.nav-r{display:flex;align-items:center;gap:10px;}
+.status-chip{display:flex;align-items:center;gap:6px;padding:5px 12px;border:1px solid rgba(0,255,136,.22);background:rgba(0,255,136,.04);}
+.s-dot{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:var(--gglow);animation:blink 1.4s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.s-txt{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:2px;color:var(--g);}
+.nav-clock{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--dim);}
+.btn-back{padding:6px 16px;font-family:'Orbitron',sans-serif;font-size:.53rem;font-weight:700;letter-spacing:2px;color:var(--bg);background:var(--c);border:none;cursor:pointer;clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%);box-shadow:var(--glow);transition:filter .2s;}
+.btn-back:hover{filter:brightness(1.15);}
+
+/* ══════════ HERO ══════════ */
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:60px;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;z-index:0;}
+.h-img{width:100%;height:100%;object-fit:cover;filter:brightness(.16) saturate(.65);}
+.h-grad{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,6,12,.65) 0%,transparent 22%,transparent 62%,var(--bg) 100%),
+  linear-gradient(90deg,var(--bg) 0%,transparent 42%,transparent 68%,var(--bg) 100%),
+  radial-gradient(ellipse 60% 70% at 62% 50%,rgba(0,40,80,.38) 0%,transparent 70%);}
+
+/* animated circuit lines */
+.circuits{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
+.circ-line{position:absolute;background:linear-gradient(90deg,transparent,rgba(0,229,255,.15),transparent);height:1px;animation:circMove linear infinite;}
+@keyframes circMove{0%{transform:translateX(-100%);}100%{transform:translateX(200%);}}
+
+/* grid */
+.h-grid{position:absolute;inset:0;z-index:1;
+  background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);
+  background-size:50px 50px;animation:gd 25s linear infinite;}
+@keyframes gd{0%{background-position:0 0;}100%{background-position:50px 50px;}}
+
+.hero-content{position:relative;z-index:5;padding:0 68px;max-width:660px;animation:hIn 1.1s cubic-bezier(.2,.8,.3,1) both;}
+@keyframes hIn{0%{opacity:0;transform:translateX(-26px);}100%{opacity:1;transform:translateX(0);}}
+.h-pre{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:5px;color:var(--c);opacity:.65;margin-bottom:18px;}
+.h-title{font-family:'Orbitron',sans-serif;font-size:clamp(1.9rem,5vw,4rem);font-weight:900;line-height:1.05;letter-spacing:1px;color:#dff0f8;margin-bottom:20px;}
+.h-title em{font-style:normal;color:var(--c);text-shadow:var(--glow);}
+.h-title strong{font-style:normal;color:var(--g);text-shadow:var(--gglow);}
+.h-desc{font-size:1.03rem;line-height:1.88;color:var(--steel);font-weight:300;margin-bottom:32px;max-width:520px;}
+.h-tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px;}
+.htag{padding:5px 14px;font-family:'Share Tech Mono',monospace;font-size:.57rem;letter-spacing:2px;border:1px solid var(--bord);color:var(--dim);background:rgba(0,229,255,.04);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%);transition:all .3s;}
+.htag:hover{border-color:var(--c);color:var(--c);}
+.h-btns{display:flex;gap:12px;flex-wrap:wrap;}
+.btn-demo{padding:13px 36px;font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);box-shadow:var(--glow2);transition:filter .3s;animation:demoPulse 3s ease-in-out infinite;}
+@keyframes demoPulse{0%,100%{box-shadow:var(--glow);}50%{box-shadow:var(--glow2);}}
+.btn-demo:hover{filter:brightness(1.1);}
+.btn-ghost{padding:12px 32px;font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--c);background:transparent;border:1px solid var(--c);cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);transition:all .3s;}
+.btn-ghost:hover{background:rgba(0,229,255,.08);box-shadow:var(--glow);}
+
+/* HERO RIGHT — FACTORY STATS */
+.hero-right{position:absolute;right:5%;top:50%;transform:translateY(-50%);z-index:5;display:flex;flex-direction:column;gap:12px;animation:rIn 1.2s ease .5s both;}
+@keyframes rIn{0%{opacity:0;transform:translateX(20px) translateY(-50%);}100%{opacity:1;transform:translateX(0) translateY(-50%);}}
+.fcard{background:rgba(0,8,18,.9);border:1px solid var(--bord2);backdrop-filter:blur(16px);padding:14px 18px;min-width:185px;clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));position:relative;overflow:visible;}
+.fcard::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.fc-lbl{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:3px;color:var(--dim);margin-bottom:5px;}
+.fc-val{font-family:'Orbitron',sans-serif;font-size:1.3rem;font-weight:900;}
+.fc-sub{font-size:.62rem;color:var(--steel);margin-top:3px;}
+.fc-bar{height:2px;background:rgba(0,229,255,.1);margin-top:8px;border-radius:1px;overflow:hidden;}
+.fc-fill{height:100%;border-radius:1px;transition:width 2s ease;}
+.vc{color:var(--c);text-shadow:var(--glow);}
+.vg{color:var(--g);text-shadow:var(--gglow);}
+.va{color:var(--amber);}
+
+.scroll-arrow{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.35;animation:bob 2.5s ease-in-out infinite;z-index:5;}
+@keyframes bob{0%,100%{transform:translateX(-50%) translateY(0);}50%{transform:translateX(-50%) translateY(8px);}}
+.scroll-arrow span{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:4px;color:var(--steel);}
+.scroll-arrow-line{width:1px;height:28px;background:linear-gradient(var(--c),transparent);}
+
+/* ══════════ METRICS STRIP ══════════ */
+.strip{background:rgba(0,8,18,.99);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:32px 60px;}
+.strip-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:0;}
+.sm{text-align:center;padding:0 16px;border-right:1px solid var(--bord);}
+.sm:last-child{border-right:none;}
+.sm-n{font-family:'Orbitron',sans-serif;font-size:1.7rem;font-weight:900;line-height:1;}
+.sm-l{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2.5px;color:var(--dim);margin-top:6px;}
+
+/* ══════════ SHARED SECTION ══════════ */
+.sec{padding:80px 60px;max-width:1380px;margin:0 auto;}
+.s-eye{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:5px;color:var(--c);opacity:.62;margin-bottom:10px;}
+.s-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.5rem,3.5vw,2.5rem);font-weight:900;color:#ddf0f8;letter-spacing:2px;line-height:1.12;position:relative;display:inline-block;}
+.s-h::after{content:'';position:absolute;bottom:-10px;left:0;width:48%;height:2px;background:linear-gradient(90deg,var(--c),transparent);}
+.s-p{font-size:.98rem;color:var(--steel);line-height:1.9;font-weight:300;max-width:560px;margin-top:24px;}
+
+/* PANEL */
+.pnl{background:var(--panel);border:1px solid var(--bord);position:relative;overflow:visible;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px));}
+.pnl::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.ca{position:absolute;top:0;right:0;width:18px;height:18px;border-top:1px solid var(--c);border-right:1px solid var(--c);}
+.cb{position:absolute;bottom:0;left:0;width:18px;height:18px;border-bottom:1px solid rgba(0,229,255,.2);border-left:1px solid rgba(0,229,255,.2);}
+.pnl-hdr{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 10px;border-bottom:1px solid var(--bord);}
+.pnl-t{font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;color:var(--c);letter-spacing:2px;}
+.bdg{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;padding:3px 9px;border:1px solid;}
+.bdg-g{color:var(--g);border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.04);}
+.bdg-c{color:var(--c);border-color:rgba(0,229,255,.3);background:rgba(0,229,255,.04);}
+.bdg-a{color:var(--amber);border-color:rgba(255,170,0,.3);background:rgba(255,170,0,.04);}
+.pnl-b{padding:16px 18px 20px;}
+
+/* ══════════ LIVE PRODUCTION DASHBOARD ══════════ */
+.dash-bg{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 50%,var(--bg) 100%);padding:80px 0 100px;}
+.dash-inner{max-width:1360px;margin:0 auto;padding:0 44px;}
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.d-wide{grid-column:span 2;}
+.d-full{grid-column:span 3;}
+
+/* OEE GAUGE */
+.oee-wrap{display:flex;justify-content:center;align-items:center;padding:20px 0 12px;position:relative;}
+.oee-canvas{width:180px;height:180px;}
+.oee-center{position:absolute;text-align:center;}
+.oee-pct{font-family:'Orbitron',sans-serif;font-size:1.8rem;font-weight:900;color:var(--g);text-shadow:var(--gglow);}
+.oee-lbl{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2px;color:var(--dim);margin-top:2px;}
+
+/* ROBOT TILES */
+.robot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.robot-tile{background:rgba(0,229,255,.03);border:1px solid var(--bord);padding:12px 14px;transition:all .3s;cursor:default;}
+.robot-tile:hover{border-color:var(--bord2);background:rgba(0,229,255,.07);}
+.rt-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.rt-id{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:1px;}
+.rt-status{width:7px;height:7px;border-radius:50%;}
+.st-on{background:var(--g);box-shadow:0 0 8px var(--g);}
+.st-wr{background:var(--amber);box-shadow:0 0 8px var(--amber);}
+.st-off{background:var(--rose);box-shadow:0 0 6px var(--rose);}
+.rt-metric{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text);margin-bottom:3px;}
+.rt-bar{height:3px;background:rgba(0,229,255,.08);border-radius:1px;overflow:hidden;margin-top:4px;}
+.rt-fill{height:100%;border-radius:1px;transition:width 1.5s ease;}
+
+/* ALERTS */
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,229,255,.05);}
+.alert-item:last-child{border-bottom:none;}
+.al-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+.al-red{background:var(--rose);box-shadow:0 0 7px var(--rose);}
+.al-yel{background:var(--amber);box-shadow:0 0 7px var(--amber);}
+.al-grn{background:var(--g);box-shadow:0 0 7px var(--g);}
+.al-txt{font-size:.77rem;line-height:1.5;color:var(--text);}
+.al-meta{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--dim);margin-top:3px;}
+
+/* ══════════ SOLUTIONS GRID ══════════ */
+.sol-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:48px;}
+.sol{background:var(--panel);border:1px solid var(--bord);padding:30px 26px;position:relative;overflow:visible;cursor:pointer;
+  clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,16px 100%,0 calc(100% - 16px));transition:all .4s;}
+.sol::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);transition:left .55s;}
+.sol:hover::before{left:100%;}
+.sol:hover{border-color:var(--bord2);transform:translateY(-6px);box-shadow:0 22px 55px rgba(0,0,0,.55);}
+.sol-ico{font-size:2rem;margin-bottom:16px;display:block;}
+.sol-name{font-family:'Orbitron',sans-serif;font-size:.72rem;font-weight:700;color:var(--c);letter-spacing:2px;margin-bottom:12px;}
+.sol-desc{font-size:.87rem;color:var(--steel);line-height:1.85;font-weight:300;}
+.sol-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.chip{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1px;padding:3px 8px;border:1px solid var(--bord);color:var(--dim);}
+
+/* ══════════ CITY SECTION (ciudad.jpeg) ══════════ */
+.city-section{position:relative;overflow:hidden;min-height:520px;display:flex;align-items:center;}
+.city-bg{position:absolute;inset:0;}
+.city-img{width:100%;height:100%;object-fit:cover;filter:brightness(.22) saturate(.7);}
+.city-grad{position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 0%,rgba(0,6,12,.7) 45%,rgba(0,6,12,.5) 70%,var(--bg) 100%);}
+.city-grid2{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:44px 44px;}
+.city-content{position:relative;z-index:2;padding:80px 60px;max-width:1380px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;}
+.city-list{margin-top:36px;}
+.city-item{display:flex;gap:16px;margin-bottom:22px;padding:18px 20px;background:rgba(0,8,18,.85);border:1px solid var(--bord);backdrop-filter:blur(10px);transition:all .3s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);}
+.city-item:hover{border-color:var(--bord2);background:rgba(0,229,255,.05);}
+.ci-ico{font-size:1.4rem;flex-shrink:0;}
+.ci-name{font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;color:var(--c);letter-spacing:1.5px;margin-bottom:6px;}
+.ci-desc{font-size:.82rem;color:var(--steel);line-height:1.7;font-weight:300;}
+.city-stats-right{display:flex;flex-direction:column;gap:20px;}
+.csr{background:rgba(0,8,18,.88);border:1px solid var(--bord);padding:22px 24px;backdrop-filter:blur(14px);clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));position:relative;}
+.csr::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.csr-lbl{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:3px;color:var(--dim);margin-bottom:8px;}
+.csr-val{font-family:'Orbitron',sans-serif;font-size:1.6rem;font-weight:900;}
+.csr-sub{font-size:.7rem;color:var(--steel);margin-top:4px;}
+
+/* ══════════ PROCESS STEPS ══════════ */
+.process-bg{background:var(--bg3);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);padding:80px 60px;}
+.process-steps{display:grid;grid-template-columns:repeat(5,1fr);gap:0;max-width:1100px;margin:48px auto 0;position:relative;}
+.process-steps::before{content:'';position:absolute;top:28px;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.3;}
+.ps{text-align:center;padding:0 12px;}
+.ps-ico{width:56px;height:56px;border:1px solid var(--bord);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.4rem;background:var(--panel);position:relative;transition:all .4s;cursor:default;}
+.ps-ico::after{content:'';position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(0,229,255,.12);animation:rng 3s ease-in-out infinite;}
+@keyframes rng{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.06);opacity:1;}}
+.ps:hover .ps-ico{border-color:var(--c);box-shadow:var(--glow);}
+.ps-num{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:3px;color:var(--dim);margin-bottom:7px;}
+.ps-name{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:1px;margin-bottom:7px;}
+.ps-desc{font-size:.7rem;color:var(--steel);line-height:1.7;}
+
+/* ══════════ ROI CALCULATOR ══════════ */
+.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:start;margin-top:44px;}
+.roi-sliders{}
+.rs{margin-bottom:26px;}
+.rs-lbl{display:flex;justify-content:space-between;font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:2px;color:var(--dim);margin-bottom:10px;}
+.rs-lbl span{color:var(--c);font-size:.65rem;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:3px;background:rgba(0,229,255,.15);border-radius:2px;outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--c);box-shadow:var(--glow);border:2px solid var(--bg);}
+.roi-results{display:flex;flex-direction:column;gap:14px;}
+.roi-card{background:var(--panel);border:1px solid var(--bord);padding:20px 22px;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,0 100%);position:relative;}
+.roi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.roi-card-lbl{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:3px;color:var(--dim);margin-bottom:6px;}
+.roi-card-val{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;}
+.roi-card-sub{font-size:.65rem;color:var(--steel);margin-top:3px;}
+
+/* CTA */
+.cta-band{padding:100px 60px;text-align:center;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse 75% 65% at 50% 50%,rgba(0,30,60,.55) 0%,transparent 70%);}
+.cta-band::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:50px 50px;}
+.cta-h{font-family:'Orbitron',sans-serif;font-size:clamp(1.5rem,4vw,2.8rem);font-weight:900;color:#def2ff;letter-spacing:3px;margin-bottom:16px;position:relative;}
+.cta-sub{font-size:1rem;color:var(--steel);max-width:520px;margin:0 auto 38px;line-height:1.9;position:relative;}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;}
+
+/* ══════════ DEMO FORM ══════════ */
+.demo-wrap{background:var(--bg2);border-top:1px solid var(--bord);padding:88px 60px;}
+.demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:70px;max-width:1100px;margin:0 auto;}
+.form-blk{margin-top:36px;}
+.fg{margin-bottom:18px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:.53rem;letter-spacing:3px;color:var(--dim);margin-bottom:8px;}
+.fg input,.fg textarea,.fg select{width:100%;background:rgba(0,229,255,.04);border:1px solid var(--bord);color:var(--text);font-family:'Exo 2',sans-serif;font-size:.9rem;padding:11px 16px;outline:none;transition:border-color .3s;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);}
+.fg input:focus,.fg textarea:focus,.fg select:focus{border-color:var(--c);background:rgba(0,229,255,.07);}
+.fg textarea{height:110px;resize:vertical;}
+.fg select option{background:var(--bg2);}
+.fg-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.btn-send{width:100%;padding:14px;font-family:'Orbitron',sans-serif;font-size:.62rem;font-weight:700;letter-spacing:3px;color:var(--bg);background:var(--c);border:none;cursor:pointer;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);box-shadow:var(--glow);transition:filter .3s;}
+.btn-send:hover{filter:brightness(1.1);}
+.demo-info{padding-top:36px;}
+.di{display:flex;gap:14px;margin-bottom:24px;}
+.di-ico{width:42px;height:42px;border:1px solid var(--bord);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.di-title{font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;color:var(--c);letter-spacing:1.5px;margin-bottom:5px;}
+.di-val{font-size:.8rem;color:var(--steel);line-height:1.7;font-weight:300;}
+.demo-highlight{background:rgba(0,229,255,.04);border:1px solid var(--bord2);padding:20px 22px;margin-top:20px;position:relative;}
+.demo-highlight::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--c),transparent);}
+.dh-title{font-family:'Orbitron',sans-serif;font-size:.65rem;font-weight:700;color:var(--c);letter-spacing:2px;margin-bottom:10px;}
+.dh-item{display:flex;align-items:center;gap:10px;margin-bottom:7px;font-size:.8rem;color:var(--steel);}
+.dh-check{color:var(--g);font-size:.8rem;}
+
+footer{text-align:center;padding:40px;border-top:1px solid var(--bord);background:rgba(0,6,12,.98);}
+.ft-logo{font-family:'Orbitron',sans-serif;font-size:1rem;font-weight:900;letter-spacing:6px;color:var(--c);text-shadow:var(--glow);margin-bottom:8px;}
+.ft-tag{font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:4px;color:var(--dim);margin-bottom:10px;}
+.ft-copy{font-size:.72rem;color:var(--dim);}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(0,229,255,.18);border-radius:2px;}
+
+@media(max-width:1100px){
+  .dash-grid{grid-template-columns:1fr 1fr;}
+  .d-wide{grid-column:span 2;}.d-full{grid-column:span 2;}
+  .sol-grid{grid-template-columns:1fr 1fr;}
+  .strip-inner{grid-template-columns:repeat(3,1fr);}
+  .process-steps{grid-template-columns:repeat(3,1fr);}
+  .roi-grid{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .sec{padding:60px 24px;}.hero-content{padding:0 24px;}
+  .hero-right{display:none;}
+  .strip{padding:32px 20px;}.strip-inner{grid-template-columns:repeat(2,1fr);}
+  .dash-grid,.sol-grid{grid-template-columns:1fr;}
+  .d-wide,.d-full{grid-column:span 1;}
+  .city-content{grid-template-columns:1fr;}
+  .process-bg{padding:60px 24px;}.process-steps{grid-template-columns:1fr 1fr;}
+  .cta-band{padding:70px 24px;}
+  .demo-grid{grid-template-columns:1fr;}
+  .demo-wrap{padding:60px 24px;}
+  .fg-2{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="cA"></div><div id="cB"></div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-l">
+    <a href="../index.html" style="display:flex;align-items:center;gap:10px;text-decoration:none;"><img src="../imagenes/logo.png" alt="DATASYS" style="height:36px;width:36px;object-fit:contain;border-radius:50%;filter:drop-shadow(0 0 8px rgba(0,229,255,.6));"><div class="nav-logo">DATASYS</div></a>
+    <div class="nav-pipe"></div>
+    <div class="nav-crumb">PLATAFORMA / <span>AUTOMATIZACIÓN INDUSTRIAL</span></div>
+  </div>
+  <div class="nav-r">
+    <div class="status-chip"><div class="s-dot"></div><div class="s-txt">FÁBRICA EN LÍNEA</div></div>
+    <div class="nav-clock" id="navClock">--:--:--</div>
+    <button class="btn-back" onclick="window.location.href='../index.html'">🏠 INICIO</button>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<section class="hero">
+  <div class="hero-bg">
+    <img class="h-img" src="../imagenes/automatizacion.jpeg" alt="Automatización Industrial DATASYS" onerror="this.style.display='none'">
+    <div class="h-grad"></div>
+  </div>
+  <div class="h-grid"></div>
+  <div class="circuits" id="circuits"></div>
+
+  <div class="hero-content">
+    <div class="h-pre">// DATASYS · INDUSTRIAL AUTOMATION &amp; ROBOTICS DIVISION</div>
+    <h1 class="h-title">
+      Fábricas del futuro,<br><em>operando hoy</em><br>con <strong>IA predictiva</strong>
+    </h1>
+    <p class="h-desc">
+      Implementamos soluciones de automatización industrial con robots colaborativos, brazos robóticos de precisión y sistemas de visión computacional. Gestión de líneas de producción completas con IA predictiva que reduce costos y elimina paros no planeados.
+    </p>
+    <div class="h-tags">
+      <div class="htag">COBOTS · ROBOTS COLABORATIVOS</div>
+      <div class="htag">VISIÓN COMPUTACIONAL</div>
+      <div class="htag">MANTENIMIENTO PREDICTIVO</div>
+      <div class="htag">GEMELO DIGITAL</div>
+      <div class="htag">SCADA · MES · ERP</div>
+      <div class="htag">INDUSTRIA 4.0</div>
+    </div>
+    <div class="h-btns">
+      <button class="btn-demo" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">SOLICITAR DEMO EN PLANTA →</button>
+      <button class="btn-ghost" onclick="document.getElementById('dashboard').scrollIntoView({behavior:'smooth'})">VER EN VIVO</button>
+    </div>
+  </div>
+
+  <!-- FACTORY LIVE CARDS -->
+  <div class="hero-right">
+    <div class="fcard">
+      <div class="fc-lbl">EFICIENCIA OEE · PLANTA</div>
+      <div class="fc-val vg" id="heroOEE">94.3%</div>
+      <div class="fc-sub">↑ +6.2% vs turno anterior</div>
+      <div class="fc-bar"><div class="fc-fill" id="heroOEEBar" style="width:94%;background:linear-gradient(90deg,var(--g2),var(--g));"></div></div>
+    </div>
+    <div class="fcard">
+      <div class="fc-lbl">ROBOTS ACTIVOS</div>
+      <div class="fc-val vc" id="heroRobots">48 / 50</div>
+      <div class="fc-sub">2 en mantenimiento preventivo</div>
+      <div class="fc-bar"><div class="fc-fill" style="width:96%;background:linear-gradient(90deg,var(--c2),var(--c));"></div></div>
+    </div>
+    <div class="fcard">
+      <div class="fc-lbl">DEFECTOS DETECTADOS · IA</div>
+      <div class="fc-val vc" id="heroDefects">0.04%</div>
+      <div class="fc-sub">Tasa de defectos — Visión CV</div>
+      <div class="fc-bar"><div class="fc-fill" style="width:99%;background:linear-gradient(90deg,var(--c2),var(--c));"></div></div>
+    </div>
+    <div class="fcard">
+      <div class="fc-lbl">PRÓXIMO PARO PRED.</div>
+      <div class="fc-val va" id="heroNextStop">14.2 días</div>
+      <div class="fc-sub">Robot ARM-07 · Rodamiento</div>
+      <div class="fc-bar"><div class="fc-fill" style="width:72%;background:linear-gradient(90deg,#cc8800,var(--amber));"></div></div>
+    </div>
+  </div>
+
+  <div class="scroll-arrow"><span>EXPLORAR</span><div class="scroll-arrow-line"></div></div>
+</section>
+
+<!-- METRICS STRIP -->
+<div class="strip">
+  <div class="strip-inner">
+    <div class="sm"><div class="sm-n vc">340+</div><div class="sm-l">PLANTAS AUTOMATIZADAS</div></div>
+    <div class="sm"><div class="sm-n vg">99.97%</div><div class="sm-l">UPTIME GARANTIZADO</div></div>
+    <div class="sm"><div class="sm-n va">-42%</div><div class="sm-l">REDUCCIÓN COSTOS OPER.</div></div>
+    <div class="sm"><div class="sm-n" style="color:var(--violet,#a855f7);text-shadow:0 0 18px rgba(168,85,247,.4);">8.5x</div><div class="sm-l">ROI PROMEDIO · 3 AÑOS</div></div>
+    <div class="sm"><div class="sm-n" style="color:var(--rose);">0.04%</div><div class="sm-l">TASA DE DEFECTOS CV</div></div>
+    <div class="sm"><div class="sm-n vc">24/7</div><div class="sm-l">MONITOREO IA EN VIVO</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ LIVE DASHBOARD ══════════════ -->
+<div class="dash-bg" id="dashboard">
+  <div class="dash-inner">
+    <div style="margin-bottom:32px;">
+      <div class="s-eye">// CONTROL ROOM · TIEMPO REAL</div>
+      <div class="s-h">Dashboard de Planta<br>Industrial en Vivo</div>
+    </div>
+
+    <div class="dash-grid">
+
+      <!-- PRODUCCIÓN MAIN CHART -->
+      <div class="pnl d-wide">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr">
+          <div class="pnl-t">PRODUCCIÓN · UNIDADES POR HORA</div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <div class="bdg bdg-g">⚡ VIVO</div>
+            <select id="lineaSel" onchange="switchLine(this.value)" style="background:rgba(0,229,255,.06);border:1px solid var(--bord);color:var(--text);font-family:'Share Tech Mono',monospace;font-size:.52rem;padding:4px 10px;outline:none;cursor:pointer;letter-spacing:1px;">
+              <option value="L1">LÍNEA 1 — ENSAMBLE</option>
+              <option value="L2">LÍNEA 2 — SOLDADURA</option>
+              <option value="L3">LÍNEA 3 — PINTURA</option>
+              <option value="L4">LÍNEA 4 — EMPAQUE</option>
+            </select>
+          </div>
+        </div>
+        <div class="pnl-b"><div style="height:230px;"><canvas id="prodChart"  style="display:block;width:100%;height:230px;"></canvas></div></div>
+      </div>
+
+      <!-- OEE GAUGE -->
+      <div class="pnl">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr"><div class="pnl-t">OEE GLOBAL</div><div class="bdg bdg-g">LIVE</div></div>
+        <div class="pnl-b">
+          <div class="oee-wrap">
+            <canvas class="oee-canvas" id="oeeGauge"   style="display:block;width:180px;height:180px;"></canvas>
+            <div class="oee-center"><div class="oee-pct" id="oeeVal">94.3%</div><div class="oee-lbl">EFICIENCIA</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;">
+            <div style="text-align:center;"><div style="font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;color:var(--c);" id="dispVal">96.8%</div><div style="font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px;">DISP.</div></div>
+            <div style="text-align:center;"><div style="font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;color:var(--g);" id="perfVal">97.2%</div><div style="font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px;">REND.</div></div>
+            <div style="text-align:center;"><div style="font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:700;color:var(--amber);" id="qualVal">99.6%</div><div style="font-family:'Share Tech Mono',monospace;font-size:.48rem;color:var(--dim);margin-top:2px;">CALID.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROBOTS STATUS -->
+      <div class="pnl d-wide">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr"><div class="pnl-t">ESTADO ROBOTS · LÍNEA ACTIVA</div><div class="bdg bdg-c">50 UNIDADES</div></div>
+        <div class="pnl-b"><div class="robot-grid" id="robotGrid"></div></div>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="pnl">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr"><div class="pnl-t">ALERTAS · IA PREDICTIVA</div><div class="bdg bdg-a" id="alertCount">3 ACTIVAS</div></div>
+        <div class="pnl-b" id="alertsPanel"></div>
+      </div>
+
+      <!-- TEMPERATURA / VIBRACIÓN -->
+      <div class="pnl">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr"><div class="pnl-t">TEMPERATURA · SENSORES</div><div class="bdg bdg-c">IoT</div></div>
+        <div class="pnl-b"><div style="height:175px;"><canvas id="tempChart"  style="display:block;width:100%;height:175px;"></canvas></div></div>
+      </div>
+
+      <!-- DEFECT RATE -->
+      <div class="pnl">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr"><div class="pnl-t">CALIDAD · VISIÓN COMPUTACIONAL</div><div class="bdg bdg-g">CV-AI</div></div>
+        <div class="pnl-b"><div style="height:175px;"><canvas id="qualChart"  style="display:block;width:100%;height:175px;"></canvas></div></div>
+      </div>
+
+      <!-- FORECAST MANTENIMIENTO -->
+      <div class="pnl d-full">
+        <div class="ca"></div><div class="cb"></div>
+        <div class="pnl-hdr"><div class="pnl-t">MANTENIMIENTO PREDICTIVO · PRÓXIMAS 4 SEMANAS</div><div class="bdg bdg-a">ML FORECAST</div></div>
+        <div class="pnl-b"><div style="height:190px;"><canvas id="maintChart" style="display:block;width:100%;height:190px;"></canvas></div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SOLUTIONS ══════════════ -->
+<div class="sec">
+  <div class="s-eye">// SOLUCIONES · AUTOMATIZACIÓN INDUSTRIAL</div>
+  <div class="s-h">Tecnología que transforma<br>tu línea de producción</div>
+  <div class="sol-grid">
+    <div class="sol"><span class="sol-ico">🤖</span><div class="sol-name">ROBOTS COLABORATIVOS</div><div class="sol-desc">Cobots certificados para trabajo codo a codo con operadores humanos. Programación intuitiva en 48h. Payback garantizado en menos de 18 meses.</div><div class="sol-chips"><span class="chip">UNIVERSAL ROBOTS</span><span class="chip">FANUC</span><span class="chip">ABB</span><span class="chip">KUKA</span></div></div>
+    <div class="sol"><span class="sol-ico">👁️</span><div class="sol-name">VISIÓN COMPUTACIONAL</div><div class="sol-desc">Detección de defectos con precisión >99.96%. Cámaras de alta velocidad + modelos CNN entrenados con tu producto. Rechazo automático en tiempo real.</div><div class="sol-chips"><span class="chip">DEEP LEARNING</span><span class="chip">YOLOv9</span><span class="chip">COGNEX</span><span class="chip">BASLER</span></div></div>
+    <div class="sol"><span class="sol-ico">🔧</span><div class="sol-name">MANTENIMIENTO PREDICTIVO</div><div class="sol-desc">Sensores IoT + ML predicen fallas con 14+ días de anticipación. Elimina paros no planeados. Reduce costos de mantenimiento hasta 38%.</div><div class="sol-chips"><span class="chip">VIBRACIÓN</span><span class="chip">TERMOGRAFÍA IR</span><span class="chip">LSTM FORECAST</span></div></div>
+    <div class="sol"><span class="sol-ico">🏭</span><div class="sol-name">GEMELO DIGITAL</div><div class="sol-desc">Replica virtual de tu planta en tiempo real. Simula cambios de producción, entrena operadores y optimiza layouts antes de implementar físicamente.</div><div class="sol-chips"><span class="chip">SIEMENS NX</span><span class="chip">UNITY 3D</span><span class="chip">NVIDIA OMNIVERSE</span></div></div>
+    <div class="sol"><span class="sol-ico">📡</span><div class="sol-name">SCADA · MES INTEGRADO</div><div class="sol-desc">Plataforma de supervisión y ejecución de manufactura integrada. Trazabilidad completa, OEE en tiempo real y reportes ejecutivos automatizados.</div><div class="sol-chips"><span class="chip">IGNITION</span><span class="chip">WONDERWARE</span><span class="chip">SAP ME</span></div></div>
+    <div class="sol"><span class="sol-ico">⚡</span><div class="sol-name">AGVs · LOGÍSTICA INTERNA</div><div class="sol-desc">Vehículos autónomos guiados para transporte interno de materiales. Rutas dinámicas con IA, carga/descarga automática y gestión de tráfico en planta.</div><div class="sol-chips"><span class="chip">AMR AUTÓNOMO</span><span class="chip">FLEET MANAGER</span><span class="chip">LiDAR + SLAM</span></div></div>
+  </div>
+</div>
+
+<!-- ══════════════ SMARTCITY / CIUDAD ══════════════ -->
+<div class="city-section">
+  <div class="city-bg">
+    <img class="city-img" src="../imagenes/ciudad.jpeg" alt="Smart City DATASYS" onerror="this.style.display='none'">
+    <div class="city-grad"></div>
+    <div class="city-grid2"></div>
+  </div>
+  <div class="city-content">
+    <div>
+      <div class="s-eye">// INDUSTRIA 4.0 · BEYOND THE FACTORY</div>
+      <div class="s-h">Automatización<br>a escala de ciudad</div>
+      <div class="city-list">
+        <div class="city-item"><div class="ci-ico">🏙️</div><div><div class="ci-name">INFRAESTRUCTURA INTELIGENTE</div><div class="ci-desc">Gestión automatizada de energía, agua y residuos urbanos con IA. Reducción del 35% en consumo energético municipal.</div></div></div>
+        <div class="city-item"><div class="ci-ico">🚦</div><div><div class="ci-name">MOVILIDAD AUTÓNOMA</div><div class="ci-desc">Semáforos adaptativos, gestión de tráfico predictivo y coordinación de vehículos autónomos de última milla.</div></div></div>
+        <div class="city-item"><div class="ci-ico">🔒</div><div><div class="ci-name">SEGURIDAD COMPUTACIONAL</div><div class="ci-desc">Red de cámaras con CV para detección de incidentes en tiempo real. Respuesta automática a emergencias en &lt;30 segundos.</div></div></div>
+        <div class="city-item"><div class="ci-ico">⚡</div><div><div class="ci-name">MICRO-REDES ELÉCTRICAS</div><div class="ci-desc">Optimización de generación y consumo con IA. Integración solar, almacenamiento y red inteligente balanceada automáticamente.</div></div></div>
+      </div>
+    </div>
+    <div class="city-stats-right">
+      <div class="csr"><div class="csr-lbl">CIUDADES CONECTADAS</div><div class="csr-val vc">28</div><div class="csr-sub">En 8 países · LATAM &amp; España</div></div>
+      <div class="csr"><div class="csr-lbl">SENSORES ACTIVOS</div><div class="csr-val vg" id="cityS">142,840</div><div class="csr-sub">IoT · Edge · Industrial</div></div>
+      <div class="csr"><div class="csr-lbl">AHORRO ENERGÉTICO</div><div class="csr-val va">-35%</div><div class="csr-sub">Promedio anual por ciudad</div></div>
+      <div class="csr"><div class="csr-lbl">TIEMPO RESPUESTA</div><div class="csr-val vc">&lt;30ms</div><div class="csr-sub">Latencia edge computing</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ PROCESO ══════════════ -->
+<div class="process-bg">
+  <div style="text-align:center;">
+    <div class="s-eye" style="text-align:center;">// METODOLOGÍA · IMPLEMENTACIÓN</div>
+    <div class="s-h" style="display:block;text-align:center;">De la auditoría al<br>arranque en 90 días</div>
+  </div>
+  <div class="process-steps">
+    <div class="ps"><div class="ps-ico" style="animation-delay:0s;">🔍</div><div class="ps-num">// SEMANA 1-2</div><div class="ps-name">AUDITORÍA</div><div class="ps-desc">Diagnóstico completo de planta, mapeo de procesos y identificación de cuellos de botella</div></div>
+    <div class="ps"><div class="ps-ico" style="animation-delay:.5s;">📐</div><div class="ps-num">// SEMANA 3-5</div><div class="ps-name">DISEÑO</div><div class="ps-desc">Arquitectura de solución, selección de hardware y diseño del gemelo digital de tu planta</div></div>
+    <div class="ps"><div class="ps-ico" style="animation-delay:1s;">⚙️</div><div class="ps-num">// SEMANA 6-10</div><div class="ps-name">INTEGRACIÓN</div><div class="ps-desc">Instalación de robots, sensores IoT y software. Integración con ERP/MES existentes</div></div>
+    <div class="ps"><div class="ps-ico" style="animation-delay:1.5s;">🧪</div><div class="ps-num">// SEMANA 11-12</div><div class="ps-name">VALIDACIÓN</div><div class="ps-desc">Pruebas de producción, calibración de modelos ML y entrenamiento del equipo operativo</div></div>
+    <div class="ps"><div class="ps-ico" style="animation-delay:2s;">🚀</div><div class="ps-num">// SEMANA 13+</div><div class="ps-name">OPERACIÓN 24/7</div><div class="ps-desc">Arranque en producción completa, monitoreo remoto continuo y mejora continua con datos</div></div>
+  </div>
+</div>
+
+<!-- ══════════════ ROI CALCULATOR ══════════════ -->
+<div class="sec">
+  <div class="s-eye">// CALCULADORA · ROI DE AUTOMATIZACIÓN</div>
+  <div class="s-h">Calcula tu retorno<br>de inversión</div>
+  <div class="roi-grid">
+    <div class="roi-sliders">
+      <p class="s-p" style="margin-bottom:28px;">Ajusta los parámetros de tu operación y calcula el impacto financiero real de automatizar con DATASYS.</p>
+      <div class="rs">
+        <div class="rs-lbl"><span>Operadores por turno</span><span id="v1">25</span></div>
+        <input type="range" min="5" max="200" value="25" id="r1" oninput="calcROI()">
+      </div>
+      <div class="rs">
+        <div class="rs-lbl"><span>Turnos por día</span><span id="v2">2</span></div>
+        <input type="range" min="1" max="3" value="2" id="r2" oninput="calcROI()">
+      </div>
+      <div class="rs">
+        <div class="rs-lbl"><span>Costo operador / mes (USD)</span><span id="v3">$1,200</span></div>
+        <input type="range" min="500" max="5000" value="1200" step="100" id="r3" oninput="calcROI()">
+      </div>
+      <div class="rs">
+        <div class="rs-lbl"><span>Paros no planeados / mes (h)</span><span id="v4">18h</span></div>
+        <input type="range" min="0" max="120" value="18" id="r4" oninput="calcROI()">
+      </div>
+      <div class="rs">
+        <div class="rs-lbl"><span>Costo por hora paro (USD)</span><span id="v5">$4,500</span></div>
+        <input type="range" min="500" max="50000" value="4500" step="500" id="r5" oninput="calcROI()">
+      </div>
+    </div>
+    <div class="roi-results">
+      <div class="roi-card"><div class="roi-card-lbl">AHORRO ANUAL EN OPERADORES</div><div class="roi-card-val vc" id="roiOp">$540,000</div><div class="roi-card-sub">Reducción 50% con cobots · mano de obra</div></div>
+      <div class="roi-card"><div class="roi-card-lbl">AHORRO PAROS NO PLANEADOS</div><div class="roi-card-val vg" id="roiStop">$972,000</div><div class="roi-card-sub">Mantenimiento predictivo · 90% reducción</div></div>
+      <div class="roi-card"><div class="roi-card-lbl">AHORRO CALIDAD / RETRABAJOS</div><div class="roi-card-val va" id="roiQ">$135,000</div><div class="roi-card-sub">Visión computacional · -38% defectos</div></div>
+      <div class="roi-card" style="border-color:rgba(0,255,136,.3);background:rgba(0,255,136,.04);">
+        <div class="roi-card-lbl">AHORRO TOTAL ANUAL ESTIMADO</div>
+        <div class="roi-card-val" style="color:var(--g);font-size:1.8rem;text-shadow:var(--gglow);" id="roiTotal">$1,647,000</div>
+        <div class="roi-card-sub">Payback estimado: <b id="roiPayback" style="color:var(--g);">14.6 meses</b></div>
+      </div>
+      <div style="padding:14px 16px;background:rgba(0,229,255,.04);border:1px solid var(--bord);font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:1px;color:var(--dim);line-height:1.8;">
+        * Estimación basada en proyectos similares. Los resultados reales varían según tipo de industria, volumen y procesos específicos.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <div class="s-eye" style="text-align:center;">// ¿LISTO PARA AUTOMATIZAR TU PLANTA?</div>
+  <div class="cta-h">Demo en tu propia<br>instalación — sin costo</div>
+  <p class="cta-sub">Nuestros ingenieros visitan tu planta, analizan tus líneas de producción y presentan una demostración en vivo con tu maquinaria real.</p>
+  <div class="cta-row">
+    <button class="btn-demo" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">AGENDAR DEMO EN PLANTA →</button>
+    <button class="btn-ghost" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">CALCULAR MI ROI</button>
+  </div>
+</div>
+
+<!-- ══════════════ DEMO FORM ══════════════ -->
+<div class="demo-wrap" id="demo">
+  <div class="demo-grid">
+    <div>
+      <div class="s-eye">// DEMO EN PLANTA · SOLICITAR</div>
+      <div class="s-h">Agenda tu demo<br>sin compromiso</div>
+      <p class="s-p">Un equipo de ingenieros especializados visita tu planta, analiza tus procesos y presenta una propuesta de automatización personalizada.</p>
+      <div class="demo-info">
+        <div class="di"><div class="di-ico">🏭</div><div><div class="di-title">DEMO EN TU PLANTA</div><div class="di-val">Visita técnica gratuita. Nuestros ingenieros analizan tu proceso y muestran el sistema con tu maquinaria real.</div></div></div>
+        <div class="di"><div class="di-ico">⚡</div><div><div class="di-title">RESPUESTA EN 48H</div><div class="di-val">Un ingeniero senior te contacta con disponibilidad de agenda y confirmación de visita en menos de 48 horas.</div></div></div>
+        <div class="di"><div class="di-ico">📊</div><div><div class="di-title">PROPUESTA CON ROI</div><div class="di-val">Recibes análisis de factibilidad, arquitectura de solución y proyección financiera detallada sin costo.</div></div></div>
+      </div>
+      <div class="demo-highlight">
+        <div class="dh-title">✓ LA DEMO INCLUYE</div>
+        <div class="dh-item"><span class="dh-check">✓</span>Auditoría de línea de producción (4-6 horas)</div>
+        <div class="dh-item"><span class="dh-check">✓</span>Demostración de robot colaborativo en vivo</div>
+        <div class="dh-item"><span class="dh-check">✓</span>Prueba de visión computacional con tus piezas</div>
+        <div class="dh-item"><span class="dh-check">✓</span>Simulación del gemelo digital de tu proceso</div>
+        <div class="dh-item"><span class="dh-check">✓</span>Cálculo de ROI personalizado con tus datos reales</div>
+        <div class="dh-item"><span class="dh-check">✓</span>Propuesta técnica y financiera en 5 días hábiles</div>
+      </div>
+    </div>
+    <div class="form-blk">
+      <div class="fg-2">
+        <div class="fg"><label>NOMBRE COMPLETO *</label><input id="cf_name" type="text" placeholder="Tu nombre completo..."></div>
+        <div class="fg"><label>CARGO / PUESTO</label><input type="text" placeholder="Director de Planta..."></div>
+      </div>
+      <div class="fg"><label>CORREO ELECTRÓNICO *</label><input id="cf_email" type="email" placeholder="tu@empresa.com"></div>
+      <div class="fg-2">
+        <div class="fg"><label>EMPRESA</label><input type="text" placeholder="Nombre de tu empresa..."></div>
+        <div class="fg"><label>TELÉFONO</label><input id="cf_phone" type="tel" placeholder="+52 55 0000 0000"></div>
+      </div>
+      <div class="fg"><label>SECTOR INDUSTRIAL</label>
+        <select id="cf_service">
+          <option value="">Seleccionar sector...</option>
+          <option>Automotriz / Tier 1-2</option>
+          <option>Manufactura Electrónica</option>
+          <option>Alimentos y Bebidas</option>
+          <option>Farmacéutica / Dispositivos Médicos</option>
+          <option>Plásticos y Empaques</option>
+          <option>Metalmecánica</option>
+          <option>Química / Petroquímica</option>
+          <option>Logística / Almacenes</option>
+          <option>SmartCity / Infraestructura</option>
+          <option>Otro sector</option>
+        </select>
+      </div>
+      <div class="fg"><label>PROCESO A AUTOMATIZAR</label>
+        <select>
+          <option value="">¿Qué necesitas automatizar?</option>
+          <option>Ensamble / Montaje</option>
+          <option>Soldadura / Unión</option>
+          <option>Inspección de Calidad (CV)</option>
+          <option>Manejo de Materiales / AGV</option>
+          <option>Empaque / Paletizado</option>
+          <option>Mecanizado / CNC</option>
+          <option>Mantenimiento Predictivo</option>
+          <option>Línea completa de producción</option>
+          <option>Múltiples procesos</option>
+        </select>
+      </div>
+      <div class="fg"><label>NÚMERO DE OPERADORES ACTUALES EN EL PROCESO</label>
+        <select>
+          <option value="">Seleccionar rango...</option>
+          <option>1 – 10 operadores</option>
+          <option>11 – 50 operadores</option>
+          <option>51 – 200 operadores</option>
+          <option>Más de 200 operadores</option>
+        </select>
+      </div>
+      <div class="fg"><label>CONTEXTO / DESAFÍOS ACTUALES</label><textarea id="cf_message" placeholder="Describe el proceso que quieres automatizar, los principales problemas (defectos, paros, costos) y cualquier restricción de espacio o seguridad..."></textarea></div>
+      <div id="cf_error" style="display:none;font-family:\'Share Tech Mono\',monospace;font-size:.48rem;color:#e05050;padding:8px 12px;border:1px solid rgba(200,40,42,.3);background:rgba(200,40,42,.06);margin-bottom:8px;"></div>
+  <button class="btn-send" id="cf_btn" onclick="sendContactForm()">SOLICITAR DEMO GRATUITA EN PLANTA →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODAL ACUSE DE RECIBO ══ -->
+<div id="acuseModal" style="position:fixed;inset:0;z-index:99100;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.96);backdrop-filter:blur(16px);">
+  <div style="background:#05101e;border:1px solid rgba(0,229,255,.38);max-width:500px;width:94%;padding:0;animation:acuseIn .4s both;position:relative;">
+    <style>@keyframes acuseIn{0%{opacity:0;transform:scale(.93) translateY(18px);}100%{opacity:1;transform:none;}}</style>
+    <div style="padding:16px 22px 12px;border-bottom:1px solid rgba(0,229,255,.13);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.45rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">✓ MENSAJE ENVIADO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#00e5ff;letter-spacing:2px;">ACUSE DE RECIBO</div>
+      </div>
+      <button onclick="closeAcuse()" style="background:none;border:none;color:#aaa;font-size:1.4rem;cursor:pointer;line-height:1;padding:4px 8px;">✕</button>
+    </div>
+    <div style="padding:20px 22px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.13);margin-bottom:14px;flex-wrap:wrap;gap:6px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;">FOLIO</span>
+        <span id="acuse_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:#00e5ff;"></span>
+        <span id="acuse_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.5;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">NOMBRE</span><span id="acuse_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">EMAIL</span><span id="acuse_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#00e5ff;font-weight:600;word-break:break-all;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">TELÉFONO</span><span id="acuse_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span></div>
+        <div style="display:grid;grid-template-columns:85px 1fr;gap:6px;padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;align-self:center;">SERVICIO</span><span id="acuse_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f5c842;font-weight:600;"></span></div>
+        <div style="padding:7px 10px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);"><span style="font-family:'Share Tech Mono',monospace;font-size:.41rem;color:#aaa;opacity:.6;display:block;margin-bottom:3px;">MENSAJE</span><span id="acuse_msg" style="font-family:'Rajdhani',sans-serif;font-size:.85rem;color:#fff;line-height:1.6;"></span></div>
+      </div>
+      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.43rem;color:#00ff88;line-height:2;margin-bottom:14px;">
+        Mensaje enviado a <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4a2925243e2b293e250a2e2b3e2b393339642732">[email&#160;protected]</a><br>
+        Tiempo de respuesta: menos de 24 horas hábiles
+      </div>
+      <button onclick="closeAcuse()" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid #00e5ff;color:#00e5ff;cursor:pointer;">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="ft-logo">DATASYS</div>
+  <div class="ft-tag">AUTOMATIZACIÓN INDUSTRIAL · ROBÓTICA · VISIÓN COMPUTACIONAL · INDUSTRIA 4.0</div>
+  <div class="ft-copy">© 2026 DATASYS. Todos los derechos reservados. · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9cfff3f2e8fdffe8f3dcf8fde8fdefe5efb2fff3f1">[email&#160;protected]</a> · +52 (55) 1234-5678</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
+/* ══ FORMULARIO REAL — FORMSPREE (meelpnqr) ══ */
+function sendContactForm(){
+  var name    = document.getElementById('cf_name')    ? document.getElementById('cf_name').value.trim()    : '';
+  var email   = document.getElementById('cf_email')   ? document.getElementById('cf_email').value.trim()   : '';
+  var phone   = document.getElementById('cf_phone')   ? document.getElementById('cf_phone').value.trim()   : '';
+  var srvEl   = document.getElementById('cf_service');
+  var service = srvEl ? srvEl.value : '';
+  var msgEl   = document.getElementById('cf_message') || document.getElementById('cf_address');
+  var message = msgEl ? msgEl.value.trim() : '';
+  var errEl   = document.getElementById('cf_error');
+  var btn     = document.getElementById('cf_btn');
+  if(errEl) errEl.style.display = 'none';
+  if(!name){
+    if(errEl){ errEl.textContent='Por favor ingresa tu nombre.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    if(errEl){ errEl.textContent='Por favor ingresa un correo electrónico válido.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!service){
+    if(errEl){ errEl.textContent='Por favor selecciona un servicio.'; errEl.style.display='block'; }
+    return;
+  }
+  if(!message){
+    if(errEl){ errEl.textContent='Por favor escribe tu mensaje.'; errEl.style.display='block'; }
+    return;
+  }
+  var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+  var fecha = new Date().toLocaleString('es-MX', {
+    day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+  });
+  var origTxt = btn ? btn.textContent : '';
+  if(btn){
+    btn.textContent = 'Enviando...';
+    btn.disabled = true;
+    btn.style.background = 'rgba(0,229,255,.1)';
+    btn.style.color = '#00e5ff';
+  }
+  fetch('https://formspree.io/f/meelpnqr', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name:name, email:email, phone:phone||'N/A',
+      service:service, message:message,
+      folio:folio, fecha:fecha, _replyto:email
+    })
+  })
+  .then(function(r){ return r.json().then(function(d){ return { ok:r.ok, data:d }; }); })
+  .then(function(res){
+    if(res.ok){
+      ['cf_name','cf_email','cf_phone','cf_message','cf_address'].forEach(function(id){
+        var el = document.getElementById(id); if(el) el.value = '';
+      });
+      if(srvEl) srvEl.value = '';
+      var am = document.getElementById('acuseModal');
+      if(am){
+        document.getElementById('acuse_folio').textContent   = folio;
+        document.getElementById('acuse_fecha').textContent   = fecha;
+        document.getElementById('acuse_nombre').textContent  = name;
+        document.getElementById('acuse_email').textContent   = email;
+        document.getElementById('acuse_phone').textContent   = phone || '—';
+        document.getElementById('acuse_service').textContent = service;
+        document.getElementById('acuse_msg').textContent     = message;
+        am.style.display = 'flex';
+      }
+      if(btn){
+        btn.textContent = '✓ Enviado';
+        btn.style.background = 'rgba(0,255,136,.1)';
+        btn.style.color = '#00ff88';
+        btn.style.border = '1px solid #00ff88';
+        setTimeout(function(){
+          btn.textContent = origTxt;
+          btn.disabled = false;
+          btn.style.background = '';
+          btn.style.color = '';
+          btn.style.border = '';
+        }, 8000);
+      }
+    } else {
+      if(errEl){ errEl.textContent='Error al enviar. Por favor intenta de nuevo.'; errEl.style.display='block'; }
+      if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+    }
+  })
+  .catch(function(){
+    if(errEl){ errEl.textContent='Error de conexión. Verifica tu red e intenta de nuevo.'; errEl.style.display='block'; }
+    if(btn){ btn.textContent=origTxt; btn.disabled=false; btn.style.background=''; btn.style.color=''; }
+  });
+}
+function closeAcuse(){
+  var m = document.getElementById('acuseModal');
+  if(m) m.style.display = 'none';
+}
+var sendForm = sendContactForm;
+var sendDemo = sendContactForm;
+function submitForm(btn){ sendContactForm(); }
+function subscribePrint(btn){ sendContactForm(); }
+
+</script><script>
+window.addEventListener("load",function(){
+setTimeout(function(){
+// CURSOR
+const cA=document.getElementById('cA'),cB=document.getElementById('cB');
+document.addEventListener('mousemove',e=>{
+  cA.style.left=e.clientX+'px';cA.style.top=e.clientY+'px';
+  setTimeout(()=>{cB.style.left=e.clientX+'px';cB.style.top=e.clientY+'px';},70);
+});
+
+// CLOCK
+setInterval(()=>{document.getElementById('navClock').textContent=new Date().toLocaleTimeString('es-MX');},1000);
+
+// CIRCUIT LINES
+(()=>{
+  const c=document.getElementById('circuits');
+  for(let i=0;i<12;i++){
+    const l=document.createElement('div');l.className='circ-line';
+    l.style.top=(8+i*8)+'%';
+    l.style.width=(20+Math.random()*30)+'%';
+    l.style.left=Math.random()*60+'%';
+    l.style.animationDuration=(6+Math.random()*10)+'s';
+    l.style.animationDelay=(Math.random()*8)+'s';
+    l.style.opacity=0.15+Math.random()*0.2;
+    c.appendChild(l);
+  }
+})();
+
+// HELPERS
+const rnd=(a,b)=>Math.random()*(b-a)+a;
+const arr=(n,a,b)=>Array.from({length:n},()=>parseFloat(rnd(a,b).toFixed(2)));
+const TT={backgroundColor:'rgba(0,8,18,.97)',borderColor:'rgba(0,229,255,.2)',borderWidth:1,titleFont:{family:'Share Tech Mono',size:10},bodyFont:{family:'Share Tech Mono',size:10},titleColor:'#00e5ff',bodyColor:'#b8d8e8',padding:10};
+const mkG=(ctx,c1,c2)=>{const g=ctx.createLinearGradient(0,0,0,ctx.canvas.height);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;};
+
+// ── PRODUCCIÓN CHART ──
+let prodChart=null, lineMode='L1';
+const LINES={
+  L1:{label:'Ensamble — Unidades/h',min:180,max:380,col:'rgba(0,229,255,'},
+  L2:{label:'Soldadura — Unidades/h',min:90,max:220,col:'rgba(0,255,136,'},
+  L3:{label:'Pintura — Unidades/h',min:60,max:140,col:'rgba(255,170,0,'},
+  L4:{label:'Empaque — Unidades/h',min:240,max:520,col:'rgba(168,85,247,'},
+};
+let lineData={};
+Object.keys(LINES).forEach(k=>{lineData[k]=arr(60,LINES[k].min*.7,LINES[k].max*.9);});
+const tLabels=Array.from({length:60},(_,i)=>{const m=new Date();m.setMinutes(m.getMinutes()-60+i);return m.getHours()+':'+(String(m.getMinutes()).padStart(2,'0'));});
+
+function buildProdChart(){
+  const ctx=document.getElementById('prodChart').getContext('2d');
+  const ln=LINES[lineMode];
+  if(prodChart)prodChart.destroy();
+  prodChart=new Chart(ctx,{
+    type:'line',
+    data:{labels:tLabels,datasets:[{
+      data:lineData[lineMode],borderColor:ln.col+'1)',borderWidth:2,fill:true,
+      backgroundColor:c2=>mkG(c2.chart.ctx,ln.col+'.2)',ln.col+'0)'),
+      pointRadius:0,tension:.4,
+    }]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>'  '+c.raw.toFixed(0)+' u/h'}}},
+      scales:{
+        x:{display:true,ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:9},maxTicksLimit:10},grid:{color:'rgba(0,229,255,.04)'}},
+        y:{display:true,position:'right',ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:9},maxTicksLimit:6},grid:{color:'rgba(0,229,255,.05)'}}
+      },animation:{duration:350}
+    }
+  });
+}
+function switchLine(v){lineMode=v;buildProdChart();}
+buildProdChart();
+
+// ── OEE GAUGE ──
+let oeeChart=null;
+function buildOEE(val){
+  const ctx=document.getElementById('oeeGauge').getContext('2d');
+  if(oeeChart)oeeChart.destroy();
+  oeeChart=new Chart(ctx,{
+    type:'doughnut',
+    data:{datasets:[{data:[val,100-val],backgroundColor:['rgba(0,255,136,.8)','rgba(0,255,136,.06)'],borderColor:['rgba(0,255,136,.9)','rgba(0,229,255,.08)'],borderWidth:2,hoverOffset:0}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'78%',rotation:-130,circumference:260,
+      plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:600}}
+  });
+}
+buildOEE(94.3);
+
+// ── ROBOT GRID ──
+const ROBOTS=[
+  {id:'ARM-01',load:88,status:'on'},{id:'ARM-02',load:92,status:'on'},{id:'ARM-03',load:74,status:'on'},
+  {id:'ARM-04',load:95,status:'on'},{id:'ARM-05',load:83,status:'on'},{id:'ARM-06',load:67,status:'wr'},
+  {id:'ARM-07',load:0, status:'wr'},{id:'ARM-08',load:91,status:'on'},{id:'ARM-09',load:88,status:'on'},
+  {id:'WLD-01',load:96,status:'on'},{id:'WLD-02',load:89,status:'on'},{id:'WLD-03',load:0, status:'off'},
+];
+function renderRobots(){
+  document.getElementById('robotGrid').innerHTML=ROBOTS.map(r=>{
+    const ld=r.status==='off'?0:Math.round(r.load*(1+rnd(-.04,.04)));
+    const barColor=r.status==='on'?'linear-gradient(90deg,var(--c2),var(--c))':r.status==='wr'?'linear-gradient(90deg,#cc8800,var(--amber))':'rgba(255,45,85,.5)';
+    return`<div class="robot-tile">
+      <div class="rt-top"><div class="rt-id">${r.id}</div><div class="rt-status st-${r.status}"></div></div>
+      <div class="rt-metric">${r.status==='off'?'⚠ FUERA DE LÍNEA':r.status==='wr'?'⚡ MANTENIMIENTO':'Carga: '+ld+'%'}</div>
+      <div class="rt-bar"><div class="rt-fill" style="width:${ld}%;background:${barColor};"></div></div>
+    </div>`;
+  }).join('');
+}
+renderRobots();
+
+// ── ALERTS ──
+const ALERTS=[
+  {type:'red',txt:'ARM-07: Vibración anormal en rodamiento principal. Reemplazo recomendado en <14 días',meta:'IA PREDICTIVA · hace 18 min'},
+  {type:'yel',txt:'Temperatura motor conveyor Línea 3: 78°C (umbral: 75°C). Monitoreo activo',meta:'SENSOR IoT #L3-T04 · hace 32 min'},
+  {type:'grn',txt:'Calibración visión computacional completada. Precisión actualizada: 99.97%',meta:'CV-AI SISTEMA · hace 1h 12min'},
+  {type:'yel',txt:'WLD-03: Programa de mantenimiento preventivo activo. Retorno estimado: 4h',meta:'SCADA MES · hace 2h'},
+];
+document.getElementById('alertsPanel').innerHTML=ALERTS.map(a=>`
+  <div class="alert-item">
+    <div class="al-dot al-${a.type}"></div>
+    <div><div class="al-txt">${a.txt}</div><div class="al-meta">${a.meta}</div></div>
+  </div>`).join('');
+
+// ── TEMP CHART ──
+(()=>{
+  const ctx=document.getElementById('tempChart').getContext('2d');
+  const lbls=Array.from({length:30},(_,i)=>i+'m');
+  new Chart(ctx,{
+    type:'line',
+    data:{labels:lbls,datasets:[
+      {label:'Motor A',data:arr(30,62,78),borderColor:'rgba(0,229,255,.85)',borderWidth:1.5,fill:false,pointRadius:0,tension:.4},
+      {label:'Motor B',data:arr(30,55,72),borderColor:'rgba(0,255,136,.75)',borderWidth:1.5,fill:false,pointRadius:0,tension:.4},
+      {label:'Motor C',data:arr(30,48,65),borderColor:'rgba(255,170,0,.7)',borderWidth:1.5,fill:false,pointRadius:0,tension:.4},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'end',labels:{color:'#6fa8bc',font:{family:'Share Tech Mono',size:9},boxWidth:8,padding:8}},tooltip:{...TT,mode:'index',intersect:false}},
+      scales:{x:{display:false},y:{ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:9},callback:v=>v+'°C'},grid:{color:'rgba(0,229,255,.05)'}}}
+    }
+  });
+})();
+
+// ── QUALITY CV CHART ──
+(()=>{
+  const ctx=document.getElementById('qualChart').getContext('2d');
+  const labels=Array.from({length:24},(_,i)=>`${String(i).padStart(2,'0')}h`);
+  const buenos=arr(24,980,999);
+  const defectos=buenos.map(v=>parseFloat((1000-v).toFixed(1)));
+  new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'OK',data:buenos,backgroundColor:'rgba(0,255,136,.4)',borderColor:'rgba(0,255,136,.7)',borderWidth:1,stack:'s'},
+      {label:'Defecto',data:defectos,backgroundColor:'rgba(255,45,85,.5)',borderColor:'rgba(255,45,85,.8)',borderWidth:1,stack:'s'},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'end',labels:{color:'#6fa8bc',font:{family:'Share Tech Mono',size:9},boxWidth:8,padding:8}},tooltip:{...TT,mode:'index',intersect:false}},
+      scales:{x:{stacked:true,ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:8},maxTicksLimit:8},grid:{display:false}},
+        y:{stacked:true,ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:9}},grid:{color:'rgba(0,229,255,.05)'}}}
+    }
+  });
+})();
+
+// ── MAINTENANCE FORECAST ──
+(()=>{
+  const ctx=document.getElementById('maintChart').getContext('2d');
+  const days=Array.from({length:28},(_,i)=>`D+${i+1}`);
+  new Chart(ctx,{
+    type:'bar',
+    data:{labels:days,datasets:[
+      {label:'Probabilidad Falla (%)',data:Array.from({length:28},(_,i)=>Math.max(0,Math.min(100,5+i*1.8+rnd(-3,5))).toFixed(1)),backgroundColor:days.map((_,i)=>i<7?'rgba(0,255,136,.45)':i<14?'rgba(255,170,0,.45)':'rgba(255,45,85,.4)'),borderColor:days.map((_,i)=>i<7?'rgba(0,255,136,.7)':i<14?'rgba(255,170,0,.7)':'rgba(255,45,85,.7)'),borderWidth:1,borderRadius:2,},
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:c=>`  Prob. falla: ${c.raw}%`}}},
+      scales:{x:{ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:8},maxTicksLimit:14},grid:{display:false}},
+        y:{min:0,max:100,ticks:{color:'#2e5568',font:{family:'Share Tech Mono',size:9},callback:v=>v+'%'},grid:{color:'rgba(0,229,255,.05)'}}}
+    }
+  });
+})();
+
+// ── LIVE UPDATES ──
+setInterval(()=>{
+  Object.keys(LINES).forEach(k=>{
+    const ln=LINES[k];
+    const last=lineData[k][lineData[k].length-1];
+    const nxt=Math.max(ln.min*.6,Math.min(ln.max*1.05,last*(1+rnd(-1,1)*.05)));
+    lineData[k].push(parseFloat(nxt.toFixed(1)));
+    lineData[k].shift();
+  });
+  if(prodChart){prodChart.data.datasets[0].data=lineData[lineMode];prodChart.update('none');}
+  // OEE update
+  const oee=parseFloat(rnd(91,97).toFixed(1));
+  document.getElementById('oeeVal').textContent=oee+'%';
+  buildOEE(oee);
+  document.getElementById('heroOEE').textContent=oee+'%';
+  document.getElementById('dispVal').textContent=parseFloat(rnd(94,99).toFixed(1))+'%';
+  document.getElementById('perfVal').textContent=parseFloat(rnd(95,99).toFixed(1))+'%';
+  document.getElementById('qualVal').textContent=parseFloat(rnd(99,99.9).toFixed(1))+'%';
+  // defect
+  const df=parseFloat(rnd(.02,.08).toFixed(2));
+  document.getElementById('heroDefects').textContent=df+'%';
+  // city sensors
+  const cs=Math.round(142840+rnd(-50,80));
+  document.getElementById('cityS').textContent=cs.toLocaleString('es-MX');
+  renderRobots();
+},2000);
+
+// ── ROI CALCULATOR ──
+function calcROI(){
+  const ops=parseInt(document.getElementById('r1').value);
+  const turns=parseInt(document.getElementById('r2').value);
+  const costOp=parseInt(document.getElementById('r3').value);
+  const stopH=parseInt(document.getElementById('r4').value);
+  const costStop=parseInt(document.getElementById('r5').value);
+  document.getElementById('v1').textContent=ops;
+  document.getElementById('v2').textContent=turns;
+  document.getElementById('v3').textContent='$'+costOp.toLocaleString();
+  document.getElementById('v4').textContent=stopH+'h';
+  document.getElementById('v5').textContent='$'+costStop.toLocaleString();
+  const savOp=Math.round(ops*turns*costOp*12*.5);
+  const savStop=Math.round(stopH*costStop*12*.9);
+  const savQ=Math.round(ops*turns*costOp*12*.05);
+  const total=savOp+savStop+savQ;
+  const invest=Math.round(ops*turns*costOp*6);
+  const payback=parseFloat((invest/total*12).toFixed(1));
+  const fmt=v=>'$'+v.toLocaleString('en-US');
+  document.getElementById('roiOp').textContent=fmt(savOp);
+  document.getElementById('roiStop').textContent=fmt(savStop);
+  document.getElementById('roiQ').textContent=fmt(savQ);
+  document.getElementById('roiTotal').textContent=fmt(total);
+  document.getElementById('roiPayback').textContent=payback+' meses';
+}
+calcROI();
+
+},200);
+});
+</script>
+</body>
+</html>
