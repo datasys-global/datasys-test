@@ -435,7 +435,11 @@ body::after{
         </div>
         <div class="wlc-title">ARIA</div>
         <div class="wlc-sub">ASISTENTE IA · DATASYS ECOSYSTEM</div>
-        <p class="wlc-desc">Soy tu asistente inteligente para las 10 plataformas DATASYS. Selecciona una plataforma en el menú lateral o escríbeme directamente.</p>
+        <p class="wlc-desc">"Bienvenido al ecosistema DATASYS. Soy ARIA, tu asistente inteligente.
+
+Para comenzar, selecciona una de nuestras 10 plataformas en el menú lateral izquierdo. Una vez seleccionada, verás el tema activo en la barra superior.
+
+Estoy lista para resolver cualquier duda sobre el área en la que te encuentres: desde costos y servicios hasta soporte técnico o facturación. ¿En qué puedo apoyarte hoy?"</p>
         <div class="wlc-chips" id="wlc-chips">
           <div class="wlc-chip" onclick="enviarPregunta('¿Qué servicios ofrece DATASYS?')">¿Qué servicios ofrecen?</div>
           <div class="wlc-chip" onclick="seleccionarPlat('apps')">Apps & Software</div>
@@ -510,7 +514,7 @@ var ARIA_SECCIONES = {
 var QUICK_BY_SECTION = {
   datos:    ["¿Qué es analytics?","Precios dashboards","¿Machine learning?","Demo Analytics"],
   bio:      ["Ronda Serie A","Valuación empresa","¿Qué es Biodynamic AI?","Invertir en biotech"],
-  apps:     ["¿Cuánto cuesta una app?","Tiempos de entrega","Tecnologías usadas","Cómo contratar"],
+  apps:     [],
   bolsa:    ["Algoritmos de trading","Precios plataforma","NYSE/NASDAQ en vivo","Gestión de riesgo"],
   auto:     ["Tipos de robots","Industria 4.0","Precios automatización","Integración IoT"],
   inv:      ["¿Cómo funciona blockchain?","Control de inventario","Integración ERP","Precios"],
@@ -584,9 +588,90 @@ function addUsr(txt){
 }
 
 /* ── QUICK BUTTONS ── */
+
+/* Categorías para Apps & Software */
+var APPS_CATEGORIAS = [
+  { label:'🏆 Experiencia',     preguntas:[
+    { label:'Caso de éxito real',       pregunta:'¿Puedes mostrarme un caso de éxito donde el diseño haya resuelto un problema de negocio real?' },
+    { label:'Mi industria',             pregunta:'¿Has diseñado para mi industria? ¿Cuáles son los estándares UX que mis competidores ignoran?' },
+    { label:'Años en el mercado',       pregunta:'¿Cuánta experiencia tienen y qué proyectos han desarrollado?' }
+  ]},
+  { label:'🎯 Estrategia',      preguntas:[
+    { label:'Validar diseño',           pregunta:'¿Cómo validan que el diseño le va a gustar a mis usuarios finales?' },
+    { label:'Presupuesto limitado',     pregunta:'Si mi presupuesto es limitado, ¿qué funciones para el MVP me recomiendan?' },
+    { label:'Propuesta de valor',       pregunta:'¿Cómo definen la estrategia y modelo de negocio de una app?' }
+  ]},
+  { label:'⚙️ Servicio Técnico', preguntas:[
+    { label:'Entrega a developers',     pregunta:'¿Cómo entregan los archivos a los desarrolladores? (entrega a developers y handoff)' },
+    { label:'iOS y Android nativo',     pregunta:'¿Conocen las guías nativas de iOS y Android? ¿Por qué seguirlas o romperlas?' },
+    { label:'Crear una app paso a paso',pregunta:'¿Cuáles son los pasos para crear una aplicación móvil desde cero?' }
+  ]},
+  { label:'🤝 Confianza',       preguntas:[
+    { label:'Propiedad del código',     pregunta:'¿Quién es el dueño de los archivos fuente y la propiedad intelectual al terminar?' },
+    { label:'Cambios post-lanzamiento', pregunta:'¿Qué pasa si después del lanzamiento descubrimos que un flujo de usuario es confuso?' }
+  ]},
+  { label:'🚀 Logística',       preguntas:[
+    { label:'Cuentas de developer',     pregunta:'¿Cuánto cuesta publicar en App Store y Google Play? ¿Qué cuentas necesito?' },
+    { label:'Requisitos legales',       pregunta:'¿Qué requisitos legales necesito para publicar mi app?' },
+    { label:'ASO y posicionamiento',    pregunta:'¿Qué es el ASO y cómo ayudan a posicionar la app en las tiendas?' }
+  ]}
+];
+
+var _appsCatActiva = -1;
+
+function renderAppsCategories(){
+  var row = document.getElementById('quick-row');
+  if(!row) return;
+  row.style.display = 'flex';
+  row.style.flexDirection = 'column';
+  row.style.gap = '6px';
+  row.style.padding = '10px 24px';
+
+  var catHtml = '<div id="apps-cat-row" style="display:flex;flex-wrap:wrap;gap:6px;">'
+    + APPS_CATEGORIAS.map(function(c, i){
+        return '<button class="qchip apps-cat-btn" data-idx="'+i+'" style="font-weight:600;border-color:rgba(0,229,255,.35);color:var(--cyan);" onclick="toggleAppsCategory('+i+')">'
+          + c.label + '</button>';
+      }).join('')
+    + '</div>'
+    + '<div id="apps-sub-row" style="display:flex;flex-wrap:wrap;gap:6px;min-height:0;"></div>';
+
+  row.innerHTML = catHtml;
+  _appsCatActiva = -1;
+}
+
+function toggleAppsCategory(idx){
+  var subRow = document.getElementById('apps-sub-row');
+  var btns = document.querySelectorAll('.apps-cat-btn');
+  if(_appsCatActiva === idx){
+    // Deseleccionar
+    btns.forEach(function(b){ b.style.background='rgba(0,229,255,.04)'; b.style.borderColor='rgba(0,229,255,.35)'; });
+    if(subRow) subRow.innerHTML = '';
+    _appsCatActiva = -1;
+    return;
+  }
+  _appsCatActiva = idx;
+  btns.forEach(function(b, i){
+    b.style.background = i===idx ? 'rgba(0,229,255,.18)' : 'rgba(0,229,255,.04)';
+    b.style.borderColor = i===idx ? 'var(--cyan)' : 'rgba(0,229,255,.35)';
+  });
+  var preguntas = APPS_CATEGORIAS[idx].preguntas;
+  if(subRow){
+    subRow.innerHTML = preguntas.map(function(p){
+      return '<button class="qchip" style="font-size:.7rem;" onclick="enviarPregunta(\''+p.pregunta.replace(/'/g,"\\'")+'\')">'+p.label+'</button>';
+    }).join('');
+  }
+}
+
 function renderQuickBtns(key){
   var row = document.getElementById('quick-row');
   if(!row) return;
+  if(key === 'apps'){
+    renderAppsCategories();
+    return;
+  }
+  row.style.flexDirection = '';
+  row.style.gap = '';
+  row.style.padding = '';
   var btns = key ? (QUICK_BY_SECTION[key] || []) : [];
   if(btns.length === 0){ row.style.display='none'; return; }
   row.style.display='flex';
