@@ -138,100 +138,10 @@ footer{background:rgba(1,6,14,.95);border-top:1px solid var(--bord);padding:28px
 
   </div>
   <div class="h-ctas">
-    <button class="btn-p" onclick="abrirDemoCFE()">🔐 DEMO CFE-SICL →</button>
+    <a href="https://datasys-test.vercel.app/Desktop/apps/cfesicl/index_clave.html" class="btn-p" style="display:block;text-align:center;text-decoration:none;">🔐 DEMO CFE-SICL →</a>
     <button class="btn-s" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">VER SERVICIOS</button>
   </div>
 </section>
-
-<!-- MODAL DEMO CFE-SICL -->
-<div id="modalCFE" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);align-items:center;justify-content:center;padding:20px;">
-  <div style="width:100%;max-width:340px;background:#060f1c;border:1px solid rgba(0,229,255,.35);box-shadow:0 0 40px rgba(0,229,255,.2);">
-    <!-- Header -->
-    <div style="padding:16px 18px;border-bottom:1px solid rgba(0,229,255,.15);display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:3px;color:rgba(0,229,255,.5);margin-bottom:3px;">// ACCESO RESTRINGIDO</div>
-        <div style="font-family:'Orbitron',sans-serif;font-size:.78rem;font-weight:700;color:#00e5ff;letter-spacing:2px;">DEMO CFE-SICL</div>
-      </div>
-      <button onclick="cerrarDemoCFE()" style="background:none;border:none;color:rgba(0,229,255,.4);font-size:1.2rem;cursor:pointer;padding:4px;">✕</button>
-    </div>
-    <!-- Body -->
-    <div style="padding:20px 18px;">
-      <!-- Info del proyecto -->
-      <div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-left:3px solid #00e5ff;padding:12px;margin-bottom:20px;">
-        <div style="font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;color:#00e5ff;letter-spacing:1px;margin-bottom:6px;">PROYECTO CFE · SICL</div>
-        <div style="font-family:'Rajdhani',sans-serif;font-size:.82rem;color:#8eb8cc;line-height:1.65;">Sistema de Control de Inventario y Logística desarrollado para <b style="color:#dff0f8">CFE</b>. Reducción de pérdida de producto del <b style="color:#00e5ff">28% → 1%</b> en el primer mes.</div>
-      </div>
-      <!-- Campo contraseña -->
-      <div style="margin-bottom:6px;">
-        <label style="font-family:'Share Tech Mono',monospace;font-size:.46rem;letter-spacing:2.5px;color:rgba(0,229,255,.5);display:block;margin-bottom:8px;">CONTRASEÑA DE ACCESO</label>
-        <div style="position:relative;">
-          <input id="cfe_pass" type="password" placeholder="Ingresa la contraseña..."
-            style="width:100%;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);color:#dff0f8;font-family:'Rajdhani',sans-serif;font-size:1rem;padding:12px 44px 12px 14px;outline:none;letter-spacing:2px;"
-            onkeydown="if(event.key==='Enter')verificarCFE()"
-            onfocus="this.style.borderColor='#00e5ff';document.getElementById('cfe_err').style.display='none';"
-            onblur="this.style.borderColor='rgba(0,229,255,.2)'">
-          <button onclick="togglePassCFE()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(0,229,255,.4);cursor:pointer;font-size:.9rem;" id="cfe_eye">👁</button>
-        </div>
-      </div>
-      <!-- Error -->
-      <div id="cfe_err" style="display:none;font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;color:#e05050;padding:7px 10px;background:rgba(224,80,80,.07);border:1px solid rgba(224,80,80,.2);margin-bottom:12px;">
-        ✕ CONTRASEÑA INCORRECTA · ACCESO DENEGADO
-      </div>
-      <!-- Hint -->
-      <div style="font-family:'Share Tech Mono',monospace;font-size:.42rem;letter-spacing:1.5px;color:rgba(0,229,255,.3);margin-bottom:16px;">
-        HINT: ADMINISTRACIÓN · USO EXCLUSIVO CFE
-      </div>
-      <!-- Botón -->
-      <button onclick="verificarCFE()" style="width:100%;padding:13px;font-family:'Orbitron',sans-serif;font-size:.6rem;font-weight:700;letter-spacing:2px;color:#030d18;background:#00e5ff;border:none;cursor:pointer;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);box-shadow:0 0 14px rgba(0,229,255,.4);">
-        ACCEDER AL DEMO →
-      </button>
-    </div>
-  </div>
-</div>
-
-<script>
-function abrirDemoCFE(){
-  var m = document.getElementById('modalCFE');
-  m.style.display = 'flex';
-  setTimeout(function(){ document.getElementById('cfe_pass').focus(); }, 150);
-}
-function cerrarDemoCFE(){
-  document.getElementById('modalCFE').style.display = 'none';
-  document.getElementById('cfe_pass').value = '';
-  document.getElementById('cfe_err').style.display = 'none';
-}
-function togglePassCFE(){
-  var inp = document.getElementById('cfe_pass');
-  var eye = document.getElementById('cfe_eye');
-  if(inp.type === 'password'){
-    inp.type = 'text';
-    eye.textContent = '🙈';
-  } else {
-    inp.type = 'password';
-    eye.textContent = '👁';
-  }
-}
-function verificarCFE(){
-  var val = document.getElementById('cfe_pass').value.trim().toUpperCase();
-  if(val === 'CFE'){
-    cerrarDemoCFE();
-    window.location.href = 'https://datasys-test.vercel.app/Desktop/apps/cfesicl/index_clave.html';
-  } else {
-    var err = document.getElementById('cfe_err');
-    err.style.display = 'block';
-    document.getElementById('cfe_pass').value = '';
-    document.getElementById('cfe_pass').focus();
-    // Shake animation
-    var inp = document.getElementById('cfe_pass');
-    inp.style.borderColor = '#e05050';
-    setTimeout(function(){ inp.style.borderColor = 'rgba(0,229,255,.2)'; }, 1200);
-  }
-}
-// Cerrar al tocar fuera del modal
-document.getElementById('modalCFE').addEventListener('click', function(e){
-  if(e.target === this) cerrarDemoCFE();
-});
-</script>
 
 <!-- FEATURES -->
 <div class="sec reveal" id="features">
