@@ -362,26 +362,26 @@ const ALL_STOCKS = [...STOCKS, ...CHIPS_EXTRA];
 
 // ── LIVE PRICE ENGINE ──
 let prices = {};
+let dataLoaded = false;
 
-function initPrices(){
-  [...ALL_STOCKS, ...INDICES].forEach(s=>{
-    const trend = Math.random()>.45 ? 1 : -1;
-    const drift = s.base * trend * (0.002 + Math.random()*.018);
-    prices[s.sym] = {
-      price: s.base + drift * Math.random(),
-      open:  s.base,
-      high:  s.base * (1 + 0.005 + Math.random()*.025),
-      low:   s.base * (1 - 0.005 - Math.random()*.025),
-      hist:  generateHistory(s.base, 390), // full day's candles
-      vol:   s.vol || 0,
-    };
-  });
-}
+// Yahoo Finance symbol mapping (some have different tickers on YF)
+const YF_MAP = {
+  'DJI':  '^DJI',
+  'SPX':  '^GSPC',
+  'COMP': '^IXIC',
+  'RUT':  '^RUT',
+  'AI':   'AI',
+};
+function yfSym(sym){ return YF_MAP[sym] || sym; }
+
+// CORS proxy for Yahoo Finance
+const PROXY = 'https://corsproxy.io/?';
+const YF_BASE = 'https://query1.finance.yahoo.com/v8/finance/chart/';
+const YF_QUOTE = 'https://query1.finance.yahoo.com/v7/finance/quote?symbols=';
 
 function generateHistory(base, n, vol=0.012){
   const pts=[];
   let p = base * (1 - 0.04 + Math.random()*.04);
-  // Add slight upward trend bias
   const trendPct = (Math.random()>.5?1:-1) * 0.03 / n;
   for(let i=0;i<n;i++){
     const noise = (Math.random()-.49) * vol;
@@ -391,13 +391,129 @@ function generateHistory(base, n, vol=0.012){
   return pts;
 }
 
-function tickPrices(){
+// Initialize with base prices as fallback, then load real data
+function initPrices(){
   [...ALL_STOCKS, ...INDICES].forEach(s=>{
+    const trend = Math.random()>.45 ? 1 : -1;
+    const drift = s.base * trend * (0.002 + Math.random()*.018);
+    prices[s.sym] = {
+      price: s.base + drift * Math.random(),
+      open:  s.base,
+      high:  s.base * (1 + 0.005 + Math.random()*.025),
+      low:   s.base * (1 - 0.005 - Math.random()*.025),
+      hist:  generateHistory(s.base, 390),
+      vol:   s.vol || 0,
+      real:  false,
+    };
+  });
+}
+
+// Fetch real quotes from Yahoo Finance
+async function fetchRealQuotes(){
+  const allSyms = [...ALL_STOCKS, ...CHIPS_EXTRA, ...INDICES];
+  const yfSyms  = allSyms.map(s=>yfSym(s.sym)).join(',');
+  const url = PROXY + encodeURIComponent(YF_QUOTE + yfSyms + '&fields=regularMarketPrice,regularMarketOpen,regularMarketDayHigh,regularMarketDayLow,regularMarketVolume,regularMarketChangePercent,regularMarketChange,marketCap,trailingPE');
+  try {
+    const res  = await fetch(url);
+    const data = await res.json();
+    const results = data?.quoteResponse?.result || [];
+    results.forEach(q=>{
+      // Find original symbol
+      const orig = allSyms.find(s=>yfSym(s.sym)===q.symbol || s.sym===q.symbol);
+      if(!orig) return;
+      const sym = orig.sym;
+      const price = q.regularMarketPrice;
+      if(!price) return;
+      const open  = q.regularMarketOpen  || price;
+      const high  = q.regularMarketDayHigh || price;
+      const low   = q.regularMarketDayLow  || price;
+      const vol   = (q.regularMarketVolume||0)/1e6;
+      const mcap  = q.marketCap ? formatMktCap(q.marketCap) : orig.mktcap;
+      const pe    = q.trailingPE ? q.trailingPE.toFixed(1) : orig.pe;
+      // Update prices object
+      prices[sym] = {
+        price,
+        open,
+        high,
+        low,
+        vol,
+        hist: generateHistory(open, 390, 0.008),
+        real: true,
+        mcap,
+        pe,
+        chgPct: q.regularMarketChangePercent||0,
+        chgAbs: q.regularMarketChange||0,
+      };
+      // Also update the static stock's base to real open
+      orig.base    = open;
+      orig.mktcap  = mcap;
+      orig.pe      = pe;
+      if(vol>0) orig.vol = vol;
+    });
+    dataLoaded = true;
+    showDataBadge(true);
+    // Re-render everything with real data
+    renderAll();
+  } catch(e){
+    console.warn('Yahoo Finance fetch failed, using simulated data:', e);
+    showDataBadge(false);
+  }
+}
+
+// Fetch intraday chart for selected symbol
+async function fetchIntradayChart(sym){
+  const yfsym = yfSym(sym);
+  const url = PROXY + encodeURIComponent(`${YF_BASE}${yfsym}?interval=5m&range=1d`);
+  try {
+    const res  = await fetch(url);
+    const data = await res.json();
+    const closes = data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+    const valid  = closes.filter(v=>v!=null);
+    if(valid.length > 5){
+      prices[sym].hist = valid;
+    }
+  } catch(e){
+    console.warn('Chart fetch failed for', sym);
+  }
+}
+
+function formatMktCap(v){
+  if(v>=1e12) return (v/1e12).toFixed(2)+'T';
+  if(v>=1e9)  return (v/1e9).toFixed(0)+'B';
+  return (v/1e6).toFixed(0)+'M';
+}
+
+// Show badge indicating real vs simulated data
+function showDataBadge(real){
+  let badge = document.getElementById('dataBadge');
+  if(!badge){
+    badge = document.createElement('div');
+    badge.id = 'dataBadge';
+    badge.style.cssText='position:fixed;bottom:32px;right:14px;z-index:2000;padding:4px 10px;font-family:Share Tech Mono,monospace;font-size:.5rem;letter-spacing:2px;border:1px solid;';
+    document.body.appendChild(badge);
+  }
+  if(real){
+    badge.textContent='● DATOS REALES · YAHOO FINANCE';
+    badge.style.color='#00d68f';
+    badge.style.borderColor='rgba(0,214,143,.35)';
+    badge.style.background='rgba(0,214,143,.07)';
+  } else {
+    badge.textContent='○ DATOS SIMULADOS';
+    badge.style.color='#f5c518';
+    badge.style.borderColor='rgba(245,197,24,.35)';
+    badge.style.background='rgba(245,197,24,.06)';
+  }
+}
+
+function tickPrices(){
+  [...ALL_STOCKS, ...CHIPS_EXTRA, ...INDICES].forEach(s=>{
     const d = prices[s.sym];
+    if(!d) return;
     const isIndex = s.type === 'index';
-    const v = isIndex ? 0.0015 : (s.subsector==='ai-pure'?0.012:0.005);
-    const newP = d.price * (1 + (Math.random()-.49)*v);
-    d.price = parseFloat(newP.toFixed(s.base>100?2:4));
+    // Smaller drift for real data (just simulate microfluctuations)
+    const v = isIndex ? 0.0004 : (s.subsector==='ai-pure'?0.003:0.0015);
+    const newP = d.price * (1 + (Math.random()-.499)*v);
+    d.price = parseFloat(newP.toFixed(newP>100?2:4));
     d.high = Math.max(d.high, d.price);
     d.low  = Math.min(d.low,  d.price);
     d.hist.push(d.price);
@@ -405,8 +521,8 @@ function tickPrices(){
   });
 }
 
-function pct(sym){ const d=prices[sym],s=findStock(sym); return d&&s ? ((d.price-s.base)/s.base*100) : 0; }
-function chg(sym){ const d=prices[sym],s=findStock(sym); return d&&s ? d.price-s.base : 0; }
+function pct(sym){ const d=prices[sym],s=findStock(sym); if(!d||!s)return 0; return d.real ? (d.chgPct||0) : ((d.price-s.base)/s.base*100); }
+function chg(sym){ const d=prices[sym],s=findStock(sym); if(!d||!s)return 0; return d.real ? (d.chgAbs||0) : d.price-s.base; }
 function findStock(sym){ return [...ALL_STOCKS,...INDICES].find(s=>s.sym===sym); }
 function fmt(p,base){ return base>500 ? '$'+p.toFixed(2) : base>10 ? '$'+p.toFixed(2) : '$'+p.toFixed(4); }
 function fmtPct(v){ return (v>=0?'+':'')+v.toFixed(2)+'%'; }
@@ -598,14 +714,17 @@ function renderSidebar(){
 function renderMainHeader(sym){
   const s=findStock(sym); if(!s)return;
   const d=prices[sym]; const p=pct(sym); const c=chg(sym);
+  const mcap = (d.real && d.mcap) ? d.mcap : s.mktcap;
+  const pe   = (d.real && d.pe)   ? d.pe   : (s.pe||'N/A');
+  const volM = d.vol ? d.vol.toFixed(1)+'M' : (s.vol||0).toFixed(1)+'M';
   document.getElementById('cpSym').textContent=sym;
   document.getElementById('cpName').textContent=s.co;
-  document.getElementById('cpExch').textContent=`${s.exch} · ${s.sector} · Apertura: $${s.base.toFixed(2)}`;
+  document.getElementById('cpExch').textContent=`${s.exch} · ${s.sector} · Apertura: $${d.open.toFixed(2)}`;
   document.getElementById('cpPrice').textContent='$'+d.price.toFixed(2);
   const chgEl=document.getElementById('cpChg');
   chgEl.innerHTML=`${arrow(c)} ${c>=0?'+':''}${c.toFixed(2)} &nbsp;(${fmtPct(p)})`;
   chgEl.className='cp-change '+(c>=0?'up':'dn');
-  document.getElementById('cpMktCap').textContent=`Cap. Mercado: $${s.mktcap} · P/E: ${s.pe||'N/A'} · Volumen: ${(s.vol||0).toFixed(1)}M`;
+  document.getElementById('cpMktCap').textContent=`Cap. Mercado: $${mcap} · P/E: ${pe} · Volumen: ${volM}`;
   renderIndicators(sym);
 }
 
@@ -804,6 +923,10 @@ function selectSym(sym){
   renderSidebar();
   renderMainHeader(sym);
   buildMainChart(sym);
+  // Fetch real intraday chart for this symbol
+  if(currentTF==='1D'){
+    fetchIntradayChart(sym).then(()=>buildMainChart(sym));
+  }
 }
 
 function setTF(tf,btn){
@@ -846,23 +969,34 @@ function updateMainChartLive(){
   renderMainHeader(currentSym);
 }
 
-// ── INIT ──
-function init(){
-  initPrices();
+// ── RENDER ALL ──
+function renderAll(){
   renderTopbarIndices();
   renderSidebar();
-  renderMainHeader('NVDA');
-  buildMainChart('NVDA');
+  renderMainHeader(currentSym);
+  buildMainChart(currentSym);
   renderMiniGrid();
   renderHeatmap();
-  renderFearGreed();
-  renderSignals();
   renderMovers();
   renderVolume();
+  renderStatusBar();
+}
+
+// ── INIT ──
+async function init(){
+  showDataBadge(false);
+  initPrices();
+  renderAll();
+  renderFearGreed();
+  renderSignals();
   renderNews();
   renderTicker();
-  renderStatusBar();
   updateClock();
+  // Fetch real data
+  await fetchRealQuotes();
+  // Also fetch intraday chart for default symbol
+  await fetchIntradayChart(currentSym);
+  buildMainChart(currentSym);
 }
 
 // Update intervals
@@ -870,6 +1004,8 @@ setInterval(()=>{ tickPrices(); renderSidebar(); renderTopbarIndices(); updateMa
 setInterval(()=>{ renderHeatmap(); renderMovers(); }, 3500);
 setInterval(renderFearGreed, 9000);
 setInterval(updateClock, 1000);
+// Real data refresh every 60 seconds
+setInterval(fetchRealQuotes, 60000);
 
 init();
 
