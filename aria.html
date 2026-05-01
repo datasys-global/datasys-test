@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#030d18">
-<meta name="description" content="ARIA — Asistente de Inteligencia Artificial de DATASYS. Consulta las 10 plataformas del ecosistema tecnológico.">
+<meta name="description" content="ARIA — Asistente de Inteligencia Artificial de DATASYS. Inicia tu diagnóstico en Producción, Inventarios y Logística.">
 <title>ARIA — Asistente IA · DATASYS</title>
 
 <!-- PWA -->
@@ -18,17 +18,10 @@
 <!-- Fuentes -->
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-<!-- ══ 10 BASES DE CONOCIMIENTO LOCAL ══ -->
-<script src="js/datos.js"></script>
-<script src="js/bio.js"></script>
-<script src="js/apps.js"></script>
-<script src="js/bolsa.js"></script>
-<script src="js/auto.js"></script>
-<script src="js/inventario.js"></script>
-<script src="js/cyber.js"></script>
-<script src="js/consul.js"></script>
-<script src="js/revista.js"></script>
-<script src="js/clientes.js"></script>
+<!-- ══ BASES DE CONOCIMIENTO LOCAL ══ -->
+<script src="js/produccion.js"></script>
+<script src="js/inventarios.js"></script>
+<script src="js/logistica.js"></script>
 
 <style>
 /* ══ RESET & VARIABLES ══ */
@@ -55,10 +48,14 @@ body::after{
 /* ══ LAYOUT ══ */
 #app{
   display:grid;
-  grid-template-columns:280px 1fr;
+  grid-template-columns:0px 1fr;
   grid-template-rows:56px 1fr;
   height:100vh;
   position:relative;
+  transition:grid-template-columns .35s ease;
+}
+#app.sidebar-visible{
+  grid-template-columns:280px 1fr;
 }
 
 /* ══ TOPBAR ══ */
@@ -95,6 +92,14 @@ body::after{
   border-right:1px solid rgba(0,229,255,.12);
   display:flex;flex-direction:column;
   overflow:hidden;
+  width:280px;
+  opacity:0;
+  visibility:hidden;
+  transition:opacity .3s ease, visibility .3s ease;
+}
+#app.sidebar-visible #sidebar{
+  opacity:1;
+  visibility:visible;
 }
 .sb-section-title{
   font-family:'Share Tech Mono',monospace;font-size:.44rem;
@@ -328,7 +333,7 @@ body::after{
 }
 
 @media(max-width:900px) and (min-width:701px){
-  #app{grid-template-columns:220px 1fr;}
+  #app.sidebar-visible{grid-template-columns:220px 1fr;}
   .plat-tag{display:none;}
 }
 </style>
@@ -357,47 +362,19 @@ body::after{
 
   <!-- ══ SIDEBAR ══ -->
   <aside id="sidebar">
-    <div class="sb-section-title">// 10 PLATAFORMAS</div>
+    <div class="sb-section-title">// INICIA TU DIAGNÓSTICO EN 3 MIN</div>
     <div class="sb-plats" id="sb-plats">
-      <button class="plat-btn" data-key="datos" onclick="seleccionarPlat('datos')">
-        <span class="plat-ico">📊</span>
-        <span class="plat-name">Análisis de Datos<span class="plat-tag">ML · DASHBOARDS · BI</span></span>
+      <button class="plat-btn" data-key="produccion" onclick="seleccionarPlat('produccion')">
+        <span class="plat-ico">🏭</span>
+        <span class="plat-name">Producción<span class="plat-tag">CONTROL · PROCESOS · KPI</span></span>
       </button>
-      <button class="plat-btn" data-key="bio" onclick="seleccionarPlat('bio')">
-        <span class="plat-ico">🧬</span>
-        <span class="plat-name">Biotecnología<span class="plat-tag">SERIE A · BIODYNAMIC AI</span></span>
-      </button>
-      <button class="plat-btn" data-key="apps" onclick="seleccionarPlat('apps')">
-        <span class="plat-ico">📱</span>
-        <span class="plat-name">Apps & Software<span class="plat-tag">iOS · ANDROID · PWA · IoT</span></span>
-      </button>
-      <button class="plat-btn" data-key="bolsa" onclick="seleccionarPlat('bolsa')">
-        <span class="plat-ico">📈</span>
-        <span class="plat-name">Bolsa de Valores<span class="plat-tag">NYSE · NASDAQ · ALGO TRADING</span></span>
-      </button>
-      <button class="plat-btn" data-key="auto" onclick="seleccionarPlat('auto')">
-        <span class="plat-ico">🤖</span>
-        <span class="plat-name">Automatización<span class="plat-tag">INDUSTRIA 4.0 · IIoT · RPA</span></span>
-      </button>
-      <button class="plat-btn" data-key="inv" onclick="seleccionarPlat('inv')">
+      <button class="plat-btn" data-key="inventarios" onclick="seleccionarPlat('inventarios')">
         <span class="plat-ico">📦</span>
-        <span class="plat-name">Inventario Virtual<span class="plat-tag">BLOCKCHAIN · SUPPLY CHAIN</span></span>
+        <span class="plat-name">Inventarios<span class="plat-tag">STOCK · ENTRADAS · SALIDAS</span></span>
       </button>
-      <button class="plat-btn" data-key="cyber" onclick="seleccionarPlat('cyber')">
-        <span class="plat-ico">🔐</span>
-        <span class="plat-name">Ciberseguridad<span class="plat-tag">SOC 24/7 · ZERO TRUST</span></span>
-      </button>
-      <button class="plat-btn" data-key="consul" onclick="seleccionarPlat('consul')">
-        <span class="plat-ico">🎯</span>
-        <span class="plat-name">Consultoría<span class="plat-tag">C-SUITE · LIVE CONFERENCES</span></span>
-      </button>
-      <button class="plat-btn" data-key="revista" onclick="seleccionarPlat('revista')">
-        <span class="plat-ico">📰</span>
-        <span class="plat-name">Revista Tech<span class="plat-tag">DIARIO · AUTO AI</span></span>
-      </button>
-      <button class="plat-btn" data-key="clientes" onclick="seleccionarPlat('clientes')">
-        <span class="plat-ico">👥</span>
-        <span class="plat-name">Área de Clientes<span class="plat-tag">PORTAL PRIVADO · LOGIN</span></span>
+      <button class="plat-btn" data-key="logistica" onclick="seleccionarPlat('logistica')">
+        <span class="plat-ico">🚚</span>
+        <span class="plat-name">Logística<span class="plat-tag">RUTAS · ENTREGAS · SUPPLY CHAIN</span></span>
       </button>
     </div>
 
@@ -433,20 +410,12 @@ body::after{
           <div class="wlc-ring"></div><div class="wlc-ring"></div><div class="wlc-ring"></div>
           <img src="imagenes/3d.png" alt="ARIA" onerror="this.style.opacity='.25'">
         </div>
-        <div class="wlc-title">ARIA</div>
-        <div class="wlc-sub">ASISTENTE IA · DATASYS ECOSYSTEM</div>
-        <p class="wlc-desc">"Bienvenido al ecosistema DATASYS. Soy ARIA, tu asistente inteligente.
-
-Para comenzar, selecciona una de nuestras 10 plataformas en el menú lateral izquierdo. Una vez seleccionada, verás el tema activo en la barra superior.
-
-Estoy lista para resolver cualquier duda sobre el área en la que te encuentres: desde costos y servicios hasta soporte técnico o facturación. ¿En qué puedo apoyarte hoy?"</p>
+        <div class="wlc-title" style="font-size:clamp(1rem,2.8vw,1.45rem);letter-spacing:.04em;line-height:1.3;">Reduce hasta 30% los tiempos de producción</div>
+        <p class="wlc-desc">Automatiza tu operación industrial con IA sin cambiar tu infraestructura actual. ¿Qué quieres mejorar?</p>
         <div class="wlc-chips" id="wlc-chips">
-          <div class="wlc-chip" onclick="enviarPregunta('¿Qué servicios ofrece DATASYS?')">¿Qué servicios ofrecen?</div>
-          <div class="wlc-chip" onclick="seleccionarPlat('apps')">Apps & Software</div>
-          <div class="wlc-chip" onclick="seleccionarPlat('cyber')">Ciberseguridad</div>
-          <div class="wlc-chip" onclick="seleccionarPlat('bio')">Biotecnología · Serie A</div>
-          <div class="wlc-chip" onclick="enviarPregunta('¿Cómo puedo contratar?')">¿Cómo contratar?</div>
-          <div class="wlc-chip" onclick="enviarPregunta('Necesito un presupuesto')">Solicitar presupuesto</div>
+          <div class="wlc-chip" onclick="seleccionarPlat('produccion')">🏭 Producción</div>
+          <div class="wlc-chip" onclick="seleccionarPlat('inventarios')">📦 Inventarios</div>
+          <div class="wlc-chip" onclick="seleccionarPlat('logistica')">🚚 Logística</div>
         </div>
       </div>
     </div>
@@ -484,54 +453,33 @@ Estoy lista para resolver cualquier duda sobre el área en la que te encuentres:
 
 /* ── ARIA_DB: carga las 10 bases de js/ ── */
 var ARIA_DB = {
-  "datos":    typeof ARIA_datos    !== "undefined" ? ARIA_datos    : [],
-  "bio":      typeof ARIA_bio      !== "undefined" ? ARIA_bio      : [],
-  "apps":     typeof ARIA_apps     !== "undefined" ? ARIA_apps     : [],
-  "bolsa":    typeof ARIA_bolsa    !== "undefined" ? ARIA_bolsa    : [],
-  "auto":     typeof ARIA_auto     !== "undefined" ? ARIA_auto     : [],
-  "inv":      typeof ARIA_inv      !== "undefined" ? ARIA_inv      : [],
-  "cyber":    typeof ARIA_cyber    !== "undefined" ? ARIA_cyber    : [],
-  "consul":   typeof ARIA_consul   !== "undefined" ? ARIA_consul   : [],
-  "revista":  typeof ARIA_revista  !== "undefined" ? ARIA_revista  : [],
-  "clientes": typeof ARIA_clientes !== "undefined" ? ARIA_clientes : []
+  "produccion":  typeof ARIA_produccion  !== "undefined" ? ARIA_produccion  : [],
+  "inventarios": typeof ARIA_inventarios !== "undefined" ? ARIA_inventarios : [],
+  "logistica":   typeof ARIA_logistica   !== "undefined" ? ARIA_logistica   : []
 };
 
 /* ── SECCIONES: alias + labels ── */
 var ARIA_SECCIONES = {
-  "datos":    { alias:["análisis","analisis","datos","dashboard","analytics","machine learning","bi","business"],     label:"📊 Análisis de Datos",   url_desktop:"Desktop/analisis_datos_datasys.html",       url_mobile:"mobile/analisis_datos_datasys_mobile.html" },
-  "bio":      { alias:["biotecnología","biotecnologia","biotech","biodynamic","genómica","genomica","serie a","inversión biotech"], label:"🧬 Biotecnología",       url_desktop:"Desktop/biotecnologia_inversores_datasys.html", url_mobile:"mobile/biotecnologia_inversores_datasys_mobile.html" },
-  "apps":     { alias:["apps","aplicaciones","software","móvil","movil","ios","android","pwa","iot"],                label:"📱 Apps & Software",     url_desktop:"Desktop/apps_datasys.html",                 url_mobile:"mobile/apps_datasys_mobile.html" },
-  "bolsa":    { alias:["bolsa","valores","trading","fintech","mercados","acciones","nyse","nasdaq"],                 label:"📈 Bolsa de Valores",    url_desktop:"Desktop/bolsa_us_datasys.html",             url_mobile:"mobile/bolsa_us_datasys_mobile.html" },
-  "auto":     { alias:["automatización","automatizacion","industrial","robots","industria 4","iiot","rpa"],          label:"🤖 Automatización",      url_desktop:"Desktop/automatizacion_datasys.html",       url_mobile:"mobile/automatizacion_datasys_mobile.html" },
-  "inv":      { alias:["inventario","stock","almacén","almacen","supply","blockchain","cadena"],                    label:"📦 Inventario Virtual",  url_desktop:"Desktop/inventario_virtual_datasys.html",   url_mobile:"mobile/inventario_virtual_datasys_mobile.html" },
-  "cyber":    { alias:["ciberseguridad","seguridad","cyber","soc","hack","pentest","zero trust","iso 27001"],       label:"🔐 Ciberseguridad",      url_desktop:"Desktop/ciberseguridad_datasys.html",       url_mobile:"mobile/ciberseguridad_datasys_mobile.html" },
-  "consul":   { alias:["consultoría","consultoria","consultor","conferencia","conferencias","estrategia"],          label:"🎯 Consultoría",         url_desktop:"Desktop/consultoria_datasys.html",          url_mobile:"mobile/consultoria_datasys_mobile.html" },
-  "revista":  { alias:["revista","tech","artículo","articulo","noticias","publicación","publicacion"],             label:"📰 Revista Tech",        url_desktop:"Desktop/revista_datasys.html",              url_mobile:"mobile/revista_datasys_mobile.html" },
-  "clientes": { alias:["clientes","portal","área de clientes","login","acceso","mi cuenta","dashboard cliente"],   label:"👥 Área de Clientes",    url_desktop:"5436837/clientes_datasys.html",             url_mobile:"5436837/clientes_datasys_mobile.html" }
+  "produccion":  { alias:["producción","produccion","producir","manufactura","planta","proceso","procesos","kpi","rendimiento","línea","linea"], label:"🏭 Producción",   url_desktop:"Desktop/produccion_datasys.html",  url_mobile:"mobile/produccion_datasys_mobile.html" },
+  "inventarios": { alias:["inventario","inventarios","stock","almacén","almacen","entrada","salida","existencias","bodega","mercancía","mercancia"], label:"📦 Inventarios", url_desktop:"Desktop/inventarios_datasys.html", url_mobile:"mobile/inventarios_datasys_mobile.html" },
+  "logistica":   { alias:["logística","logistica","ruta","rutas","entrega","entregas","transporte","supply chain","cadena","distribución","distribucion","flete"], label:"🚚 Logística",   url_desktop:"Desktop/logistica_datasys.html",   url_mobile:"mobile/logistica_datasys_mobile.html" }
 };
 
 /* ── Quick buttons por sección ── */
 var QUICK_BY_SECTION = {
-  datos:    ["¿Qué es analytics?","Precios dashboards","¿Machine learning?","Demo Analytics"],
-  bio:      ["Ronda Serie A","Valuación empresa","¿Qué es Biodynamic AI?","Invertir en biotech"],
-  apps:     [],
-  bolsa:    ["Algoritmos de trading","Precios plataforma","NYSE/NASDAQ en vivo","Gestión de riesgo"],
-  auto:     ["Tipos de robots","Industria 4.0","Precios automatización","Integración IoT"],
-  inv:      ["¿Cómo funciona blockchain?","Control de inventario","Integración ERP","Precios"],
-  cyber:    ["¿Qué es SOC 24/7?","Zero Trust","Pentest Red Team","ISO 27001"],
-  consul:   ["Sesión gratuita","Tipos de consultoría","Conferencias globales","Precios"],
-  revista:  ["Suscripción impresa","¿Cómo funciona?","Temáticas de la revista","Colaborar"],
-  clientes: ["Acceder al portal","¿Qué incluye?","Soporte clientes","Dashboard"]
+  produccion:  ["¿Qué métricas monitorean?","Control de calidad","Eficiencia por línea","Reportes de producción"],
+  inventarios: ["¿Cómo funciona el sistema?","Control de entradas/salidas","Alertas de stock bajo","Integración ERP"],
+  logistica:   ["Seguimiento de rutas","Costos de distribución","¿Qué es supply chain?","Tiempos de entrega"]
 };
 
 /* ── Respuesta global cuando no hay sección activa ── */
 var RESPUESTA_GLOBAL_DATASYS = [
   { claves:["hola","hi","buenas","buenos","buen día","saludos","qué tal","que tal","hey"],
-    respuesta:"¡Hola! Soy <b>ARIA</b>, asistente IA del ecosistema <b>DATASYS</b>. Tenemos <b>10 plataformas tecnológicas</b>. Puedes seleccionar una en el menú lateral o preguntarme directamente. ¿En qué te puedo ayudar?" },
+    respuesta:"¡Hola! Soy <b>ARIA</b>, asistente IA del ecosistema <b>DATASYS</b>. Cubrimos <b>3 áreas clave</b>: Producción, Inventarios y Logística. Puedes seleccionar una en el menú lateral o preguntarme directamente. ¿En qué te puedo ayudar?" },
   { claves:["gracias","perfecto","ok","listo","entendido","excelente","genial","bien"],
     respuesta:"Con mucho gusto 😊 Si tienes más dudas o quieres ver una plataforma, usa el menú lateral o escríbeme. También puedes contactarnos en <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a>." },
   { claves:["servicio","servicios","ofrecen","hacen","plataformas","ecosistema","qué es datasys","que es"],
-    respuesta:"DATASYS es un <b>ecosistema tecnológico</b> con 10 plataformas integradas:<br>📊 Análisis de Datos · 🧬 Biotecnología · 📱 Apps & Software · 📈 Bolsa de Valores · 🤖 Automatización · 📦 Inventario Virtual · 🔐 Ciberseguridad · 🎯 Consultoría · 📰 Revista Tech · 👥 Área de Clientes<br><br>Toca cualquier ícono del menú lateral para saber más." },
+    respuesta:"DATASYS cubre <b>3 áreas operativas clave</b>:<br>🏭 Producción · 📦 Inventarios · 🚚 Logística<br><br>Toca cualquier área del menú lateral para saber más." },
   { claves:["contacto","correo","email","teléfono","telefono","llamar","whatsapp","ubicación","ubicacion","dónde","donde"],
     respuesta:"Puedes contactarnos por:<br>• <b>Email:</b> <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a><br>• <b>Teléfono/WhatsApp:</b> +52 (55) 1017-6436<br>• <b>Sede:</b> Ciudad de México, México<br>Respondemos en menos de <b>24 horas hábiles</b>." },
   { claves:["precio","costo","cuánto","cuanto","presupuesto","cotización","cotizacion","tarifa","inversión","inversion"],
@@ -549,6 +497,12 @@ function getMsgs(){ return document.getElementById('msgs'); }
 function esconderBienvenida(){
   var w = document.getElementById('welcome');
   if(w){ w.style.display='none'; }
+}
+
+/* ── MOSTRAR SIDEBAR ── */
+function mostrarSidebar(){
+  var app = document.getElementById('app');
+  if(app) app.classList.add('sidebar-visible');
 }
 
 /* ── SIDEBAR ── */
@@ -577,6 +531,7 @@ function addBot(html){
 }
 
 function addUsr(txt){
+  mostrarSidebar();
   esconderBienvenida();
   var w = getMsgs();
   var m = document.createElement('div');
@@ -706,6 +661,7 @@ function activarPlatBtn(key){
 /* ── SELECCIONAR PLATAFORMA (desde sidebar) ── */
 function seleccionarPlat(key){
   if(!ARIA_SECCIONES[key]) return;
+  mostrarSidebar();
   ariaSeccion = key;
   actualizarCtx();
   activarPlatBtn(key);
@@ -722,7 +678,7 @@ function volverMenu(){
   actualizarCtx();
   activarPlatBtn('');
   renderQuickBtns('');
-  addBot('Volviste al menú general de ARIA. ¿Sobre cuál de las <b>10 plataformas</b> DATASYS quieres saber más?<br><span style="opacity:.4;font-size:.8em;">Usa el menú lateral o escribe el nombre de la plataforma.</span>');
+  addBot('Volviste al menú general de ARIA. ¿Sobre cuál área quieres saber más?<br><span style="opacity:.4;font-size:.8em;">Usa el menú lateral o escribe: producción, inventarios o logística.</span>');
 }
 
 /* ── BÚSQUEDA LOCAL ── */
@@ -770,7 +726,7 @@ function fallback(){
     var url = isMob ? s.url_mobile : s.url_desktop;
     return 'No tengo esa información específica aquí, pero puedes ver todo sobre <b>'+s.label+'</b> en la plataforma completa:<br><a href="'+url+'" style="color:var(--cyan)">→ Ver plataforma completa</a><br><br>O contáctanos: <a href="mailto:contacto@datasys.mx" style="color:var(--cyan)">contacto@datasys.mx</a> · +52 (55) 1017-6436';
   }
-  return '¿Sobre cuál de las <b>10 plataformas</b> DATASYS quieres saber más? Puedes seleccionarla en el menú lateral o preguntarme directamente.<br><span style="opacity:.5;font-size:.8em;">📊 datos · 🧬 biotech · 📱 apps · 📈 bolsa · 🤖 auto · 📦 inventario · 🔐 cyber · 🎯 consultoría · 📰 revista · 👥 clientes</span>';
+  return '¿Sobre cuál área quieres saber más? Puedes seleccionarla en el menú lateral o preguntarme directamente.<br><span style="opacity:.5;font-size:.8em;">🏭 producción · 📦 inventarios · 🚚 logística</span>';
 }
 
 /* ── PROCESADOR PRINCIPAL ── */
