@@ -143,6 +143,7 @@ body::after{
 /* Mobile sidebar toggle */
 #sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;backdrop-filter:blur(4px);}
 #sidebar-toggle{display:none;background:none;border:1px solid rgba(0,229,255,.25);color:var(--cyan);padding:6px 10px;font-size:.8rem;cursor:pointer;border-radius:2px;}
+#sidebar-toggle.disabled{opacity:.25;pointer-events:none;border-color:rgba(0,229,255,.1);color:rgba(0,229,255,.3);}
 
 /* ══ CHAT AREA ══ */
 #chat-area{
@@ -322,11 +323,18 @@ body::after{
     grid-template-rows:56px 1fr;
   }
   #sidebar{
-    position:fixed;top:56px;left:-280px;width:280px;
+    position:fixed;top:56px;left:-290px;width:280px;
     height:calc(100vh - 56px);z-index:300;
-    transition:left .3s ease;
+    opacity:1 !important;visibility:visible !important;
+    transition:left .3s ease, box-shadow .3s ease;
+    background:rgba(6,15,28,.98);
+    box-shadow:none;
+    overflow-y:auto;
   }
-  #sidebar.open{left:0;}
+  #sidebar.open{
+    left:0;
+    box-shadow:4px 0 40px rgba(0,0,0,.8), 0 0 0 1px rgba(0,229,255,.15);
+  }
   #sidebar-overlay{display:block;}
   #sidebar-toggle{display:flex;align-items:center;gap:5px;}
   .tb-aria-lbl{display:none;}
@@ -515,6 +523,25 @@ var ariaSeccion = "";
 var sidebarOpen = false;
 var esperandoTamaño = false;
 
+/* ── TOGGLE BTN: habilitar / deshabilitar ── */
+function setSidebarToggle(enabled){
+  var btn = document.getElementById('sidebar-toggle');
+  if(!btn) return;
+  if(enabled){
+    btn.classList.remove('disabled');
+    btn.title = 'Menú de plataformas';
+  } else {
+    btn.classList.add('disabled');
+    // Cerrar sidebar si estaba abierto
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('sidebar-overlay');
+    sidebarOpen = false;
+    if(sb) sb.classList.remove('open');
+    if(ov) ov.style.display = 'none';
+    btn.title = 'Selecciona una plataforma primero';
+  }
+}
+
 /* ── HELPERS DE DOM ── */
 function getMsgs(){ return document.getElementById('msgs'); }
 function esconderBienvenida(){
@@ -554,7 +581,8 @@ function addBot(html){
 }
 
 function addUsr(txt){
-  mostrarSidebar();
+  // Solo mostrar sidebar en desktop
+  if(window.innerWidth > 768) mostrarSidebar();
   esconderBienvenida();
   var w = getMsgs();
   var m = document.createElement('div');
@@ -684,16 +712,27 @@ function activarPlatBtn(key){
 /* ── SELECCIONAR PLATAFORMA (desde sidebar) ── */
 function seleccionarPlat(key){
   if(!ARIA_SECCIONES[key]) return;
-  mostrarSidebar();
+
+  // Cerrar sidebar en mobile ANTES de procesar
+  if(window.innerWidth <= 768){
+    var sb = document.getElementById('sidebar');
+    var ov = document.getElementById('sidebar-overlay');
+    sidebarOpen = false;
+    if(sb) sb.classList.remove('open');
+    if(ov) ov.style.display = 'none';
+  }
+
+  // Evitar duplicar mensaje si ya está en esta sección
+  if(ariaSeccion === key && esperandoTamaño) return;
+
   ariaSeccion = key;
-  // Registrar en perfil de usuario
   if(typeof registrarSeccion === 'function') registrarSeccion(key);
   esperandoTamaño = true;
   actualizarCtx();
   activarPlatBtn(key);
   renderTamanosEmpresa();
-  // Cerrar sidebar en mobile
-  if(window.innerWidth <= 700) toggleSidebar();
+  setSidebarToggle(true); // habilitar ☰
+
   var lbl = ARIA_SECCIONES[key].label;
   var saludo = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ', <b>' + ARIA_USER.nombre + '</b>' : '';
   addBot('Perfecto' + saludo + ', vamos a <b>' + lbl + '</b>.<br>Para darte la recomendación más precisa: ¿cuántos empleados tiene tu empresa?');
@@ -719,6 +758,7 @@ function volverMenu(){
   actualizarCtx();
   activarPlatBtn('');
   renderQuickBtns('');
+  setSidebarToggle(false); // deshabilitar ☰
   addBot('Volviste al menú general de ARIA. ¿Sobre cuál área quieres saber más?<br><span style="opacity:.4;font-size:.8em;">Usa el menú lateral o escribe: producción, inventarios o logística.</span>');
 }
 
@@ -863,11 +903,13 @@ function enviarPregunta(txt){
 
 /* ── INIT: mensaje de bienvenida ── */
 window.addEventListener('DOMContentLoaded', function(){
+  // Deshabilitar ☰ al inicio — se habilita al seleccionar sección
+  setSidebarToggle(false);
+
   // Bienvenida automática tras 600ms
   setTimeout(function(){
     var w = getMsgs();
     var wp = document.getElementById('welcome');
-    // Solo si NO hay mensajes previos
     if(wp && wp.style.display !== 'none'){
       // La pantalla de bienvenida ya está visible, no agregar mensaje adicional
     }
