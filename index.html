@@ -8,9 +8,10 @@
     var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     var isMac = /Macintosh|MacIntel|MacPPC/i.test(ua);
     var isWin = /Win32|Win64|Windows/i.test(ua);
-    // Solo redirigir si es móvil real — nunca si es Mac o Windows aunque la ventana sea pequeña
-    if(isMobile && !isMac && !isWin)
-      window.location.replace("index_mobile.html");
+    var isSmallScreen = window.innerWidth <= 768;
+    // Redirigir si es móvil real O pantalla pequeña (funciona también en DevTools)
+    if((isMobile && !isMac && !isWin) || isSmallScreen)
+      window.location.replace("aria.html");
   })();
 </script>
 
