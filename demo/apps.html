@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DATASYS — Vista Móvil · Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --c: #00e5ff;
+    --bg: #030d18;
+    --bg2: #060f1c;
+    --glow: 0 0 16px rgba(0,229,255,.45);
+    --glow2: 0 0 32px rgba(0,229,255,.6);
+    --phone-w: 390px;
+    --phone-h: 844px;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    font-family: 'Orbitron', sans-serif;
+    overflow: hidden;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 30s linear infinite;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(0,40,80,.5) 0%, transparent 70%);
+    z-index: 0;
+  }
+
+  @keyframes gridMove {
+    0%   { background-position: 0 0; }
+    100% { background-position: 60px 60px; }
+  }
+
+  /* Floating ambient orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: .18;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .orb-1 { width: 500px; height: 500px; background: var(--c); top: -150px; left: -150px; animation: orbFloat 12s ease-in-out infinite; }
+  .orb-2 { width: 400px; height: 400px; background: #0033ff; bottom: -100px; right: -100px; animation: orbFloat 16s ease-in-out infinite reverse; }
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%       { transform: translate(40px, 30px) scale(1.08); }
+  }
+
+  /* Top label bar */
+  .top-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 50px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: rgba(3,13,24,.85);
+    border-bottom: 1px solid rgba(0,229,255,.12);
+    backdrop-filter: blur(20px);
+  }
+
+  .top-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .65rem;
+    letter-spacing: 4px;
+    color: var(--c);
+    text-shadow: var(--glow);
+  }
+
+  .top-brand .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: var(--glow);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.2;} }
+
+  .top-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .5rem;
+    letter-spacing: 3px;
+    color: rgba(0,229,255,.45);
+  }
+
+  .top-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .top-btn {
+    padding: 5px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .44rem;
+    letter-spacing: 2px;
+    color: var(--c);
+    background: transparent;
+    border: 1px solid rgba(0,229,255,.25);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .top-btn:hover { background: rgba(0,229,255,.08); border-color: rgba(0,229,255,.5); }
+
+  /* ── MAIN SCENE ── */
+  .scene {
+    position: fixed;
+    inset: 50px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  /* ── PHONE SHELL ── */
+  .phone-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Side glow trails */
+  .phone-wrap::before, .phone-wrap::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    width: 80px;
+    height: 60%;
+    background: linear-gradient(90deg, transparent, rgba(0,229,255,.06));
+    pointer-events: none;
+    border-radius: 40px;
+  }
+  .phone-wrap::before { right: calc(100% - 10px); transform: scaleX(-1); }
+  .phone-wrap::after  { left: calc(100% - 10px); }
+
+  .phone-shell {
+    position: relative;
+    width: calc(var(--phone-w) + 28px);
+    height: calc(var(--phone-h) + 56px);
+    background: linear-gradient(145deg, #1a2535 0%, #0c1624 40%, #060d18 100%);
+    border-radius: 52px;
+    box-shadow:
+      0 0 0 1px rgba(0,229,255,.18),
+      0 0 0 2px rgba(0,20,40,.8),
+      0 0 60px rgba(0,229,255,.12),
+      0 40px 120px rgba(0,0,0,.7),
+      inset 0 1px 0 rgba(255,255,255,.06),
+      inset 0 -1px 0 rgba(0,0,0,.4);
+    animation: phoneFloat 6s ease-in-out infinite;
+  }
+
+  @keyframes phoneFloat {
+    0%, 100% { transform: translateY(0) rotateX(0deg) rotateY(0deg); }
+    25%       { transform: translateY(-6px) rotateX(.8deg) rotateY(.4deg); }
+    50%       { transform: translateY(-10px) rotateX(0deg) rotateY(0deg); }
+    75%       { transform: translateY(-4px) rotateX(-.6deg) rotateY(-.3deg); }
+  }
+
+  /* Side buttons */
+  .btn-vol-up, .btn-vol-dn, .btn-power {
+    position: absolute;
+    background: linear-gradient(90deg, #0d1e30, #1a2e44);
+    border-radius: 3px;
+    box-shadow: 0 0 6px rgba(0,229,255,.08);
+  }
+  .btn-vol-up { left: -4px; top: 140px; width: 4px; height: 36px; }
+  .btn-vol-dn { left: -4px; top: 188px; width: 4px; height: 36px; }
+  .btn-power  { right: -4px; top: 180px; width: 4px; height: 60px; }
+
+  /* Notch / Dynamic Island */
+  .phone-notch {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 34px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 0 12px rgba(0,0,0,.8);
+  }
+  .notch-camera {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #0a0a0a;
+    border: 1px solid #111;
+    position: relative;
+  }
+  .notch-camera::after {
+    content: '';
+    position: absolute;
+    top: 2px; left: 2px;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: rgba(0,229,255,.2);
+  }
+  .notch-speaker {
+    width: 40px; height: 4px;
+    background: #111;
+    border-radius: 4px;
+  }
+
+  /* Screen area */
+  .phone-screen {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    border-radius: 40px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.4);
+  }
+
+  /* Status bar overlay */
+  .status-bar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 66px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    pointer-events: none;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+  }
+  .sb-time {
+    font-family: 'Orbitron', sans-serif;
+    font-size: .55rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .sb-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .5rem;
+    color: #fff;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .sb-battery {
+    width: 22px; height: 11px;
+    border: 1px solid rgba(255,255,255,.6);
+    border-radius: 2px;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    padding: 1.5px;
+  }
+  .sb-battery::after {
+    content: '';
+    position: absolute;
+    right: -4px;
+    width: 3px; height: 5px;
+    background: rgba(255,255,255,.5);
+    border-radius: 0 1px 1px 0;
+  }
+  .sb-battery-fill {
+    width: 70%;
+    height: 100%;
+    background: #fff;
+    border-radius: 1px;
+  }
+
+  /* Home indicator */
+  .home-indicator {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130px; height: 5px;
+    background: rgba(255,255,255,.2);
+    border-radius: 3px;
+    z-index: 50;
+    pointer-events: none;
+  }
+
+  /* The iframe */
+  .phone-iframe {
+    position: absolute;
+    top: 66px;
+    left: 0; right: 0;
+    bottom: 20px;
+    width: 100%;
+    height: calc(100% - 86px);
+    border: none;
+    background: #030d18;
+    border-radius: 0 0 36px 36px;
+    overflow: hidden;
+  }
+
+  /* Screen reflection */
+  .screen-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.04) 0%, transparent 40%);
+    border-radius: 40px;
+    pointer-events: none;
+    z-index: 60;
+  }
+
+  /* Bottom reflection below phone */
+  .phone-reflection {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(var(--phone-w) + 28px);
+    height: 40px;
+    background: linear-gradient(180deg, rgba(0,229,255,.06) 0%, transparent 100%);
+    filter: blur(8px);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Info panel beside phone */
+  .info-panel {
+    position: absolute;
+    right: calc(50% - 380px - 220px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .info-card {
+    background: rgba(0,229,255,.03);
+    border: 1px solid rgba(0,229,255,.12);
+    padding: 14px 16px;
+  }
+
+  .info-card-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .4rem;
+    letter-spacing: 3px;
+    color: rgba(0,229,255,.5);
+    margin-bottom: 6px;
+  }
+
+  .info-card-val {
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--c);
+    letter-spacing: 1px;
+  }
+
+  .info-card-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .38rem;
+    letter-spacing: 2px;
+    color: rgba(142,184,204,.4);
+    margin-top: 3px;
+  }
+
+  /* Clock update */
+  .live-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .42rem;
+    letter-spacing: 2px;
+    color: rgba(0,229,255,.5);
+  }
+  .live-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #00ff88;
+    box-shadow: 0 0 6px #00ff88;
+    animation: blink 1.5s ease-in-out infinite;
+  }
+
+  /* Responsive: scale phone on smaller screens */
+  @media (max-height: 780px) {
+    :root { --phone-h: 750px; }
+  }
+  @media (max-width: 900px) {
+    .info-panel { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<!-- TOP BAR -->
+<header class="top-bar">
+  <div class="top-brand">
+    <div class="dot"></div>
+    DATASYS
+    <span style="opacity:.3;">·</span>
+    <span style="font-family:'Share Tech Mono',monospace; font-size:.5rem; letter-spacing:3px; color:rgba(0,229,255,.55); font-weight:400;">ECOSISTEMA TECNOLÓGICO</span>
+  </div>
+  <div class="top-label">// VISTA PREVIA MÓVIL · LAPTOP DISPLAY</div>
+  <div class="top-actions">
+    <div class="live-indicator">
+      <div class="live-dot"></div>
+      <span id="clockLabel">00:00</span>
+    </div>
+    <button class="top-btn" onclick="reloadPhone()">↺ RELOAD</button>
+    <button class="top-btn" onclick="goBack()">← VOLVER</button>
+  </div>
+</header>
+
+<!-- SCENE -->
+<div class="scene">
+
+  <!-- INFO PANEL LEFT -->
+  <div class="info-panel" style="left: calc(50% - 380px - 220px); right: auto;">
+    <div class="info-card">
+      <div class="info-card-label">// DISPOSITIVO</div>
+      <div class="info-card-val">iPhone 15 Pro</div>
+      <div class="info-card-sub">390 × 844 · 3x RETINA</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">// VIEWPORT</div>
+      <div class="info-card-val">390px</div>
+      <div class="info-card-sub">MOBILE · PORTRAIT</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">// PLATAFORMA</div>
+      <div class="info-card-val">iOS · PWA</div>
+      <div class="info-card-sub">DATASYS APP OFICIAL</div>
+    </div>
+  </div>
+
+  <!-- PHONE -->
+  <div class="phone-wrap">
+    <div class="phone-shell">
+
+      <!-- Physical buttons -->
+      <div class="btn-vol-up"></div>
+      <div class="btn-vol-dn"></div>
+      <div class="btn-power"></div>
+
+      <!-- Screen -->
+      <div class="phone-screen">
+
+        <!-- Status bar overlay -->
+        <div class="status-bar">
+          <div class="sb-time" id="statusTime">9:41</div>
+          <div class="sb-icons">
+            <span>▲▲▲</span>
+            <span>WiFi</span>
+            <div class="sb-battery"><div class="sb-battery-fill"></div></div>
+          </div>
+        </div>
+
+        <!-- Dynamic island / Notch -->
+        <div class="phone-notch">
+          <div class="notch-camera"></div>
+          <div class="notch-speaker"></div>
+        </div>
+
+        <!-- The actual mobile site -->
+        <iframe
+          class="phone-iframe"
+          id="phoneSite"
+          src="index_administracion.html"
+          title="DATASYS Mobile"
+          scrolling="yes"
+        ></iframe>
+
+        <!-- Reflection shimmer -->
+        <div class="screen-shine"></div>
+
+        <!-- Home indicator -->
+        <div class="home-indicator"></div>
+
+      </div><!-- /phone-screen -->
+
+    </div><!-- /phone-shell -->
+
+    <!-- Shadow reflection -->
+    <div class="phone-reflection"></div>
+
+  </div><!-- /phone-wrap -->
+
+  <!-- INFO PANEL RIGHT -->
+  <div class="info-panel">
+    <div class="info-card">
+      <div class="info-card-label">// PÁGINAS</div>
+      <div class="info-card-val">9</div>
+      <div class="info-card-sub">PLATAFORMAS ACTIVAS</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">// ESTADO</div>
+      <div class="info-card-val" style="color:#00ff88;">LIVE</div>
+      <div class="info-card-sub">PRODUCCIÓN · v2.6</div>
+    </div>
+    <div class="info-card">
+      <div class="info-card-label">// IA ASISTENTE</div>
+      <div class="info-card-val">ARIA</div>
+      <div class="info-card-sub">24/7 ONLINE</div>
+    </div>
+  </div>
+
+</div><!-- /scene -->
+
+<script>
+  // Live clock in status bar
+  function updateClock() {
+    const now = new Date();
+    const h = String(now.getHours()).padStart(2, '0');
+    const m = String(now.getMinutes()).padStart(2, '0');
+    const timeStr = h + ':' + m;
+    document.getElementById('statusTime').textContent = timeStr;
+    document.getElementById('clockLabel').textContent = timeStr;
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  function reloadPhone() {
+    const iframe = document.getElementById('phoneSite');
+    iframe.src = iframe.src;
+  }
+
+  function goBack() {
+    window.location.href = 'Desktop/apps_datasys.html';
+  }
+</script>
+
+</body>
+</html>

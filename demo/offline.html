@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#060a06">
+<title>CFE·SICL — Sin conexión</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black:   #060a06;
+    --surface: #0d130d;
+    --card:    #111a11;
+    --border:  #1c2e1c;
+    --green:   #00e5a0;
+    --orange:  #ff9500;
+    --text:    #d8edd8;
+    --muted:   #4a6e4a;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    height: 100%;
+    background: var(--black);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,229,160,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,160,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+  }
+  .wrapper {
+    position: relative; z-index: 1;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.25rem;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .logo {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(3rem, 12vw, 5rem);
+    letter-spacing: 10px;
+    color: var(--green);
+    line-height: 1;
+  }
+  .logo span { color: #ffe033; }
+  .icon { font-size: 3.5rem; }
+  .title {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(1.4rem, 6vw, 2rem);
+    letter-spacing: 4px;
+    color: var(--orange);
+  }
+  .msg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    max-width: 280px;
+    line-height: 1.7;
+    text-transform: uppercase;
+  }
+  .notice {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--green);
+    padding: 1rem 1.25rem;
+    max-width: 340px;
+    width: 100%;
+    text-align: left;
+  }
+  .notice-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 0.5rem;
+  }
+  .notice-body {
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .btn {
+    display: inline-block;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    color: var(--black);
+    background: var(--green);
+    padding: 0.75rem 2rem;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { opacity: 0.8; }
+  .footer {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    opacity: 0.45;
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="logo">CFE·<span>SICL</span></div>
+  <div class="icon">📡</div>
+  <div class="title">Sin Conexión</div>
+  <div class="msg">No se detecta conexión a internet en este momento</div>
+
+  <div class="notice">
+    <div class="notice-title">ℹ️ Modo offline</div>
+    <div class="notice-body">
+      Los datos guardados localmente siguen disponibles.
+      Verifica tu red Wi-Fi o datos móviles e intenta de nuevo.
+    </div>
+  </div>
+
+  <button class="btn" onclick="location.reload()">Reintentar</button>
+
+  <div class="footer">SICL · Modo sin conexión</div>
+</div>
+</body>
+</html>
