@@ -22,6 +22,8 @@
 <script src="js/produccion.js"></script>
 <script src="js/inventarios.js"></script>
 <script src="js/logistica.js"></script>
+<!-- ══ MOTOR DE VENTAS INTELIGENTE ══ -->
+<script src="js/aria_sales_engine.js"></script>
 
 <style>
 /* ══ RESET & VARIABLES ══ */
@@ -221,6 +223,7 @@ body::after{
   max-width:82%;animation:msgIn .3s ease both;
 }
 @keyframes msgIn{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:none;}}
+@keyframes pricePulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(239,68,68,.3);}50%{opacity:.7;box-shadow:0 0 14px rgba(239,68,68,.6);}}
 .msg.bot{align-self:flex-start;}
 .msg.usr{align-self:flex-end;flex-direction:row-reverse;}
 
@@ -488,9 +491,29 @@ var RESPUESTA_GLOBAL_DATASYS = [
     respuesta:"Para iniciar con DATASYS:<br>1. Selecciona la plataforma de tu interés en el menú lateral<br>2. Contáctanos en <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a><br>3. Agendamos una sesión sin costo<br>4. Entregamos propuesta en 48 hrs" }
 ];
 
+/* ── Soluciones por Tamaño de Empresa ── */
+var SOLUCIONES_TAMAÑO = {
+  "produccion": {
+    "1 - 20 empleados": "Solución recomendada: <b>Software de Control de Órdenes Ligero</b>. Estandariza tus procesos básicos sin gran inversión. Ahorro estimado: 15% en tiempo de producción.  → cotización estimada: $ 750 USD MENSUALES",
+    "20 - 100 empleados": "Solución recomendada: <b>ERP de Producción Modular</b> con alertas de calidad automatizadas. Ahorro estimado: 20% en tiempo de producción y mermas. → cotización estimada: $ 800 USD MENSUALES",
+    "+ 100 empleados": "Solución recomendada: <b>Automatización de procesos con IA y monitoreo en tiempo real</b>. Ahorro estimado: 25% en tiempo de producción. → cotización estimada: $ 1000 USD MENSUALES"
+  },
+  "inventarios": {
+    "1 - 20 empleados": "Solución recomendada: <b>Sistema Básico de Entradas y Salidas en la Nube</b>. Ideal para visualizar tu stock al instante. Precisión de inventario: +90%. → cotización estimada: $ 299.00 USD",
+    "20 - 100 empleados": "Solución recomendada: <b>Gestor de Inventarios Multi-Almacén</b> con códigos de barras. Optimiza tus reabastecimientos. Reducción de quiebres de stock: 30%. → cotización estimada: $ 299.00 USD",
+    "+ 100 empleados": "Solución recomendada: <b>WMS inteligente impulsado por IA</b> con predicción de demanda y rotación. Análisis predictivo. Precisión de stock: 99.9%. → cotización estimada: $ 299.00 USD"
+  },
+  "logistica": {
+    "1 - 20 empleados": "Solución recomendada: <b>Rastreo GPS Simplificado</b> para unidades. Monitorea ubicación en tiempo real. Aumento de entregas exitosas: 15%. → cotización estimada: $ 500 USD MENSUALES",
+    "20 - 100 empleados": "Solución recomendada: <b>Optimizador de Rutas Dinámico</b>. Reduce el consumo de combustible y tiempos de entrega. Ahorro en combustible: 20%. → cotización estimada: $ 700  USD MENSUALES", 
+    "+ 100 empleados": "Solución recomendada: <b>Plataforma Integral de Supply Chain con IA</b>. Control de flotillas, análisis predictivo de rutas y control de costos. Reducción en tiempos de entrega: 30%. → cotización estimada: $ 1000 USD MENSUALES"
+  }
+};
+
 /* ── Estado ── */
 var ariaSeccion = "";
 var sidebarOpen = false;
+var esperandoTamaño = false;
 
 /* ── HELPERS DE DOM ── */
 function getMsgs(){ return document.getElementById('msgs'); }
@@ -663,18 +686,36 @@ function seleccionarPlat(key){
   if(!ARIA_SECCIONES[key]) return;
   mostrarSidebar();
   ariaSeccion = key;
+  // Registrar en perfil de usuario
+  if(typeof registrarSeccion === 'function') registrarSeccion(key);
+  esperandoTamaño = true;
   actualizarCtx();
   activarPlatBtn(key);
-  renderQuickBtns(key);
+  renderTamanosEmpresa();
   // Cerrar sidebar en mobile
   if(window.innerWidth <= 700) toggleSidebar();
   var lbl = ARIA_SECCIONES[key].label;
-  addBot('Entraste a <b>'+lbl+'</b>. Pregúntame lo que necesites sobre esta plataforma.<br><span style="opacity:.4;font-size:.8em;">Usa los botones de abajo o escribe tu pregunta.</span>');
+  var saludo = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ', <b>' + ARIA_USER.nombre + '</b>' : '';
+  addBot('Perfecto' + saludo + ', vamos a <b>' + lbl + '</b>.<br>Para darte la recomendación más precisa: ¿cuántos empleados tiene tu empresa?');
+}
+
+function renderTamanosEmpresa() {
+  var row = document.getElementById('quick-row');
+  if(!row) return;
+  row.style.flexDirection = '';
+  row.style.gap = '';
+  row.style.padding = '';
+  row.style.display = 'flex';
+  var btns = ["1 - 20 empleados", "20 - 100 empleados", "+ 100 empleados"];
+  row.innerHTML = btns.map(function(b){
+    return '<button class="qchip" onclick="enviarPregunta(\''+b+'\')">' + b + '</button>';
+  }).join('');
 }
 
 /* ── VOLVER AL MENÚ ── */
 function volverMenu(){
   ariaSeccion = '';
+  esperandoTamaño = false;
   actualizarCtx();
   activarPlatBtn('');
   renderQuickBtns('');
@@ -729,7 +770,7 @@ function fallback(){
   return '¿Sobre cuál área quieres saber más? Puedes seleccionarla en el menú lateral o preguntarme directamente.<br><span style="opacity:.5;font-size:.8em;">🏭 producción · 📦 inventarios · 🚚 logística</span>';
 }
 
-/* ── PROCESADOR PRINCIPAL ── */
+/* ── PROCESADOR PRINCIPAL (v2 con Motor de Ventas) ── */
 function procesarMensaje(texto){
   var t = texto.toLowerCase();
 
@@ -738,27 +779,52 @@ function procesarMensaje(texto){
     volverMenu(); return;
   }
 
-  // Buscar primero en base local (global o por sección)
+  // ── MOTOR DE VENTAS: acumular perfil del usuario ──
+  if(typeof detectarContexto === 'function') detectarContexto(texto);
+
+  // ── FLUJO: esperando tamaño de empresa ──
+  if (esperandoTamaño) {
+    if (t.includes("1") || t.includes("20") || t.includes("100") || t.includes("empleado") || t.includes("pequeña") || t.includes("mediana") || t.includes("grande")) {
+      var tamano = (typeof resolverTamanoTexto === 'function') ? resolverTamanoTexto(texto) : "mediana";
+
+      // Si está disponible la versión v2 del discurso usa esa, sino la v1
+      if (ariaSeccion && typeof SOLUCIONES_TAMAÑO_V2 !== 'undefined'
+          && SOLUCIONES_TAMAÑO_V2[ariaSeccion] && SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano]) {
+        var html = SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano](tamano);
+        addBot(html);
+      } else if (ariaSeccion && SOLUCIONES_TAMAÑO[ariaSeccion]) {
+        // fallback a v1
+        var keyV1 = tamano === 'pequeña' ? '1 - 20 empleados' : tamano === 'mediana' ? '20 - 100 empleados' : '+ 100 empleados';
+        var solucion = SOLUCIONES_TAMAÑO[ariaSeccion][keyV1] || '';
+        addBot(solucion);
+      }
+      esperandoTamaño = false;
+      renderQuickBtns(ariaSeccion);
+      return;
+    }
+    // No coincide tamaño → procesar como duda normal
+    esperandoTamaño = false;
+    renderQuickBtns(ariaSeccion);
+  }
+
+  // ── MOTOR DE VENTAS: interceptar intención de precio/cotización ──
+  if(typeof respuestaInteligente === 'function' && ariaSeccion){
+    var inteligente = respuestaInteligente(texto, ariaSeccion);
+    if(inteligente){ addBot(inteligente); return; }
+  }
+
+  // ── BUSCAR en base local (global o sección activa) ──
   var local = buscarLocal(texto);
   if(local){ addBot(local); return; }
 
-  // Si no hay sección activa, intentar detectar una por el texto
+  // ── Sin sección: detectar por texto ──
   if(!ariaSeccion){
     var destino = detectarSeccion(texto);
     if(destino){
-      ariaSeccion = destino;
-      actualizarCtx();
-      activarPlatBtn(destino);
-      renderQuickBtns(destino);
-      var local2 = buscarLocal(texto);
-      if(local2){
-        addBot('<span style="opacity:.45;font-size:.78em;">// '+ARIA_SECCIONES[destino].label+'</span><br>'+local2+'<br><span style="opacity:.35;font-size:.76em;">Escribe <b>salir</b> para volver al menú general.</span>');
-      } else {
-        addBot('Entraste a <b>'+ARIA_SECCIONES[destino].label+'</b>. Pregúntame lo que necesites.<br><span style="opacity:.35;font-size:.76em;">Escribe <b>salir</b> para volver al menú.</span>');
-      }
+      seleccionarPlat(destino);
       return;
     }
-    // Buscar en respuestas globales
+    // Respuestas globales
     for(var i=0;i<RESPUESTA_GLOBAL_DATASYS.length;i++){
       var item = RESPUESTA_GLOBAL_DATASYS[i];
       if(item.claves.some(function(c){ return t.includes(c); })){
@@ -767,7 +833,16 @@ function procesarMensaje(texto){
     }
   }
 
-  // Sin match: fallback
+  // ── Sin match: preguntas de descubrimiento antes de fallback genérico ──
+  if(ariaSeccion && typeof siguientePreguntaDescubrimiento === 'function'){
+    var discovery = siguientePreguntaDescubrimiento(ariaSeccion);
+    if(discovery){
+      addBot(discovery);
+      return;
+    }
+  }
+
+  // ── Último recurso: fallback ──
   addBot(fallback());
 }
 
@@ -805,6 +880,121 @@ window.addEventListener('DOMContentLoaded', function(){
     seleccionarPlat(platParam);
   }
 });
+</script>
+
+<!-- ══ MODAL ACUSE ARIA ══ -->
+<div id="ariaAcuseModal" style="position:fixed;inset:0;z-index:99200;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.95);backdrop-filter:blur(14px);">
+  <div style="background:#060f1c;border:1px solid rgba(0,229,255,.35);max-width:480px;width:92%;padding:0;animation:modalIn .4s both;position:relative;">
+    <div style="padding:16px 24px 12px;border-bottom:1px solid rgba(0,229,255,.12);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">MENSAJE ENVIADO</div>
+        <div style="font-family:'Orbitron',sans-serif;font-size:.76rem;font-weight:700;color:var(--cyan);letter-spacing:2px;">ACUSE DE RECIBO</div>
+      </div>
+      <button onclick="document.getElementById('ariaAcuseModal').style.display='none'" style="background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer;">✕</button>
+    </div>
+    <div style="padding:20px 24px;">
+      <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.12);margin-bottom:14px;">
+        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;opacity:.6;">FOLIO</span>
+        <span id="aa_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--cyan);"></span>
+        <span id="aa_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.4;"></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">NOMBRE</span>
+          <span id="aa_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">EMAIL</span>
+          <span id="aa_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:var(--cyan);font-weight:600;"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">TELÉFONO</span>
+          <span id="aa_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span>
+        </div>
+        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">SERVICIO</span>
+          <span id="aa_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f0c040;font-weight:700;"></span>
+        </div>
+        <div style="padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;display:block;margin-bottom:3px;">MENSAJE</span>
+          <span id="aa_msg" style="font-family:'Rajdhani',sans-serif;font-size:.84rem;color:#fff;line-height:1.5;"></span>
+        </div>
+      </div>
+      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#00ff88;line-height:1.8;margin-bottom:14px;">
+        Mensaje enviado a contacto@datasys.mx<br>Tiempo de respuesta: menos de 24 horas
+      </div>
+      <button onclick="document.getElementById('ariaAcuseModal').style.display='none'" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid var(--cyan);color:var(--cyan);cursor:pointer;">CERRAR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleAriaForm(){
+  var wrap = document.getElementById('aria-form-wrap');
+  var btn  = document.getElementById('af_toggle_btn');
+  if(!wrap) return;
+  if(wrap.style.maxHeight === '0px' || wrap.style.maxHeight === ''){
+    wrap.style.maxHeight = '700px';
+    wrap.style.opacity   = '1';
+    if(btn) btn.style.background = 'rgba(0,229,255,.15)';
+    if(btn) btn.style.color = 'var(--cyan)';
+    if(btn) btn.style.border = '1px solid var(--cyan)';
+  } else {
+    wrap.style.maxHeight = '0px';
+    wrap.style.opacity   = '0';
+    if(btn) btn.style.background = 'var(--cyan)';
+    if(btn) btn.style.color = 'var(--dark)';
+    if(btn) btn.style.border = 'none';
+  }
+}
+function sendAriaForm(){
+  var name    = (document.getElementById('af_name')||{}).value||'';
+  var email   = (document.getElementById('af_email')||{}).value||'';
+  var phone   = (document.getElementById('af_phone')||{}).value||'';
+  var empresa = (document.getElementById('af_empresa')||{}).value||'';
+  var service = (document.getElementById('af_service')||{}).value||'';
+  var message = (document.getElementById('af_message')||{}).value||'';
+  var errEl   = document.getElementById('af_error');
+  var btn     = document.getElementById('af_btn');
+  name=name.trim(); email=email.trim(); phone=phone.trim(); message=message.trim();
+  if(errEl) errEl.style.display='none';
+  if(!name)   { if(errEl){errEl.textContent='Ingresa tu nombre.'; errEl.style.display='block';} return; }
+  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+              { if(errEl){errEl.textContent='Ingresa un email válido.'; errEl.style.display='block';} return; }
+  empresa=empresa.trim();
+  if(!empresa){ if(errEl){errEl.textContent='Ingresa el nombre de tu empresa.'; errEl.style.display='block';} return; }
+  if(!message){ if(errEl){errEl.textContent='Escribe tu mensaje.'; errEl.style.display='block';} return; }
+  var folio = 'DS-'+Math.floor(Math.random()*90000+10000);
+  var fecha = new Date().toLocaleString('es-MX',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  if(btn){ btn.textContent='Enviando...'; btn.disabled=true; btn.style.background='rgba(0,229,255,.12)'; btn.style.color='var(--cyan)'; }
+  fetch('https://formspree.io/f/meelpnqr',{
+    method:'POST',
+    headers:{'Accept':'application/json','Content-Type':'application/json'},
+    body:JSON.stringify({name:name,email:email,phone:phone||'N/A',empresa:empresa,service:service,message:message,folio:folio,fecha:fecha,_replyto:email})
+  })
+  .then(function(r){ return r.json().then(function(d){return{ok:r.ok,data:d};}); })
+  .then(function(res){
+    if(res.ok){
+      document.getElementById('aa_folio').textContent   = folio;
+      document.getElementById('aa_fecha').textContent   = fecha;
+      document.getElementById('aa_nombre').textContent  = name;
+      document.getElementById('aa_email').textContent   = email;
+      document.getElementById('aa_phone').textContent   = phone||'—';
+      document.getElementById('aa_service').textContent = service;
+      document.getElementById('aa_msg').textContent     = message;
+      document.getElementById('ariaAcuseModal').style.display='flex';
+      var wrap = document.getElementById('aria-form-wrap');
+      if(wrap) wrap.innerHTML='<div style="text-align:center;padding:16px;font-family:Orbitron,sans-serif;font-size:.62rem;color:#00ff88;letter-spacing:2px;">✅ MENSAJE ENVIADO<br><span style=\"font-size:.5rem;opacity:.6;\">Folio: '+folio+'</span></div>';
+    } else {
+      if(errEl){errEl.textContent='Error al enviar. Intenta de nuevo.'; errEl.style.display='block';}
+      if(btn){ btn.textContent='ENVIAR MENSAJE'; btn.disabled=false; btn.style.background='var(--cyan)'; btn.style.color='var(--dark)'; }
+    }
+  })
+  .catch(function(){
+    if(errEl){errEl.textContent='Sin conexión. Intenta de nuevo.'; errEl.style.display='block';}
+    if(btn){ btn.textContent='ENVIAR MENSAJE'; btn.disabled=false; btn.style.background='var(--cyan)'; btn.style.color='var(--dark)'; }
+  });
+}
 </script>
 </body>
 </html>
