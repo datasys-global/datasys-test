@@ -469,7 +469,10 @@ function _respuestaInventarios(tamano) {
     + '<span>VER<br>DEMO</span>'
     + '</button>'
 
-    + '</div>';
+    + '</div>'
+
+    // Flag para que procesarMensaje lance el diagnóstico tras render
+    + '<span class="aria-trigger" data-trigger="diagnostico-inventarios" style="display:none;"></span>';
 }
 
 /* ──────────────────────────────────────────────────
@@ -560,7 +563,10 @@ function _respuestaLogistica(tamano) {
     + '<span>VER<br>DEMO</span>'
     + '</button>'
 
-    + '</div>';
+    + '</div>'
+
+    // Flag para diagnóstico guiado post-solución
+    + '<span class="aria-trigger" data-trigger="diagnostico-logistica" style="display:none;"></span>';
 }
 
 /* ──────────────────────────────────────────────────
