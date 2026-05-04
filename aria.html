@@ -568,15 +568,30 @@ function toggleSidebar(){
 function addBot(html){
   esconderBienvenida();
   var w = getMsgs();
-  // Typing
+  // Typing indicator
   var tp = document.createElement('div');
   tp.className = 'msg bot';
   tp.innerHTML = '<div class="msg-av"><img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'"></div><div class="bubble"><div class="typing-bub"><span></span><span></span><span></span></div></div>';
   w.appendChild(tp);
-  w.scrollTop = w.scrollHeight;
+  // Scroll al inicio del mensaje (typing indicator)
+  tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
   setTimeout(function(){
     tp.querySelector('.bubble').innerHTML = html;
-    w.scrollTop = w.scrollHeight;
+    // Scroll al inicio del mensaje ya renderizado
+    setTimeout(function(){
+      tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
+
+    // Detectar trigger de diagnóstico
+    var trigger = tp.querySelector('.aria-trigger[data-trigger]');
+    if(trigger){
+      var t = trigger.getAttribute('data-trigger');
+      setTimeout(function(){
+        if(t === 'diagnostico-inventarios') iniciarDiagnostico('inventarios');
+        else if(t === 'diagnostico-logistica') iniciarDiagnostico('logistica');
+        else if(t === 'diagnostico-produccion') iniciarDiagnostico('produccion');
+      }, 20000);
+    }
   }, 520);
 }
 
@@ -590,7 +605,7 @@ function addUsr(txt){
   m.innerHTML = '<div class="msg-av-usr">TÚ</div><div class="bubble"></div>';
   m.querySelector('.bubble').textContent = txt;
   w.appendChild(m);
-  w.scrollTop = w.scrollHeight;
+  m.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ── QUICK BUTTONS ── */
@@ -747,8 +762,189 @@ function renderTamanosEmpresa() {
   row.style.display = 'flex';
   var btns = ["1 - 20 empleados", "20 - 100 empleados", "+ 100 empleados"];
   row.innerHTML = btns.map(function(b){
-    return '<button class="qchip" onclick="enviarPregunta(\''+b+'\')">' + b + '</button>';
+    return '<button class="qchip" onclick="'
+      + 'if(typeof ARIA_USER!==\'undefined\') ARIA_USER.rangoEmpleados=\'' + b + '\';'
+      + 'enviarPregunta(\'' + b + '\')">' + b + '</button>';
   }).join('');
+}
+
+/* ── DIAGNÓSTICO GUIADO — botones de info clave post-solución ── */
+var DIAGNOSTICO_PASOS = {
+  inventarios: [
+    {
+      pregunta: '¿Cómo controlan su inventario actualmente?',
+      opciones: ['En Excel / hojas de cálculo', 'Sistema desactualizado', 'Sin sistema, es manual', 'Ya tenemos sistema pero falla']
+    },
+    {
+      pregunta: '¿Cuál es su mayor problema hoy?',
+      opciones: ['Quiebres de stock frecuentes', 'No sé qué tengo en bodega', 'Mermas y diferencias de inventario', 'Procesos muy lentos']
+    },
+    {
+      pregunta: '¿Con qué urgencia necesitan la solución?',
+      opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
+    },
+    {
+      pregunta: '¿Quién toma la decisión de compra?',
+      opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+    }
+  ],
+  logistica: [
+    {
+      pregunta: '¿Cómo gestionan sus entregas actualmente?',
+      opciones: ['Todo en Excel / WhatsApp', 'Sin sistema formal', 'Sistema propio que ya no alcanza', 'Tercerizamos todo']
+    },
+    {
+      pregunta: '¿Cuál es su mayor dolor en logística?',
+      opciones: ['Entregas tardías o fallidas', 'No sé dónde están mis unidades', 'Alto costo de combustible', 'Clientes se quejan constantemente']
+    },
+    {
+      pregunta: '¿Con qué urgencia necesitan la solución?',
+      opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
+    },
+    {
+      pregunta: '¿Quién toma la decisión de compra?',
+      opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+    }
+  ],
+  produccion: [
+    {
+      pregunta: '¿Cómo monitorean su producción hoy?',
+      opciones: ['Hojas de papel / Excel', 'Sistema desactualizado', 'De forma visual sin datos', 'Ya tenemos algo pero es insuficiente']
+    },
+    {
+      pregunta: '¿Cuál es su mayor problema en planta?',
+      opciones: ['Paros no planificados frecuentes', 'No sé mi OEE real', 'Alta tasa de rechazos / scrap', 'Retrasos en órdenes de producción']
+    },
+    {
+      pregunta: '¿Con qué urgencia necesitan la solución?',
+      opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
+    },
+    {
+      pregunta: '¿Quién toma la decisión de compra?',
+      opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+    }
+  ]
+};
+
+var _diagPaso = 0;
+var _diagRespuestas = [];
+
+function iniciarDiagnostico(seccion) {
+  _diagPaso = 0;
+  _diagRespuestas = [];
+
+  // Texto puente personalizado antes de las preguntas
+  var secLabel = {inventarios:'Inventarios', logistica:'Logística', produccion:'Producción'}[seccion] || seccion;
+  var tamano = (typeof ARIA_USER !== 'undefined' && ARIA_USER.tamaño) || null;
+  var rangoEmpleados = (typeof ARIA_USER !== 'undefined' && ARIA_USER.rangoEmpleados) || null;
+
+  // Texto legible del rango
+  var tamanoTexto = '';
+  if (rangoEmpleados) {
+    tamanoTexto = rangoEmpleados;
+  } else if (tamano === 'pequeña') {
+    tamanoTexto = '1 - 20 empleados';
+  } else if (tamano === 'mediana') {
+    tamanoTexto = '20 - 100 empleados';
+  } else if (tamano === 'grande') {
+    tamanoTexto = '+ 100 empleados';
+  }
+
+  var msg = '📊 Sabemos que tienes un reto en tu área de '
+    + '<b>' + secLabel + '</b>'
+    + (tamanoTexto ? ' y que tu empresa cuenta con <b>' + tamanoTexto + '</b>' : '')
+    + '.<br><br>'
+    + 'Te hemos propuesto una solución que en el <b style="color:#00ff88;">90% de los casos</b> '
+    + 'resuelve el problema satisfactoriamente. '
+    + 'El <b>10% restante también tiene solución</b> — solo hay que conocer un poco más tu operación.<br><br>'
+    + '<button onclick="this.parentNode.innerHTML=\'<span style=\\\'opacity:.4;font-size:.8rem;\\\'>Diagnóstico iniciado ✓</span>\';'
+    + 'if(typeof siguientePasoDiagnostico===\'function\') siguientePasoDiagnostico(\'' + seccion + '\');" '
+    + 'style="margin-top:4px;padding:12px 20px;font-family:\'Orbitron\',monospace;font-size:.55rem;font-weight:700;'
+    + 'letter-spacing:3px;background:transparent;color:var(--cyan);border:1px solid var(--cyan);cursor:pointer;'
+    + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
+    + '🔍 CONTINUAR CON EL DIAGNÓSTICO</button>';
+
+  addBot(msg);
+}
+
+function siguientePasoDiagnostico(seccion) {
+  var pasos = DIAGNOSTICO_PASOS[seccion];
+  if (!pasos || _diagPaso >= pasos.length) {
+    mostrarResumenDiagnostico(seccion);
+    return;
+  }
+  var paso = pasos[_diagPaso];
+  renderBotonesDiagnostico(paso.pregunta, paso.opciones, seccion);
+}
+
+function renderBotonesDiagnostico(pregunta, opciones, seccion) {
+  var row = document.getElementById('quick-row');
+  if (!row) return;
+
+  // Mostrar pregunta en el chat
+  var nombre = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ARIA_USER.nombre + ', ' : '';
+  addBot('🔍 <b>' + nombre + pregunta + '</b>');
+
+  // Renderizar botones horizontales con wrap
+  row.style.display = 'flex';
+  row.style.flexDirection = 'row';
+  row.style.flexWrap = 'wrap';
+  row.style.gap = '6px';
+  row.style.padding = '8px 16px';
+  row.innerHTML = opciones.map(function(op) {
+    return '<button class="qchip" style="flex:1;min-width:140px;max-width:48%;text-align:center;padding:9px 12px;font-size:.72rem;border-color:rgba(0,229,255,.2);" '
+      + 'onclick="responderDiagnostico(\'' + seccion + '\',\'' + op.replace(/'/g,"\\'") + '\')">'
+      + op + '</button>';
+  }).join('');
+}
+
+function responderDiagnostico(seccion, respuesta) {
+  // Registrar respuesta como dolor si aplica
+  if (typeof ARIA_USER !== 'undefined') {
+    ARIA_USER.dolor.push(respuesta);
+  }
+  _diagRespuestas.push(respuesta);
+  addUsr(respuesta);
+  _diagPaso++;
+  setTimeout(function() {
+    siguientePasoDiagnostico(seccion);
+  }, 400);
+}
+
+function mostrarResumenDiagnostico(seccion) {
+  var r = _diagRespuestas;
+  var nombre = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? '<b>' + ARIA_USER.nombre + '</b>, ' : '';
+  var secLabel = {inventarios:'Inventarios',logistica:'Logística',produccion:'Producción'}[seccion] || seccion;
+
+  var resumen = '✅ ' + nombre + 'gracias por compartir esta información.<br><br>'
+    + '<div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:12px 14px;margin:6px 0;">'
+    + '<div style="font-family:\'Orbitron\',monospace;font-size:.45rem;letter-spacing:3px;color:var(--cyan);margin-bottom:8px;opacity:.7;">// DIAGNÓSTICO COMPLETADO · ' + secLabel.toUpperCase() + '</div>'
+    + r.map(function(resp, i) {
+        return '<div style="font-size:.82rem;padding:4px 0;border-bottom:1px solid rgba(0,229,255,.06);display:flex;gap:8px;">'
+          + '<span style="color:var(--cyan);flex-shrink:0;">' + (i+1) + '.</span>'
+          + '<span style="opacity:.8;">' + resp + '</span></div>';
+      }).join('')
+    + '</div><br>'
+    + 'Con base en tu diagnóstico, tenemos una solución que encaja exactamente con tu operación. '
+    + 'Un especialista DATASYS te contactará en <b>menos de 2 horas</b> para mostrarte cómo lo resolvemos paso a paso.<br><br>'
+    + '<button onclick="iniciarCierreVenta(\'' + seccion + '\')" style="'
+    + 'padding:12px 20px;font-family:\'Orbitron\',monospace;font-size:.55rem;font-weight:700;'
+    + 'letter-spacing:3px;background:var(--cyan);color:var(--dark);border:none;cursor:pointer;'
+    + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
+    + '📩 HABLAR CON UN ESPECIALISTA →</button>';
+
+  addBot(resumen);
+
+  // Limpiar botones y volver a quick chips normales
+  setTimeout(function() {
+    var row = document.getElementById('quick-row');
+    if (row) {
+      row.style.flexDirection = '';
+      row.style.gap = '';
+      row.style.padding = '';
+    }
+    renderQuickBtns(seccion);
+  }, 600);
 }
 
 /* ── VOLVER AL MENÚ ── */
