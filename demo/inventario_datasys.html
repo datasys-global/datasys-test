@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#070d12">
+<title>Datasys · Inventario</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --cyan: #00d4ff;
+  --cyan2: #0af;
+  --cyan-glow: rgba(0,212,255,0.12);
+  --bg: #060c11;
+  --bg2: #0b1620;
+  --bg3: #101e2a;
+  --bg4: #162534;
+  --border: rgba(0,212,255,0.18);
+  --border-md: rgba(0,212,255,0.32);
+  --border-hi: rgba(0,212,255,0.55);
+  --text: #dff2ff;
+  --text-dim: #6a9ab0;
+  --text-mid: #a8cfe0;
+  --green: #00e676;
+  --red: #ff3d57;
+  --amber: #ffab00;
+  --purple: #b388ff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html { font-size: 14px; }
+
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* grid bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.022) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.app { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 16px 40px; }
+
+/* ── HEADER ── */
+.header {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.logo {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1.5px solid var(--border-md);
+  object-fit: cover; flex-shrink: 0;
+}
+
+.logo-fb {
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1.5px solid var(--border-md);
+  display: none; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace; font-size: 11px;
+  color: var(--cyan); background: var(--bg3); flex-shrink: 0;
+}
+
+.brand h1 {
+  font-family: 'Orbitron', monospace; font-size: 15px;
+  font-weight: 700; letter-spacing: 3px; color: var(--cyan);
+  line-height: 1;
+}
+
+.brand p {
+  font-size: 10px; color: var(--text-dim);
+  letter-spacing: 2px; text-transform: uppercase; margin-top: 2px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.header-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.pill {
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  letter-spacing: 2px; padding: 4px 10px; border-radius: 3px;
+  border: 1px solid; display: flex; align-items: center; gap: 5px;
+}
+
+.pill-online { color: var(--green); border-color: rgba(0,230,118,0.35); }
+.pill-online .dot { width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+/* ── STATS GRID ── */
+.stats {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media(max-width:640px){ .stats { grid-template-columns: repeat(2,1fr); } }
+
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 14px 16px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.stat-card::before {
+  content: ''; position: absolute; left:0;top:0;bottom:0;width:3px;
+  background: var(--accent, var(--cyan));
+  border-radius: 3px 0 0 3px;
+}
+
+.stat-card:hover { border-color: var(--border-md); }
+
+.stat-lbl {
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  margin-bottom: 6px;
+}
+
+.stat-val {
+  font-family: 'Orbitron', monospace; font-size: 24px;
+  font-weight: 700; color: var(--accent, var(--cyan)); line-height: 1;
+}
+
+.stat-sub { font-size: 10px; color: var(--text-dim); margin-top: 3px; }
+
+/* ── TOOLBAR ── */
+.toolbar {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 16px; flex-wrap: wrap;
+}
+
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+
+.search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--text-dim); font-size: 13px; pointer-events: none;
+}
+
+.search-inp {
+  width: 100%; padding: 9px 12px 9px 33px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text); font-size: 13px;
+  font-family: 'Rajdhani', sans-serif; font-weight: 500;
+  outline: none; transition: border-color 0.2s;
+}
+
+.search-inp:focus { border-color: var(--border-md); }
+.search-inp::placeholder { color: var(--text-dim); }
+
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.chip {
+  padding: 6px 12px; border-radius: 4px; font-size: 11px;
+  font-family: 'Rajdhani', sans-serif; font-weight: 600; letter-spacing: 0.5px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-dim); cursor: pointer; transition: all 0.18s; outline: none;
+}
+
+.chip.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-glow); }
+.chip:hover:not(.active) { border-color: var(--border-md); color: var(--text-mid); }
+
+/* ── ACTION BUTTONS ── */
+.btn {
+  padding: 8px 14px; border-radius: 6px; cursor: pointer;
+  font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 600;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  transition: all 0.18s; border: none; outline: none;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary { background: var(--cyan); color: var(--bg); }
+.btn-primary:hover { background: #22e0ff; }
+
+.btn-green { background: rgba(0,230,118,0.12); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+.btn-green:hover { background: rgba(0,230,118,0.2); }
+
+.btn-amber { background: rgba(255,171,0,0.1); color: var(--amber); border: 1px solid rgba(255,171,0,0.3); }
+.btn-amber:hover { background: rgba(255,171,0,0.18); }
+
+.btn-outline { background: transparent; color: var(--cyan); border: 1px solid var(--border-md); }
+.btn-outline:hover { background: var(--cyan-glow); }
+
+.btn-red { background: rgba(255,61,87,0.1); color: var(--red); border: 1px solid rgba(255,61,87,0.3); }
+.btn-red:hover { background: rgba(255,61,87,0.18); }
+
+/* ── MAIN GRID ── */
+.grid { display: grid; grid-template-columns: 1fr 360px; gap: 16px; align-items: start; }
+@media(max-width:900px){ .grid { grid-template-columns: 1fr; } }
+
+/* ── TABLE ── */
+.table-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+
+.table-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  background: rgba(0,212,255,0.04);
+}
+
+.table-title {
+  font-family: 'Orbitron', monospace; font-size: 10px;
+  font-weight: 600; letter-spacing: 2px; color: var(--cyan);
+}
+
+.table-wrap { overflow-x: auto; max-height: 480px; overflow-y: auto; }
+
+table { width: 100%; border-collapse: collapse; min-width: 640px; }
+
+thead th {
+  padding: 10px 14px; text-align: left;
+  font-family: 'Share Tech Mono', monospace; font-size: 9px;
+  letter-spacing: 2px; color: var(--text-dim); text-transform: uppercase;
+  background: var(--bg3); border-bottom: 1px solid var(--border);
+  white-space: nowrap; position: sticky; top: 0; z-index: 2;
+  cursor: pointer; user-select: none;
+}
+
+thead th:hover { color: var(--cyan); }
+thead th .sort-icon { margin-left: 4px; opacity: 0.4; }
+thead th.sorted .sort-icon { opacity: 1; color: var(--cyan); }
+
+tbody tr {
+  border-bottom: 1px solid rgba(0,212,255,0.07);
+  transition: background 0.15s;
+}
+
+tbody tr:hover { background: rgba(0,212,255,0.04); }
+
+tbody td {
+  padding: 10px 14px; font-size: 13px; font-weight: 500;
+  color: var(--text); vertical-align: middle;
+}
+
+.code-cell {
+  font-family: 'Share Tech Mono', monospace; font-size: 11px;
+  color: var(--text-dim); letter-spacing: 1px;
+}
+
+.qty-cell {
+  font-family: 'Orbitron', monospace; font-size: 15px; font-weight: 700;
+}
+
+.actions-cell { display: flex; gap: 6px; align-items: center; }
+
+.icon-btn {
+  width: 28px; height: 28px; border-radius: 5px; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; transition: all 0.15s; outline: none; background: transparent;
+}
+
+.icon-btn:hover { transform: scale(1.1); }
+.ib-in  { color: var(--green); border: 1px solid rgba(0,230,118,0.25); }
+.ib-in:hover  { background: rgba(0,230,118,0.12); }
+.ib-out { color: var(--red);   border: 1px solid rgba(255,61,87,0.25); }
+.ib-out:hover { background: rgba(255,61,87,0.1); }
+.ib-del { color: var(--text-dim); border: 1px solid var(--border); }
+.ib-del:hover { color: var(--red); border-color: rgba(255,61,87,0.3); background: rgba(255,61,87,0.08); }
+
+.badge {
+  font-family: 'Share Tech Mono', monospace; font-size: 8px;
+  letter-spacing: 1px; padding: 2px 7px; border-radius: 3px;
+  display: inline-block;
+}
+
+.badge-ok  { color: var(--green); background: rgba(0,230,118,0.1);  border: 1px solid rgba(0,230,118,0.25); }
+.badge-low { color: var(--amber); background: rgba(255,171,0,0.1);  border: 1px solid rgba(255,171,0,0.3); }
+.badge-out { color: var(--red);   background: rgba(255,61,87,0.1);  border: 1px solid rgba(255,61,87,0.3); }
+
+.empty-row td {
+  padding: 50px 20px; text-align: center;
+  color: var(--text-dim); font-size: 13px;
+}
+
+/* ── SIDE PANEL ── */
+.side { display: flex; flex-direction: column; gap: 14px; }
+
+.panel-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px; border-bottom: 1px solid var(--border);
+  background: rgba(0,212,255,0.04);
+}
+
+.panel-title {
+  font-family: 'Orbitron', monospace; font-size: 9px;
+  font-weight: 600; letter-spacing: 2px; color: var(--cyan);
+}
+
+.panel-body { padding: 14px; }
+
+/* ── FORM ── */
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-row.one { grid-template-columns: 1fr; }
+
+.fg { margin-bottom: 10px; }
+
+.fg label {
+  display: block; font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 5px;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.fg input, .fg select, .fg textarea {
+  width: 100%; padding: 9px 11px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text); font-size: 13px;
+  font-family: 'Rajdhani', sans-serif; font-weight: 500;
+  outline: none; transition: border-color 0.18s, background 0.18s;
+  -webkit-appearance: none;
+}
+
+.fg input:focus, .fg select:focus, .fg textarea:focus {
+  border-color: var(--border-md); background: var(--bg4);
+}
+
+.fg select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236a9ab0'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 30px;
+}
+
+.fg select option { background: #0b1620; }
+
+/* Movement type toggle */
+.mv-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; }
+
+.mv-btn {
+  padding: 9px 8px; border-radius: 6px; cursor: pointer; border: 1.5px solid;
+  font-family: 'Orbitron', monospace; font-size: 9px; font-weight: 700;
+  letter-spacing: 1.5px; text-transform: uppercase; transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 6px; outline: none;
+}
+
+.mv-in  { color: var(--green); border-color: rgba(0,230,118,0.3); background: rgba(0,230,118,0.05); }
+.mv-in.active  { background: rgba(0,230,118,0.18); border-color: var(--green); }
+.mv-out { color: var(--red);   border-color: rgba(255,61,87,0.3); background: rgba(255,61,87,0.05); }
+.mv-out.active { background: rgba(255,61,87,0.15); border-color: var(--red); }
+
+/* ── IMPORT/EXPORT ── */
+.io-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.io-btn {
+  padding: 10px 8px; border-radius: 6px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  border: 1.5px dashed var(--border); background: transparent;
+  color: var(--text-dim); font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+  transition: all 0.18s; outline: none; text-align: center;
+}
+
+.io-btn:hover { border-color: var(--border-md); color: var(--text-mid); background: var(--bg3); }
+.io-btn .io-icon { font-size: 20px; line-height: 1; }
+.io-btn.solid { border-style: solid; }
+.io-btn.io-export { border-color: rgba(0,230,118,0.3); color: var(--green); }
+.io-btn.io-export:hover { background: rgba(0,230,118,0.08); }
+
+/* ── MOVEMENT LOG ── */
+.log-list { max-height: 260px; overflow-y: auto; }
+
+.log-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; border-bottom: 1px solid rgba(0,212,255,0.06);
+}
+
+.log-item:last-child { border-bottom: none; }
+
+.log-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+
+.log-in  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.log-out { background: var(--red);   box-shadow: 0 0 6px var(--red); }
+
+.log-info { flex: 1; min-width: 0; }
+.log-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.log-meta { font-size: 10px; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; margin-top: 1px; }
+
+.log-qty {
+  font-family: 'Orbitron', monospace; font-size: 13px; font-weight: 700;
+  flex-shrink: 0;
+}
+
+.log-qty.in  { color: var(--green); }
+.log-qty.out { color: var(--red); }
+
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  background: var(--bg3); border: 1px solid var(--border-md);
+  color: var(--text); padding: 10px 22px; border-radius: 7px;
+  font-size: 13px; font-family: 'Rajdhani', sans-serif; font-weight: 600;
+  letter-spacing: 0.3px; opacity: 0; transition: all 0.28s cubic-bezier(.4,0,.2,1);
+  z-index: 9999; white-space: nowrap; pointer-events: none;
+}
+
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.ok   { border-color: rgba(0,230,118,0.5);  color: var(--green); }
+.toast.err  { border-color: rgba(255,61,87,0.5);  color: var(--red); }
+.toast.info { border-color: rgba(0,212,255,0.5);  color: var(--cyan); }
+
+/* ── MODAL ── */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(6,12,17,0.88);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 8888; backdrop-filter: blur(6px); padding: 20px;
+  opacity: 0; transition: opacity 0.22s; pointer-events: none;
+}
+
+.modal-bg.show { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--bg2); border: 1.5px solid var(--border-md);
+  border-radius: 12px; padding: 24px; width: 100%; max-width: 340px;
+  transform: scale(0.94); transition: transform 0.22s;
+}
+
+.modal-bg.show .modal { transform: scale(1); }
+.modal h3 { font-family: 'Orbitron', monospace; font-size: 12px; color: var(--cyan); letter-spacing: 1px; margin-bottom: 16px; }
+.modal-btns { display: flex; gap: 8px; margin-top: 18px; }
+.modal-btns .btn { flex: 1; justify-content: center; padding: 10px; font-size: 9px; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ── DRAG OVER ── */
+.drag-over { border-color: var(--cyan) !important; background: var(--cyan-glow) !important; color: var(--cyan) !important; }
+
+/* ── TEMPLATE HINT ── */
+.template-note {
+  font-size: 10px; color: var(--text-dim); margin-top: 8px; line-height: 1.5;
+  font-family: 'Share Tech Mono', monospace; letter-spacing: 0.5px;
+}
+
+.template-note code {
+  color: var(--cyan); background: rgba(0,212,255,0.08);
+  padding: 1px 5px; border-radius: 3px;
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <div class="header">
+    <img class="logo" src="../imagenes/logo.png" alt="Datasys"
+         onerror="this.style.display='none';document.getElementById('lfb').style.display='flex'">
+    <div class="logo-fb" id="lfb">DS</div>
+    <div class="brand">
+      <h1>DATASYS</h1>
+      <p>Sistema de Inventario</p>
+    </div>
+    <div class="header-right">
+      <div class="pill pill-online"><div class="dot"></div>EN LÍNEA</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card" style="--accent:var(--cyan)">
+      <div class="stat-lbl">Total artículos</div>
+      <div class="stat-val" id="st-total">0</div>
+      <div class="stat-sub">SKUs registrados</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--green)">
+      <div class="stat-lbl">Unidades totales</div>
+      <div class="stat-val" id="st-units">0</div>
+      <div class="stat-sub">Stock disponible</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--amber)">
+      <div class="stat-lbl">Stock bajo</div>
+      <div class="stat-val" id="st-low">0</div>
+      <div class="stat-sub">Por reabastecer</div>
+    </div>
+    <div class="stat-card" style="--accent:var(--red)">
+      <div class="stat-lbl">Agotados</div>
+      <div class="stat-val" id="st-out">0</div>
+      <div class="stat-sub">Sin existencia</div>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-inp" type="text" id="search" placeholder="Buscar artículo, código, categoría..." oninput="render()">
+    </div>
+    <div class="filter-row" id="filter-chips"></div>
+    <button class="btn btn-outline" onclick="exportCSV()" title="Exportar CSV">⬇ CSV</button>
+    <button class="btn btn-green" onclick="exportXLSX()" title="Exportar Excel">⬇ EXCEL</button>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="grid">
+
+    <!-- TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">// INVENTARIO · <span id="tbl-count">0</span> artículos</div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-outline" onclick="clearAll()" style="font-size:8px;padding:6px 10px;">🗑 LIMPIAR TODO</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="inv-table">
+          <thead>
+            <tr>
+              <th onclick="sortBy('code')">Código <span class="sort-icon" id="sort-code">↕</span></th>
+              <th onclick="sortBy('name')">Nombre <span class="sort-icon" id="sort-name">↕</span></th>
+              <th onclick="sortBy('cat')">Categoría <span class="sort-icon" id="sort-cat">↕</span></th>
+              <th onclick="sortBy('qty')" style="text-align:right">Stock <span class="sort-icon" id="sort-qty">↕</span></th>
+              <th onclick="sortBy('min')" style="text-align:right">Mín. <span class="sort-icon" id="sort-min">↕</span></th>
+              <th>Ubicación</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="inv-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SIDE -->
+    <div class="side">
+
+      <!-- ENTRADA / SALIDA -->
+      <div class="panel-card">
+        <div class="panel-head">
+          <div class="panel-title">// MOVIMIENTO</div>
+        </div>
+        <div class="panel-body">
+          <div class="mv-toggle">
+            <button class="mv-btn mv-in active" id="btn-in" onclick="setMv('in')">▲ ENTRADA</button>
+            <button class="mv-btn mv-out" id="btn-out" onclick="setMv('out')">▼ SALIDA</button>
+          </div>
+          <div class="fg">
+            <label>Artículo</label>
+            <select id="mv-item">
+              <option value="">-- Selecciona artículo --</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Cantidad</label>
+              <input type="number" id="mv-qty" placeholder="0" min="1">
+            </div>
+            <div class="fg">
+              <label>Referencia</label>
+              <input type="text" id="mv-ref" placeholder="Folio / Nota">
+            </div>
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="doMovement()">
+            REGISTRAR MOVIMIENTO
+          </button>
+        </div>
+      </div>
+
+      <!-- NUEVO ARTÍCULO -->
+      <div class="panel-card">
+        <div class="panel-head">
+          <div class="panel-title">// NUEVO ARTÍCULO</div>
+          <button class="btn btn-outline" style="font-size:8px;padding:5px 9px;" onclick="toggleNewForm()">
+            <span id="new-form-lbl">+ ABRIR</span>
+          </button>
+        </div>
+        <div class="panel-body" id="new-form" style="display:none">
+          <div class="form-row">
+            <div class="fg">
+              <label>Código *</label>
+              <input type="text" id="nf-code" placeholder="DSY-001">
+            </div>
+            <div class="fg">
+              <label>Stock inicial</label>
+              <input type="number" id="nf-qty" placeholder="0" min="0">
+            </div>
+          </div>
+          <div class="fg">
+            <label>Nombre *</label>
+            <input type="text" id="nf-name" placeholder="Nombre del artículo">
+          </div>
+          <div class="form-row">
+            <div class="fg">
+              <label>Categoría</label>
+              <select id="nf-cat">
+                <option value="">Sin categoría</option>
+                <option>Hardware</option>
+                <option>Software</option>
+                <option>Redes</option>
+                <option>Periféricos</option>
+                <option>Consumibles</option>
+                <option>Mobiliario</option>
+                <option>Otro</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Stock mínimo</label>
+              <input type="number" id="nf-min" placeholder="5" min="0">
+            </div>
+          </div>
+          <div class="fg">
+            <label>Ubicación</label>
+            <input type="text" id="nf-loc" placeholder="Almacén A / Rack 3">
+          </div>
+          <button class="btn btn-primary" style="width:100%;justify-content:center;padding:10px;" onclick="addItem()">
+            + AGREGAR AL INVENTARIO
+          </button>
+        </div>
+      </div>
+
+      <!-- IMPORT / EXPORT -->
+      <div class="panel-card">
+        <div class="panel-head"><div class="panel-title">// IMPORTAR · EXPORTAR</div></div>
+        <div class="panel-body">
+          <div class="io-grid">
+            <!-- Drag drop import -->
+            <label class="io-btn" id="drop-zone" for="file-inp"
+                   ondragover="ev.preventDefault();this.classList.add('drag-over')"
+                   ondragleave="this.classList.remove('drag-over')"
+                   ondrop="handleDrop(event)">
+              <div class="io-icon">📂</div>
+              <div>IMPORTAR<br>XLSX / CSV</div>
+            </label>
+            <input type="file" id="file-inp" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFile(this)">
+
+            <button class="io-btn solid io-export" onclick="exportXLSX()">
+              <div class="io-icon">📊</div>
+              <div>DESCARGAR<br>EXCEL</div>
+            </button>
+
+            <button class="io-btn solid" onclick="exportCSV()" style="border-color:rgba(0,212,255,0.35);color:var(--cyan)">
+              <div class="io-icon">📋</div>
+              <div>DESCARGAR<br>CSV</div>
+            </button>
+
+            <button class="io-btn" onclick="downloadTemplate()" style="border-color:rgba(179,136,255,0.35);color:var(--purple)">
+              <div class="io-icon">📄</div>
+              <div>PLANTILLA<br>EXCEL</div>
+            </button>
+          </div>
+          <div class="template-note">
+            Columnas requeridas: <code>codigo</code> <code>nombre</code> <code>cantidad</code>
+            Opcionales: <code>categoria</code> <code>minimo</code> <code>ubicacion</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOG DE MOVIMIENTOS -->
+      <div class="panel-card">
+        <div class="panel-head">
+          <div class="panel-title">// ÚLTIMOS MOVIMIENTOS</div>
+          <button class="btn btn-outline" style="font-size:8px;padding:5px 9px;" onclick="clearLog()">LIMPIAR</button>
+        </div>
+        <div class="panel-body" style="padding:10px 14px;">
+          <div class="log-list" id="log-list">
+            <div style="text-align:center;padding:20px;color:var(--text-dim);font-size:12px;">
+              Sin movimientos registrados
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div class="modal-bg" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">CONFIRMAR ACCIÓN</h3>
+    <div id="modal-body" style="font-size:13px;color:var(--text-dim);line-height:1.6;"></div>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeModal()">CANCELAR</button>
+      <button class="btn btn-red" id="modal-ok">CONFIRMAR</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DATASYS · Inventario — entradas, salidas, import/export
+   ══════════════════════════════════════════════════ */
+
+var inv  = JSON.parse(localStorage.getItem('ds_inv2') || '[]');
+var log  = JSON.parse(localStorage.getItem('ds_log2') || '[]');
+var mvType = 'in';
+var sortCol = 'name', sortAsc = true;
+var activeFilter = 'Todos';
+
+/* ── SAVE ── */
+function save() {
+  localStorage.setItem('ds_inv2', JSON.stringify(inv));
+  localStorage.setItem('ds_log2', JSON.stringify(log));
+  updateStats();
+  render();
+  renderLog();
+  rebuildSelect();
+}
+
+/* ── STATS ── */
+function updateStats() {
+  var total = inv.length;
+  var units = inv.reduce(function(s,i){ return s+(parseInt(i.qty)||0); },0);
+  var low   = inv.filter(function(i){ var q=parseInt(i.qty)||0,m=parseInt(i.min)||0; return q>0&&q<=m; }).length;
+  var out   = inv.filter(function(i){ return (parseInt(i.qty)||0)===0; }).length;
+  set('st-total', total);
+  set('st-units', units);
+  set('st-low',   low);
+  set('st-out',   out);
+}
+
+/* ── FILTERS ── */
+function buildFilters() {
+  var cats = inv.map(function(i){ return i.cat||'Sin categoría'; })
+    .filter(function(v,i,a){ return a.indexOf(v)===i; }).sort();
+  var all = ['Todos'].concat(cats);
+  var el = document.getElementById('filter-chips');
+  el.innerHTML = all.map(function(c){
+    return '<button class="chip'+(c===activeFilter?' active':'')+'" onclick="setFilter(\''+esc(c)+'\')">'
+      +esc(c)+'</button>';
+  }).join('');
+}
+
+function setFilter(c) {
+  activeFilter = c;
+  buildFilters();
+  render();
+}
+
+/* ── SORT ── */
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  document.querySelectorAll('.sort-icon').forEach(function(el){ el.textContent='↕'; el.parentElement.classList.remove('sorted'); });
+  var icon = document.getElementById('sort-'+col);
+  if (icon) { icon.textContent = sortAsc?'↑':'↓'; icon.parentElement.classList.add('sorted'); }
+  render();
+}
+
+/* ── RENDER TABLE ── */
+function render() {
+  buildFilters();
+  var q = (document.getElementById('search').value||'').toLowerCase();
+  var filtered = inv.filter(function(i){
+    var matchQ = !q ||
+      (i.name||'').toLowerCase().includes(q) ||
+      (i.code||'').toLowerCase().includes(q) ||
+      (i.cat||'').toLowerCase().includes(q)  ||
+      (i.loc||'').toLowerCase().includes(q);
+    var matchF = activeFilter==='Todos' || (i.cat||'Sin categoría')===activeFilter;
+    return matchQ && matchF;
+  });
+
+  filtered.sort(function(a,b){
+    var va = (a[sortCol]||''), vb = (b[sortCol]||'');
+    if (sortCol==='qty'||sortCol==='min') { va=parseInt(va)||0; vb=parseInt(vb)||0; }
+    else { va=String(va).toLowerCase(); vb=String(vb).toLowerCase(); }
+    if (va<vb) return sortAsc?-1:1;
+    if (va>vb) return sortAsc?1:-1;
+    return 0;
+  });
+
+  set('tbl-count', filtered.length);
+
+  var tbody = document.getElementById('inv-tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">Sin artículos en el inventario</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(item){
+    var qty = parseInt(item.qty)||0, min = parseInt(item.min)||0;
+    var qtyColor = 'var(--cyan)';
+    var badge='', bTxt='';
+    if (qty===0)       { qtyColor='var(--red)';   badge='badge-out'; bTxt='AGOTADO'; }
+    else if (qty<=min) { qtyColor='var(--amber)';  badge='badge-low'; bTxt='BAJO'; }
+    else               { badge='badge-ok';  bTxt='OK'; }
+
+    return '<tr>'
+      +'<td class="code-cell">'+esc(item.code)+'</td>'
+      +'<td>'+esc(item.name)+'</td>'
+      +'<td><span class="badge" style="color:var(--text-dim);background:rgba(0,212,255,0.06);border:1px solid var(--border)">'+esc(item.cat||'—')+'</span></td>'
+      +'<td style="text-align:right"><span class="qty-cell" style="color:'+qtyColor+'">'+qty+'</span></td>'
+      +'<td style="text-align:right;color:var(--text-dim);font-family:\'Share Tech Mono\',monospace;font-size:12px">'+min+'</td>'
+      +'<td style="color:var(--text-dim);font-size:12px">'+esc(item.loc||'—')+'</td>'
+      +'<td><span class="badge '+badge+'">'+bTxt+'</span></td>'
+      +'<td><div class="actions-cell">'
+        +'<button class="icon-btn ib-in" onclick="quickMv(\''+item.id+'\',\'in\')" title="Entrada">▲</button>'
+        +'<button class="icon-btn ib-out" onclick="quickMv(\''+item.id+'\',\'out\')" title="Salida">▼</button>'
+        +'<button class="icon-btn ib-del" onclick="confirmDel(\''+item.id+'\')" title="Eliminar">✕</button>'
+      +'</div></td>'
+      +'</tr>';
+  }).join('');
+}
+
+/* ── ADD ITEM ── */
+function addItem() {
+  var code = gv('nf-code').trim();
+  var name = gv('nf-name').trim();
+  var qty  = parseInt(gv('nf-qty'))  || 0;
+  var min  = parseInt(gv('nf-min'))  || 0;
+  var cat  = gv('nf-cat')  || 'Otro';
+  var loc  = gv('nf-loc').trim();
+
+  if (!name) { toast('Ingresa el nombre del artículo', 'err'); return; }
+  if (!code) { code = 'DSY-' + String(Date.now()).slice(-5); }
+
+  if (inv.find(function(i){ return i.code===code; })) {
+    toast('Ya existe un artículo con ese código', 'err'); return;
+  }
+
+  inv.push({ id:'id'+Date.now(), code:code, name:name, qty:qty, min:min, cat:cat, loc:loc });
+  save();
+  toast('Artículo agregado', 'ok');
+  ['nf-code','nf-name','nf-qty','nf-min','nf-loc'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('nf-cat').value='';
+}
+
+/* ── MOVEMENT ── */
+function setMv(type) {
+  mvType = type;
+  document.getElementById('btn-in').classList.toggle('active', type==='in');
+  document.getElementById('btn-out').classList.toggle('active', type==='out');
+}
+
+function doMovement() {
+  var itemId = gv('mv-item');
+  var qty    = parseInt(gv('mv-qty')) || 0;
+  var ref    = gv('mv-ref').trim();
+
+  if (!itemId) { toast('Selecciona un artículo', 'err'); return; }
+  if (qty <= 0) { toast('Ingresa una cantidad válida', 'err'); return; }
+
+  var item = inv.find(function(i){ return i.id===itemId; });
+  if (!item) return;
+
+  if (mvType==='out' && qty > (parseInt(item.qty)||0)) {
+    toast('Stock insuficiente para la salida', 'err'); return;
+  }
+
+  if (mvType==='in') item.qty = (parseInt(item.qty)||0) + qty;
+  else               item.qty = (parseInt(item.qty)||0) - qty;
+
+  log.unshift({
+    ts: Date.now(), type: mvType,
+    itemId: item.id, name: item.name, code: item.code,
+    qty: qty, ref: ref,
+    date: new Date().toLocaleString('es-MX')
+  });
+
+  if (log.length > 200) log = log.slice(0,200);
+
+  save();
+  document.getElementById('mv-qty').value='';
+  document.getElementById('mv-ref').value='';
+  toast((mvType==='in'?'Entrada':'Salida')+' registrada', 'ok');
+}
+
+function quickMv(id, type) {
+  setMv(type);
+  document.getElementById('mv-item').value = id;
+  document.getElementById('mv-qty').focus();
+  document.getElementById('mv-qty').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ── REBUILD SELECT ── */
+function rebuildSelect() {
+  var sel = document.getElementById('mv-item');
+  var cur = sel.value;
+  sel.innerHTML = '<option value="">-- Selecciona artículo --</option>'
+    + inv.slice().sort(function(a,b){ return a.name.localeCompare(b.name); })
+        .map(function(i){
+          return '<option value="'+i.id+'">'+esc(i.code)+' · '+esc(i.name)+'</option>';
+        }).join('');
+  if (cur) sel.value = cur;
+}
+
+/* ── LOG ── */
+function renderLog() {
+  var el = document.getElementById('log-list');
+  if (!log.length) {
+    el.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-dim);font-size:12px;">Sin movimientos registrados</div>';
+    return;
+  }
+  el.innerHTML = log.slice(0,50).map(function(l){
+    return '<div class="log-item">'
+      +'<div class="log-dot '+(l.type==='in'?'log-in':'log-out')+'"></div>'
+      +'<div class="log-info">'
+        +'<div class="log-name">'+esc(l.name)+'</div>'
+        +'<div class="log-meta">'+esc(l.code)+(l.ref?' · '+esc(l.ref):'')+' · '+esc(l.date)+'</div>'
+      +'</div>'
+      +'<div class="log-qty '+(l.type==='in'?'in':'out')+'">'
+        +(l.type==='in'?'+':'-')+l.qty
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function clearLog() {
+  log = [];
+  save();
+  toast('Historial limpiado', 'info');
+}
+
+/* ── IMPORT ── */
+function handleDrop(ev) {
+  ev.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  var file = ev.dataTransfer.files[0];
+  if (file) processFile(file);
+}
+
+function handleFile(input) {
+  if (input.files[0]) processFile(input.files[0]);
+  input.value='';
+}
+
+function processFile(file) {
+  var name = file.name.toLowerCase();
+  var reader = new FileReader();
+
+  if (name.endsWith('.csv')) {
+    reader.onload = function(e) { parseCSVData(e.target.result); };
+    reader.readAsText(file, 'UTF-8');
+  } else {
+    reader.onload = function(e) { parseXLSXData(e.target.result); };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+function parseXLSXData(buf) {
+  try {
+    var wb = XLSX.read(buf, { type:'array' });
+    var ws = wb.Sheets[wb.SheetNames[0]];
+    var rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
+    importRows(rows);
+  } catch(e) { toast('Error al leer el archivo Excel', 'err'); }
+}
+
+function parseCSVData(text) {
+  try {
+    var lines = text.split(/\r?\n/).filter(function(l){ return l.trim(); });
+    if (!lines.length) { toast('Archivo CSV vacío', 'err'); return; }
+    var headers = lines[0].split(/[,;]/).map(function(h){ return h.trim().toLowerCase().replace(/[^a-z0-9]/g,''); });
+    var rows = [];
+    for (var i=1; i<lines.length; i++) {
+      var cols = lines[i].split(/[,;]/);
+      var obj = {};
+      headers.forEach(function(h,j){ obj[h] = (cols[j]||'').trim(); });
+      rows.push(obj);
+    }
+    importRows(rows);
+  } catch(e) { toast('Error al leer el CSV', 'err'); }
+}
+
+var COL_MAP = {
+  code:  ['codigo','code','cod','sku','id'],
+  name:  ['nombre','name','articulo','producto','descripcion','description'],
+  qty:   ['cantidad','qty','quantity','stock','existencia','existencias'],
+  min:   ['minimo','min','stockminimo','minimum','reorden'],
+  cat:   ['categoria','category','cat','tipo','type'],
+  loc:   ['ubicacion','location','loc','almacen','warehouse']
+};
+
+function findCol(headers, key) {
+  var candidates = COL_MAP[key]||[];
+  for (var i=0; i<candidates.length; i++) {
+    var c = candidates[i];
+    for (var j=0; j<headers.length; j++) {
+      if (headers[j].replace(/[^a-z0-9]/g,'')===c) return headers[j];
+    }
+  }
+  return null;
+}
+
+function importRows(rows) {
+  if (!rows.length) { toast('Sin datos para importar', 'err'); return; }
+
+  var headers = Object.keys(rows[0]).map(function(h){ return h.toLowerCase().trim(); });
+  var map = {
+    code: findCol(headers,'code'),
+    name: findCol(headers,'name'),
+    qty:  findCol(headers,'qty'),
+    min:  findCol(headers,'min'),
+    cat:  findCol(headers,'cat'),
+    loc:  findCol(headers,'loc')
+  };
+
+  var colKeys = Object.keys(rows[0]);
+
+  function getVal(row, fieldKey) {
+    var mapped = map[fieldKey];
+    if (!mapped) return '';
+    // Try exact match first
+    if (row[mapped] !== undefined) return String(row[mapped]);
+    // Case-insensitive
+    for (var k in row) {
+      if (k.toLowerCase().trim() === mapped) return String(row[k]);
+    }
+    return '';
+  }
+
+  if (!map.name) { toast('No se encontró columna "nombre" o "name"', 'err'); return; }
+
+  var added=0, updated=0, skipped=0;
+  rows.forEach(function(row) {
+    var name = getVal(row,'name').trim();
+    if (!name) { skipped++; return; }
+
+    var code = getVal(row,'code').trim() || ('DSY-'+String(Date.now()+Math.random()).replace('.','').slice(-6));
+    var qty  = parseInt(getVal(row,'qty'))  || 0;
+    var min  = parseInt(getVal(row,'min'))  || 0;
+    var cat  = getVal(row,'cat').trim()  || 'Otro';
+    var loc  = getVal(row,'loc').trim();
+
+    var existing = inv.findIndex(function(i){ return i.code===code; });
+    if (existing>=0) {
+      inv[existing].name=name; inv[existing].qty=qty;
+      inv[existing].min=min;   inv[existing].cat=cat; inv[existing].loc=loc;
+      updated++;
+    } else {
+      inv.push({ id:'id'+Date.now()+Math.floor(Math.random()*9999), code:code, name:name, qty:qty, min:min, cat:cat, loc:loc });
+      added++;
+    }
+  });
+
+  save();
+  toast(added+' agregados, '+updated+' actualizados'+(skipped?' ('+skipped+' vacíos)':''), 'ok');
+}
+
+/* ── EXPORT XLSX ── */
+function exportXLSX() {
+  if (!inv.length) { toast('Inventario vacío', 'err'); return; }
+  var ws_data = [['Codigo','Nombre','Categoria','Stock','Minimo','Ubicacion']];
+  inv.forEach(function(i){
+    ws_data.push([i.code,i.name,i.cat||'',parseInt(i.qty)||0,parseInt(i.min)||0,i.loc||'']);
+  });
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(ws_data);
+  ws['!cols']=[{wch:12},{wch:30},{wch:14},{wch:10},{wch:10},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+  // Log sheet
+  if (log.length) {
+    var log_data = [['Fecha','Tipo','Codigo','Nombre','Cantidad','Referencia']];
+    log.forEach(function(l){
+      log_data.push([l.date, l.type==='in'?'ENTRADA':'SALIDA', l.code, l.name, l.qty, l.ref||'']);
+    });
+    var ws2 = XLSX.utils.aoa_to_sheet(log_data);
+    ws2['!cols']=[{wch:20},{wch:10},{wch:12},{wch:30},{wch:10},{wch:16}];
+    XLSX.utils.book_append_sheet(wb, ws2, 'Movimientos');
+  }
+
+  XLSX.writeFile(wb, 'inventario_datasys_'+datestamp()+'.xlsx');
+  toast('Excel descargado', 'ok');
+}
+
+/* ── EXPORT CSV ── */
+function exportCSV() {
+  if (!inv.length) { toast('Inventario vacío', 'err'); return; }
+  var rows = [['codigo','nombre','categoria','cantidad','minimo','ubicacion']];
+  inv.forEach(function(i){
+    rows.push([csvQ(i.code),csvQ(i.name),csvQ(i.cat||''),parseInt(i.qty)||0,parseInt(i.min)||0,csvQ(i.loc||'')]);
+  });
+  var csv = rows.map(function(r){ return r.join(','); }).join('\n');
+  download('inventario_datasys_'+datestamp()+'.csv', 'text/csv', '\uFEFF'+csv);
+  toast('CSV descargado', 'ok');
+}
+
+function csvQ(s) {
+  s = String(s||'');
+  if (s.includes(',') || s.includes('"') || s.includes('\n')) return '"'+s.replace(/"/g,'""')+'"';
+  return s;
+}
+
+/* ── TEMPLATE ── */
+function downloadTemplate() {
+  var ws_data = [
+    ['codigo','nombre','categoria','cantidad','minimo','ubicacion'],
+    ['DSY-001','Laptop HP EliteBook','Hardware',5,2,'Almacén A - Rack 1'],
+    ['DSY-002','Cable HDMI 2m','Periféricos',20,5,'Almacén A - Rack 2'],
+    ['DSY-003','Tóner HP 26A','Consumibles',3,2,'Almacén B'],
+  ];
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(ws_data);
+  ws['!cols']=[{wch:12},{wch:30},{wch:14},{wch:10},{wch:10},{wch:22}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Plantilla');
+  XLSX.writeFile(wb, 'plantilla_inventario_datasys.xlsx');
+  toast('Plantilla descargada', 'info');
+}
+
+/* ── CLEAR ALL ── */
+function clearAll() {
+  showModal(
+    'LIMPIAR INVENTARIO',
+    '¿Eliminar <b>todos los artículos</b> del inventario? Esta acción no se puede deshacer.',
+    function() { inv=[]; save(); toast('Inventario limpiado','info'); }
+  );
+}
+
+/* ── DELETE ── */
+function confirmDel(id) {
+  var item = inv.find(function(i){ return i.id===id; });
+  if (!item) return;
+  showModal(
+    'ELIMINAR ARTÍCULO',
+    '¿Eliminar <b>'+esc(item.name)+'</b> del inventario?',
+    function() {
+      inv = inv.filter(function(i){ return i.id!==id; });
+      save(); toast('Artículo eliminado','err');
+    }
+  );
+}
+
+/* ── TOGGLE NEW FORM ── */
+var newFormOpen = false;
+function toggleNewForm() {
+  newFormOpen = !newFormOpen;
+  document.getElementById('new-form').style.display = newFormOpen ? 'block' : 'none';
+  document.getElementById('new-form-lbl').textContent = newFormOpen ? '− CERRAR' : '+ ABRIR';
+}
+
+/* ── MODAL ── */
+function showModal(title, body, onOk) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = body;
+  document.getElementById('modal-ok').onclick = function() { onOk(); closeModal(); };
+  document.getElementById('modal').classList.add('show');
+}
+
+function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+document.getElementById('modal').addEventListener('click', function(e){
+  if (e.target === e.currentTarget) closeModal();
+});
+
+/* ── TOAST ── */
+var _tt;
+function toast(msg, type) {
+  clearTimeout(_tt);
+  var el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast '+(type||'');
+  void el.offsetWidth; el.classList.add('show');
+  _tt = setTimeout(function(){ el.classList.remove('show'); }, 2800);
+}
+
+/* ── HELPERS ── */
+function gv(id) { return (document.getElementById(id)||{}).value||''; }
+function set(id, v) { var el=document.getElementById(id); if(el) el.textContent=v; }
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function datestamp() {
+  var d=new Date();
+  return d.getFullYear()+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+}
+function download(filename, mime, content) {
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download = filename; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ── INIT ── */
+updateStats();
+render();
+renderLog();
+rebuildSelect();
+</script>
+</body>
+</html>
