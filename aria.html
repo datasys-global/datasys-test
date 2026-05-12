@@ -1,1238 +1,1995 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="theme-color" content="#030d18">
-<meta name="description" content="ARIA — Asistente de Inteligencia Artificial de DATASYS. Inicia tu diagnóstico en Producción, Inventarios y Logística.">
-<title>ARIA — Asistente IA · DATASYS</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#030d18">
+  <meta name="description"
+    content="ARIA — Asistente de Inteligencia Artificial de DATASYS. Inicia tu diagnóstico en Producción, Inventarios y Logística.">
+  <title>ARIA — Asistente IA · DATASYS</title>
 
-<!-- PWA -->
-<link rel="manifest" href="manifest.json">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="ARIA · DATASYS">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="imagenes/apple-touch-icon.png">
-<link rel="icon" type="image/png" href="imagenes/icon_32.png">
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="ARIA · DATASYS">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="imagenes/apple-touch-icon.png">
+  <link rel="icon" type="image/png" href="imagenes/icon_32.png">
 
-<!-- Fuentes -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <!-- Fuentes -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600&family=Share+Tech+Mono&display=swap"
+    rel="stylesheet">
 
-<!-- ══ BASES DE CONOCIMIENTO LOCAL ══ -->
-<script src="js/produccion.js"></script>
-<script src="js/inventarios.js"></script>
-<script src="js/logistica.js"></script>
-<!-- ══ MOTOR DE VENTAS INTELIGENTE ══ -->
-<script src="js/aria_sales_engine.js"></script>
+  <!-- ══ BASES DE CONOCIMIENTO LOCAL ══ -->
+  <script src="js/produccion.js"></script>
+  <script src="js/inventarios.js"></script>
+  <script src="js/logistica.js"></script>
+  <!-- ══ MOTOR DE VENTAS INTELIGENTE ══ -->
+  <script src="js/aria_sales_engine.js"></script>
 
-<style>
-/* ══ RESET & VARIABLES ══ */
-:root{
-  --cyan:#00e5ff; --cyan2:#00b8d9; --cyan-dim:rgba(0,229,255,.12);
-  --dark:#030d18;  --dark2:#060f1c; --dark3:#0a1828;
-  --silver:#8eb8cc; --white:#dff0f8; --gold:#f0c040;
-  --green:#00ff88; --red:#e05050;
-  --glow-sm:0 0 12px rgba(0,229,255,.4);
-  --glow-md:0 0 24px rgba(0,229,255,.5),0 0 48px rgba(0,229,255,.2);
-  --glow-lg:0 0 40px rgba(0,229,255,.6),0 0 80px rgba(0,229,255,.25);
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;background:var(--dark);}
-body{font-family:'Rajdhani',sans-serif;color:var(--white);}
+  <style>
+    /* ══ RESET & VARIABLES ══ */
+    :root {
+      --cyan: #00e5ff;
+      --cyan2: #00b8d9;
+      --cyan-dim: rgba(0, 229, 255, .12);
+      --dark: #030d18;
+      --dark2: #060f1c;
+      --dark3: #0a1828;
+      --silver: #8eb8cc;
+      --white: #dff0f8;
+      --gold: #f0c040;
+      --green: #00ff88;
+      --red: #e05050;
+      --glow-sm: 0 0 12px rgba(0, 229, 255, .4);
+      --glow-md: 0 0 24px rgba(0, 229, 255, .5), 0 0 48px rgba(0, 229, 255, .2);
+      --glow-lg: 0 0 40px rgba(0, 229, 255, .6), 0 0 80px rgba(0, 229, 255, .25);
+    }
 
-/* Scanlines */
-body::after{
-  content:'';position:fixed;inset:0;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,229,255,.008) 3px,rgba(0,229,255,.008) 4px);
-  pointer-events:none;z-index:9997;
-}
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-/* ══ LAYOUT ══ */
-#app{
-  display:grid;
-  grid-template-columns:0px 1fr;
-  grid-template-rows:56px 1fr;
-  height:100vh;
-  position:relative;
-  transition:grid-template-columns .35s ease;
-}
-#app.sidebar-visible{
-  grid-template-columns:280px 1fr;
-}
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--dark);
+    }
 
-/* ══ TOPBAR ══ */
-#topbar{
-  grid-column:1/-1;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 24px;
-  background:rgba(3,13,24,.98);
-  border-bottom:1px solid rgba(0,229,255,.18);
-  backdrop-filter:blur(18px);
-  z-index:100;
-  position:relative;
-}
-#topbar::after{
-  content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;
-  background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.35;
-}
-.tb-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-.tb-logo img{height:32px;object-fit:contain;filter:drop-shadow(0 0 8px rgba(0,229,255,.6));}
-.tb-logo-txt{font-family:'Orbitron',sans-serif;font-size:.9rem;font-weight:900;letter-spacing:4px;color:var(--cyan);text-shadow:var(--glow-sm);}
-.tb-logo-sep{width:1px;height:22px;background:rgba(0,229,255,.2);}
-.tb-aria-lbl{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:3px;color:var(--silver);opacity:.6;}
-.tb-right{display:flex;align-items:center;gap:12px;}
-.tb-status{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:var(--green);}
-.tb-status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse-green 2s ease-in-out infinite;}
-@keyframes pulse-green{0%,100%{box-shadow:0 0 4px var(--green);}50%{box-shadow:0 0 12px var(--green),0 0 20px var(--green);}}
-.tb-back{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:rgba(0,229,255,.5);text-decoration:none;border:1px solid rgba(0,229,255,.2);padding:5px 12px;transition:all .2s;}
-.tb-back:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,.06);}
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      color: var(--white);
+    }
 
-/* ══ SIDEBAR ══ */
-#sidebar{
-  grid-row:2;
-  background:rgba(6,15,28,.95);
-  border-right:1px solid rgba(0,229,255,.12);
-  display:flex;flex-direction:column;
-  overflow:hidden;
-  width:280px;
-  opacity:0;
-  visibility:hidden;
-  transition:opacity .3s ease, visibility .3s ease;
-}
-#app.sidebar-visible #sidebar{
-  opacity:1;
-  visibility:visible;
-}
-.sb-section-title{
-  font-family:'Share Tech Mono',monospace;font-size:.44rem;
-  letter-spacing:3px;color:var(--silver);opacity:.4;
-  padding:16px 18px 8px;text-transform:uppercase;
-}
-.sb-plats{flex:1;overflow-y:auto;padding:0 10px 10px;}
-.sb-plats::-webkit-scrollbar{width:2px;}
-.sb-plats::-webkit-scrollbar-thumb{background:rgba(0,229,255,.2);}
+    /* Scanlines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0, 229, 255, .008) 3px, rgba(0, 229, 255, .008) 4px);
+      pointer-events: none;
+      z-index: 9997;
+    }
 
-.plat-btn{
-  width:100%;display:flex;align-items:center;gap:10px;
-  padding:9px 10px;margin-bottom:2px;
-  background:none;border:1px solid transparent;
-  color:var(--silver);font-family:'Rajdhani',sans-serif;font-size:.82rem;
-  font-weight:500;letter-spacing:.5px;cursor:pointer;
-  border-radius:3px;transition:all .2s;text-align:left;
-  position:relative;overflow:hidden;
-}
-.plat-btn::before{
-  content:'';position:absolute;left:0;top:0;bottom:0;width:2px;
-  background:var(--cyan);transform:scaleY(0);transition:transform .2s;
-}
-.plat-btn:hover{background:rgba(0,229,255,.06);border-color:rgba(0,229,255,.15);color:var(--white);}
-.plat-btn:hover::before{transform:scaleY(1);}
-.plat-btn.active{background:rgba(0,229,255,.1);border-color:rgba(0,229,255,.3);color:var(--cyan);}
-.plat-btn.active::before{transform:scaleY(1);}
-.plat-ico{font-size:1rem;flex-shrink:0;width:22px;text-align:center;}
-.plat-name{flex:1;line-height:1.3;}
-.plat-tag{font-family:'Share Tech Mono',monospace;font-size:.36rem;letter-spacing:1px;color:rgba(0,229,255,.35);display:block;margin-top:1px;}
+    /* ══ LAYOUT ══ */
+    #app {
+      display: grid;
+      grid-template-columns: 0px 1fr;
+      grid-template-rows: 56px 1fr;
+      height: 100vh;
+      position: relative;
+      transition: grid-template-columns .35s ease;
+    }
 
-.sb-divider{height:1px;background:rgba(0,229,255,.07);margin:10px 18px;}
-.sb-contact{padding:12px 18px;flex-shrink:0;border-top:1px solid rgba(0,229,255,.08);}
-.sb-contact-lbl{font-family:'Share Tech Mono',monospace;font-size:.4rem;letter-spacing:2px;color:var(--silver);opacity:.4;margin-bottom:7px;}
-.sb-contact-item{font-family:'Rajdhani',sans-serif;font-size:.75rem;color:var(--silver);opacity:.55;display:flex;align-items:center;gap:7px;margin-bottom:4px;}
-.sb-contact-item a{color:var(--cyan);opacity:.7;text-decoration:none;}
-.sb-contact-item a:hover{opacity:1;}
+    #app.sidebar-visible {
+      grid-template-columns: 280px 1fr;
+    }
 
-/* Mobile sidebar toggle */
-#sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;backdrop-filter:blur(4px);}
-#sidebar-toggle{display:none;background:none;border:1px solid rgba(0,229,255,.25);color:var(--cyan);padding:6px 10px;font-size:.8rem;cursor:pointer;border-radius:2px;}
-#sidebar-toggle.disabled{opacity:.25;pointer-events:none;border-color:rgba(0,229,255,.1);color:rgba(0,229,255,.3);}
+    /* ══ TOPBAR ══ */
+    #topbar {
+      grid-column: 1/-1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(3, 13, 24, .98);
+      border-bottom: 1px solid rgba(0, 229, 255, .18);
+      backdrop-filter: blur(18px);
+      z-index: 100;
+      position: relative;
+    }
 
-/* ══ CHAT AREA ══ */
-#chat-area{
-  grid-row:2;
-  display:flex;flex-direction:column;
-  background:var(--dark);
-  position:relative;
-  overflow:hidden;
-}
+    #topbar::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 5%;
+      right: 5%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+      opacity: .35;
+    }
 
-/* Grid de fondo */
-#chat-area::before{
-  content:'';position:absolute;inset:0;
-  background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);
-  background-size:44px 44px;pointer-events:none;z-index:0;
-}
+    .tb-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
 
-/* Context bar */
-#ctx-bar{
-  display:none;flex-shrink:0;
-  padding:6px 18px;
-  background:rgba(0,229,255,.05);
-  border-bottom:1px solid rgba(0,229,255,.12);
-  align-items:center;justify-content:space-between;
-  position:relative;z-index:1;
-}
-#ctx-bar.show{display:flex;}
-.ctx-left{display:flex;align-items:center;gap:8px;}
-#ctx-ico{font-size:.9rem;}
-#ctx-lbl{font-family:'Share Tech Mono',monospace;font-size:.52rem;letter-spacing:2px;color:var(--cyan);}
-.ctx-back{
-  font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:1.5px;
-  color:rgba(0,229,255,.4);background:none;border:1px solid rgba(0,229,255,.18);
-  padding:3px 9px;cursor:pointer;transition:all .2s;
-}
-.ctx-back:hover{color:var(--cyan);border-color:var(--cyan);}
+    .tb-logo img {
+      height: 32px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 8px rgba(0, 229, 255, .6));
+    }
 
-/* Mensajes */
-#msgs{
-  flex:1;overflow-y:auto;
-  padding:20px 24px;
-  display:flex;flex-direction:column;gap:12px;
-  position:relative;z-index:1;
-}
-#msgs::-webkit-scrollbar{width:3px;}
-#msgs::-webkit-scrollbar-thumb{background:rgba(0,229,255,.25);border-radius:2px;}
+    .tb-logo-txt {
+      font-family: 'Orbitron', sans-serif;
+      font-size: .9rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      color: var(--cyan);
+      text-shadow: var(--glow-sm);
+    }
 
-/* Estado vacío / bienvenida */
-#welcome{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  flex:1;text-align:center;padding:40px 24px;
-  animation:fadeUp .6s ease both;
-}
-@keyframes fadeUp{0%{opacity:0;transform:translateY(16px);}100%{opacity:1;transform:none;}}
-.wlc-logo{position:relative;width:220px;height:220px;margin:0 auto 32px;}
-.wlc-logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 0 40px rgba(0,229,255,.5));animation:logoSpin 11s ease-in-out infinite;}
-@keyframes logoSpin{0%,100%{transform:scale(1) rotate(-1deg);filter:drop-shadow(0 0 28px rgba(0,229,255,.4));}50%{transform:scale(1.04) rotate(1deg);filter:drop-shadow(0 0 56px rgba(0,229,255,.75));}}
-.wlc-ring{position:absolute;inset:-10px;border-radius:50%;border:1px solid rgba(0,229,255,.2);animation:ringPulse 3s ease-in-out infinite;}
-.wlc-ring:nth-child(2){inset:-24px;animation-delay:.5s;border-color:rgba(0,229,255,.1);}
-.wlc-ring:nth-child(3){inset:-42px;animation-delay:1s;border-color:rgba(0,229,255,.05);}
-@keyframes ringPulse{0%,100%{transform:scale(1);opacity:.5;}50%{transform:scale(1.03);opacity:1;}}
-.wlc-title{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:900;color:var(--cyan);letter-spacing:4px;text-shadow:var(--glow-sm);margin-bottom:8px;}
-.wlc-sub{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:3px;color:var(--silver);opacity:.5;margin-bottom:24px;}
-.wlc-desc{font-size:.92rem;color:var(--silver);opacity:.6;line-height:1.8;max-width:400px;margin-bottom:28px;}
-.wlc-chips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:480px;}
-.wlc-chip{
-  font-family:'Rajdhani',sans-serif;font-size:.75rem;letter-spacing:.5px;
-  padding:6px 14px;background:rgba(0,229,255,.05);
-  border:1px solid rgba(0,229,255,.2);color:var(--cyan);
-  cursor:pointer;transition:all .2s;
-  clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);
-}
-.wlc-chip:hover{background:rgba(0,229,255,.12);border-color:var(--cyan);box-shadow:var(--glow-sm);}
+    .tb-logo-sep {
+      width: 1px;
+      height: 22px;
+      background: rgba(0, 229, 255, .2);
+    }
 
-/* Burbujas */
-.msg{
-  display:flex;gap:10px;align-items:flex-start;
-  max-width:82%;animation:msgIn .3s ease both;
-}
-@keyframes msgIn{0%{opacity:0;transform:translateY(8px);}100%{opacity:1;transform:none;}}
-@keyframes pricePulse{0%,100%{opacity:1;box-shadow:0 0 6px rgba(239,68,68,.3);}50%{opacity:.7;box-shadow:0 0 14px rgba(239,68,68,.6);}}
-.msg.bot{align-self:flex-start;}
-.msg.usr{align-self:flex-end;flex-direction:row-reverse;}
+    .tb-aria-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .58rem;
+      letter-spacing: 3px;
+      color: var(--silver);
+      opacity: .6;
+    }
 
-.msg-av{
-  width:30px;height:30px;border-radius:50%;flex-shrink:0;
-  border:1px solid rgba(0,229,255,.25);overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(0,229,255,.08);
-}
-.msg-av img{width:100%;height:100%;object-fit:cover;}
-.msg-av-usr{
-  width:30px;height:30px;border-radius:50%;flex-shrink:0;
-  background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.3);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Orbitron',sans-serif;font-size:.45rem;font-weight:700;color:var(--cyan);
-}
+    .tb-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-.bubble{
-  padding:11px 14px;font-size:.9rem;line-height:1.7;
-  max-width:100%;
-}
-.msg.bot .bubble{
-  background:rgba(0,229,255,.06);
-  border:1px solid rgba(0,229,255,.18);
-  color:var(--white);
-  clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%);
-}
-.msg.bot .bubble a{color:var(--cyan);}
-.msg.usr .bubble{
-  background:rgba(0,229,255,.14);
-  border:1px solid rgba(0,229,255,.35);
-  color:var(--cyan);
-  clip-path:polygon(8px 0,100% 0,100% 100%,0 100%,0 8px);
-}
+    .tb-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      letter-spacing: 2px;
+      color: var(--green);
+    }
 
-/* Typing indicator */
-.typing-bub{
-  display:flex;gap:4px;align-items:center;
-  padding:14px 18px;
-}
-.typing-bub span{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--cyan);opacity:.35;
-  animation:typingPulse 1.2s ease-in-out infinite;
-}
-.typing-bub span:nth-child(2){animation-delay:.2s;}
-.typing-bub span:nth-child(3){animation-delay:.4s;}
-@keyframes typingPulse{0%,80%,100%{opacity:.35;transform:scale(1);}40%{opacity:1;transform:scale(1.4);}}
+    .tb-status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse-green 2s ease-in-out infinite;
+    }
 
-/* ══ QUICK BUTTONS ══ */
-#quick-row{
-  display:flex;flex-wrap:wrap;gap:6px;
-  padding:10px 24px;flex-shrink:0;
-  border-top:1px solid rgba(0,229,255,.08);
-  position:relative;z-index:1;
-}
-.qchip{
-  font-family:'Rajdhani',sans-serif;font-size:.75rem;letter-spacing:.5px;
-  padding:5px 12px;background:rgba(0,229,255,.04);
-  border:1px solid rgba(0,229,255,.18);color:rgba(0,229,255,.7);
-  cursor:pointer;transition:all .2s;white-space:nowrap;
-}
-.qchip:hover{background:rgba(0,229,255,.1);border-color:var(--cyan);color:var(--cyan);}
+    @keyframes pulse-green {
 
-/* ══ INPUT ROW ══ */
-#input-row{
-  display:flex;align-items:center;gap:8px;
-  padding:12px 24px 16px;flex-shrink:0;
-  background:rgba(3,13,24,.8);
-  border-top:1px solid rgba(0,229,255,.12);
-  position:relative;z-index:1;
-}
-#chat-input{
-  flex:1;background:rgba(0,229,255,.04);
-  border:1px solid rgba(0,229,255,.2);
-  color:var(--white);font-family:'Rajdhani',sans-serif;font-size:.95rem;
-  padding:11px 16px;outline:none;
-  transition:border-color .3s;
-  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
-}
-#chat-input:focus{border-color:rgba(0,229,255,.55);background:rgba(0,229,255,.07);}
-#chat-input::placeholder{color:rgba(142,184,204,.28);}
-#send-btn{
-  width:44px;height:44px;flex-shrink:0;
-  background:rgba(0,229,255,.1);border:1px solid var(--cyan);color:var(--cyan);
-  cursor:pointer;font-size:1rem;transition:all .3s;display:flex;align-items:center;justify-content:center;
-  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
-}
-#send-btn:hover{background:var(--cyan);color:var(--dark);box-shadow:var(--glow-sm);}
-#send-btn:disabled{opacity:.3;cursor:default;}
+      0%,
+      100% {
+        box-shadow: 0 0 4px var(--green);
+      }
 
-/* ══ RESPONSIVE MOBILE ══ */
-@media(max-width:700px){
-  #app{
-    grid-template-columns:1fr;
-    grid-template-rows:56px 1fr;
-  }
-  #sidebar{
-    position:fixed;top:56px;left:-290px;width:280px;
-    height:calc(100vh - 56px);z-index:300;
-    opacity:1 !important;visibility:visible !important;
-    transition:left .3s ease, box-shadow .3s ease;
-    background:rgba(6,15,28,.98);
-    box-shadow:none;
-    overflow-y:auto;
-  }
-  #sidebar.open{
-    left:0;
-    box-shadow:4px 0 40px rgba(0,0,0,.8), 0 0 0 1px rgba(0,229,255,.15);
-  }
-  #sidebar-overlay{display:block;}
-  #sidebar-toggle{display:flex;align-items:center;gap:5px;}
-  .tb-aria-lbl{display:none;}
-  #msgs{padding:14px 16px;}
-  #input-row{padding:10px 14px 14px;}
-  #quick-row{padding:8px 14px;}
-}
+      50% {
+        box-shadow: 0 0 12px var(--green), 0 0 20px var(--green);
+      }
+    }
 
-@media(max-width:900px) and (min-width:701px){
-  #app.sidebar-visible{grid-template-columns:220px 1fr;}
-  .plat-tag{display:none;}
-}
-</style>
+    .tb-back {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .5rem;
+      letter-spacing: 2px;
+      color: rgba(0, 229, 255, .5);
+      text-decoration: none;
+      border: 1px solid rgba(0, 229, 255, .2);
+      padding: 5px 12px;
+      transition: all .2s;
+    }
+
+    .tb-back:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+      background: rgba(0, 229, 255, .06);
+    }
+
+    /* ══ SIDEBAR ══ */
+    #sidebar {
+      grid-row: 2;
+      background: rgba(6, 15, 28, .95);
+      border-right: 1px solid rgba(0, 229, 255, .12);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      width: 280px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .3s ease, visibility .3s ease;
+    }
+
+    #app.sidebar-visible #sidebar {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .sb-section-title {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .44rem;
+      letter-spacing: 3px;
+      color: var(--silver);
+      opacity: .4;
+      padding: 16px 18px 8px;
+      text-transform: uppercase;
+    }
+
+    .sb-plats {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0 10px 10px;
+    }
+
+    .sb-plats::-webkit-scrollbar {
+      width: 2px;
+    }
+
+    .sb-plats::-webkit-scrollbar-thumb {
+      background: rgba(0, 229, 255, .2);
+    }
+
+    .plat-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 10px;
+      margin-bottom: 2px;
+      background: none;
+      border: 1px solid transparent;
+      color: var(--silver);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .82rem;
+      font-weight: 500;
+      letter-spacing: .5px;
+      cursor: pointer;
+      border-radius: 3px;
+      transition: all .2s;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .plat-btn::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--cyan);
+      transform: scaleY(0);
+      transition: transform .2s;
+    }
+
+    .plat-btn:hover {
+      background: rgba(0, 229, 255, .06);
+      border-color: rgba(0, 229, 255, .15);
+      color: var(--white);
+    }
+
+    .plat-btn:hover::before {
+      transform: scaleY(1);
+    }
+
+    .plat-btn.active {
+      background: rgba(0, 229, 255, .1);
+      border-color: rgba(0, 229, 255, .3);
+      color: var(--cyan);
+    }
+
+    .plat-btn.active::before {
+      transform: scaleY(1);
+    }
+
+    .plat-ico {
+      font-size: 1rem;
+      flex-shrink: 0;
+      width: 22px;
+      text-align: center;
+    }
+
+    .plat-name {
+      flex: 1;
+      line-height: 1.3;
+    }
+
+    .plat-tag {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .36rem;
+      letter-spacing: 1px;
+      color: rgba(0, 229, 255, .35);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .sb-divider {
+      height: 1px;
+      background: rgba(0, 229, 255, .07);
+      margin: 10px 18px;
+    }
+
+    .sb-contact {
+      padding: 12px 18px;
+      flex-shrink: 0;
+      border-top: 1px solid rgba(0, 229, 255, .08);
+    }
+
+    .sb-contact-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .4rem;
+      letter-spacing: 2px;
+      color: var(--silver);
+      opacity: .4;
+      margin-bottom: 7px;
+    }
+
+    .sb-contact-item {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .75rem;
+      color: var(--silver);
+      opacity: .55;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      margin-bottom: 4px;
+    }
+
+    .sb-contact-item a {
+      color: var(--cyan);
+      opacity: .7;
+      text-decoration: none;
+    }
+
+    .sb-contact-item a:hover {
+      opacity: 1;
+    }
+
+    /* Mobile sidebar toggle */
+    #sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .7);
+      z-index: 200;
+      backdrop-filter: blur(4px);
+    }
+
+    #sidebar-toggle {
+      display: none;
+      background: none;
+      border: 1px solid rgba(0, 229, 255, .25);
+      color: var(--cyan);
+      padding: 6px 10px;
+      font-size: .8rem;
+      cursor: pointer;
+      border-radius: 2px;
+    }
+
+    #sidebar-toggle.disabled {
+      opacity: .25;
+      pointer-events: none;
+      border-color: rgba(0, 229, 255, .1);
+      color: rgba(0, 229, 255, .3);
+    }
+
+    /* ══ CHAT AREA ══ */
+    #chat-area {
+      grid-row: 2;
+      display: flex;
+      flex-direction: column;
+      background: var(--dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Grid de fondo */
+    #chat-area::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: linear-gradient(rgba(0, 229, 255, .025) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 229, 255, .025) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Context bar */
+    #ctx-bar {
+      display: none;
+      flex-shrink: 0;
+      padding: 6px 18px;
+      background: rgba(0, 229, 255, .05);
+      border-bottom: 1px solid rgba(0, 229, 255, .12);
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    #ctx-bar.show {
+      display: flex;
+    }
+
+    .ctx-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #ctx-ico {
+      font-size: .9rem;
+    }
+
+    #ctx-lbl {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .52rem;
+      letter-spacing: 2px;
+      color: var(--cyan);
+    }
+
+    .ctx-back {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .44rem;
+      letter-spacing: 1.5px;
+      color: rgba(0, 229, 255, .4);
+      background: none;
+      border: 1px solid rgba(0, 229, 255, .18);
+      padding: 3px 9px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .ctx-back:hover {
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    /* Mensajes */
+    #msgs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #msgs::-webkit-scrollbar {
+      width: 3px;
+    }
+
+    #msgs::-webkit-scrollbar-thumb {
+      background: rgba(0, 229, 255, .25);
+      border-radius: 2px;
+    }
+
+    /* Estado vacío / bienvenida */
+    #welcome {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      text-align: center;
+      padding: 40px 24px;
+      animation: fadeUp .6s ease both;
+    }
+
+    @keyframes fadeUp {
+      0% {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    .wlc-logo {
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 0 auto 32px;
+    }
+
+    .wlc-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 0 40px rgba(0, 229, 255, .5));
+      animation: logoSpin 11s ease-in-out infinite;
+    }
+
+    @keyframes logoSpin {
+
+      0%,
+      100% {
+        transform: scale(1) rotate(-1deg);
+        filter: drop-shadow(0 0 28px rgba(0, 229, 255, .4));
+      }
+
+      50% {
+        transform: scale(1.04) rotate(1deg);
+        filter: drop-shadow(0 0 56px rgba(0, 229, 255, .75));
+      }
+    }
+
+    .wlc-ring {
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      border: 1px solid rgba(0, 229, 255, .2);
+      animation: ringPulse 3s ease-in-out infinite;
+    }
+
+    .wlc-ring:nth-child(2) {
+      inset: -24px;
+      animation-delay: .5s;
+      border-color: rgba(0, 229, 255, .1);
+    }
+
+    .wlc-ring:nth-child(3) {
+      inset: -42px;
+      animation-delay: 1s;
+      border-color: rgba(0, 229, 255, .05);
+    }
+
+    @keyframes ringPulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: .5;
+      }
+
+      50% {
+        transform: scale(1.03);
+        opacity: 1;
+      }
+    }
+
+    .wlc-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 900;
+      color: var(--cyan);
+      letter-spacing: 4px;
+      text-shadow: var(--glow-sm);
+      margin-bottom: 8px;
+    }
+
+    .wlc-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: .6rem;
+      letter-spacing: 3px;
+      color: var(--silver);
+      opacity: .5;
+      margin-bottom: 24px;
+    }
+
+    .wlc-desc {
+      font-size: .92rem;
+      color: var(--silver);
+      opacity: .6;
+      line-height: 1.8;
+      max-width: 400px;
+      margin-bottom: 28px;
+    }
+
+    .wlc-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      justify-content: center;
+      max-width: 480px;
+    }
+
+    .wlc-chip {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .5px;
+      padding: 6px 14px;
+      background: rgba(0, 229, 255, .05);
+      border: 1px solid rgba(0, 229, 255, .2);
+      color: var(--cyan);
+      cursor: pointer;
+      transition: all .2s;
+      clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+    }
+
+    .wlc-chip:hover {
+      background: rgba(0, 229, 255, .12);
+      border-color: var(--cyan);
+      box-shadow: var(--glow-sm);
+    }
+
+    /* Burbujas */
+    .msg {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      max-width: 82%;
+      animation: msgIn .3s ease both;
+    }
+
+    @keyframes msgIn {
+      0% {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    @keyframes pricePulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 6px rgba(239, 68, 68, .3);
+      }
+
+      50% {
+        opacity: .7;
+        box-shadow: 0 0 14px rgba(239, 68, 68, .6);
+      }
+    }
+
+    .msg.bot {
+      align-self: flex-start;
+    }
+
+    .msg.usr {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+    }
+
+    .msg-av {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 1px solid rgba(0, 229, 255, .25);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 229, 255, .08);
+    }
+
+    .msg-av img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .msg-av-usr {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: rgba(0, 229, 255, .15);
+      border: 1px solid rgba(0, 229, 255, .3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Orbitron', sans-serif;
+      font-size: .45rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .bubble {
+      padding: 11px 14px;
+      font-size: .9rem;
+      line-height: 1.7;
+      max-width: 100%;
+    }
+
+    .msg.bot .bubble {
+      background: rgba(0, 229, 255, .06);
+      border: 1px solid rgba(0, 229, 255, .18);
+      color: var(--white);
+      clip-path: polygon(0 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%);
+    }
+
+    .msg.bot .bubble a {
+      color: var(--cyan);
+    }
+
+    .msg.usr .bubble {
+      background: rgba(0, 229, 255, .14);
+      border: 1px solid rgba(0, 229, 255, .35);
+      color: var(--cyan);
+      clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%, 0 8px);
+    }
+
+    /* Typing indicator */
+    .typing-bub {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+      padding: 14px 18px;
+    }
+
+    .typing-bub span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      opacity: .35;
+      animation: typingPulse 1.2s ease-in-out infinite;
+    }
+
+    .typing-bub span:nth-child(2) {
+      animation-delay: .2s;
+    }
+
+    .typing-bub span:nth-child(3) {
+      animation-delay: .4s;
+    }
+
+    @keyframes typingPulse {
+
+      0%,
+      80%,
+      100% {
+        opacity: .35;
+        transform: scale(1);
+      }
+
+      40% {
+        opacity: 1;
+        transform: scale(1.4);
+      }
+    }
+
+    /* ══ QUICK BUTTONS ══ */
+    #quick-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 10px 24px;
+      flex-shrink: 0;
+      border-top: 1px solid rgba(0, 229, 255, .08);
+      position: relative;
+      z-index: 1;
+    }
+
+    .qchip {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .75rem;
+      letter-spacing: .5px;
+      padding: 5px 12px;
+      background: rgba(0, 229, 255, .04);
+      border: 1px solid rgba(0, 229, 255, .18);
+      color: rgba(0, 229, 255, .7);
+      cursor: pointer;
+      transition: all .2s;
+      white-space: nowrap;
+    }
+
+    .qchip:hover {
+      background: rgba(0, 229, 255, .1);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    /* ══ INPUT ROW ══ */
+    #input-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px 16px;
+      flex-shrink: 0;
+      background: rgba(3, 13, 24, .8);
+      border-top: 1px solid rgba(0, 229, 255, .12);
+      position: relative;
+      z-index: 1;
+    }
+
+    #chat-input {
+      flex: 1;
+      background: rgba(0, 229, 255, .04);
+      border: 1px solid rgba(0, 229, 255, .2);
+      color: var(--white);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: .95rem;
+      padding: 11px 16px;
+      outline: none;
+      transition: border-color .3s;
+      clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    }
+
+    #chat-input:focus {
+      border-color: rgba(0, 229, 255, .55);
+      background: rgba(0, 229, 255, .07);
+    }
+
+    #chat-input::placeholder {
+      color: rgba(142, 184, 204, .28);
+    }
+
+    #send-btn {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+      background: rgba(0, 229, 255, .1);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all .3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+    }
+
+    #send-btn:hover {
+      background: var(--cyan);
+      color: var(--dark);
+      box-shadow: var(--glow-sm);
+    }
+
+    #send-btn:disabled {
+      opacity: .3;
+      cursor: default;
+    }
+
+    /* ══ RESPONSIVE MOBILE ══ */
+    @media(max-width:700px) {
+      #app {
+        grid-template-columns: 1fr;
+        grid-template-rows: 56px 1fr;
+      }
+
+      #sidebar {
+        position: fixed;
+        top: 56px;
+        left: -290px;
+        width: 280px;
+        height: calc(100vh - 56px);
+        z-index: 300;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transition: left .3s ease, box-shadow .3s ease;
+        background: rgba(6, 15, 28, .98);
+        box-shadow: none;
+        overflow-y: auto;
+      }
+
+      #sidebar.open {
+        left: 0;
+        box-shadow: 4px 0 40px rgba(0, 0, 0, .8), 0 0 0 1px rgba(0, 229, 255, .15);
+      }
+
+      #sidebar-overlay {
+        display: block;
+      }
+
+      #sidebar-toggle {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .tb-aria-lbl {
+        display: none;
+      }
+
+      #msgs {
+        padding: 14px 16px;
+      }
+
+      #input-row {
+        padding: 10px 14px 14px;
+      }
+
+      #quick-row {
+        padding: 8px 14px;
+      }
+    }
+
+    @media(max-width:900px) and (min-width:701px) {
+      #app.sidebar-visible {
+        grid-template-columns: 220px 1fr;
+      }
+
+      .plat-tag {
+        display: none;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<div id="app">
+  <div id="app">
 
-  <!-- ══ TOPBAR ══ -->
-  <header id="topbar">
-    <div class="tb-logo">
-      <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
-      <img src="imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
-      <span class="tb-logo-txt">DATASYS</span>
-      <div class="tb-logo-sep"></div>
-      <span class="tb-aria-lbl">ARIA · ASISTENTE IA</span>
-    </div>
-    <div class="tb-right">
-      <div class="tb-status">
-        <div class="tb-status-dot"></div>
-        EN LÍNEA
+    <!-- ══ TOPBAR ══ -->
+    <header id="topbar">
+      <div class="tb-logo">
+        <button id="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <img src="imagenes/logo.png" alt="DATASYS" onerror="this.style.display='none'">
+        <span class="tb-logo-txt">DATASYS</span>
+        <div class="tb-logo-sep"></div>
+        <span class="tb-aria-lbl">ARIA · ASISTENTE IA</span>
       </div>
-      <a class="tb-back" href="index.html" id="back-link">← INICIO</a>
-    </div>
-  </header>
-
-  <!-- ══ SIDEBAR ══ -->
-  <aside id="sidebar">
-    <div class="sb-section-title">// INICIA TU DIAGNÓSTICO EN 3 MIN</div>
-    <div class="sb-plats" id="sb-plats">
-      <button class="plat-btn" data-key="produccion" onclick="seleccionarPlat('produccion')">
-        <span class="plat-ico">🏭</span>
-        <span class="plat-name">Producción<span class="plat-tag">CONTROL · PROCESOS · KPI</span></span>
-      </button>
-      <button class="plat-btn" data-key="inventarios" onclick="seleccionarPlat('inventarios')">
-        <span class="plat-ico">📦</span>
-        <span class="plat-name">Inventarios<span class="plat-tag">STOCK · ENTRADAS · SALIDAS</span></span>
-      </button>
-      <button class="plat-btn" data-key="logistica" onclick="seleccionarPlat('logistica')">
-        <span class="plat-ico">🚚</span>
-        <span class="plat-name">Logística<span class="plat-tag">RUTAS · ENTREGAS · SUPPLY CHAIN</span></span>
-      </button>
-    </div>
-
-    <div class="sb-divider"></div>
-    <div class="sb-contact">
-      <div class="sb-contact-lbl">CONTACTO DIRECTO</div>
-      <div class="sb-contact-item">📧 <a href="/cdn-cgi/l/email-protection#71121e1f051012051e31151005100208025f1c09"><span class="__cf_email__" data-cfemail="23404c4d574240574c6347425742505a500d4e5b">[email&#160;protected]</span></a></div>
-      <div class="sb-contact-item">📞 +52 (55) 1017-6436</div>
-      <div class="sb-contact-item">📍 Ciudad de México</div>
-    </div>
-  </aside>
-
-  <!-- Overlay mobile -->
-  <div id="sidebar-overlay" onclick="toggleSidebar()" style="display:none;"></div>
-
-  <!-- ══ CHAT AREA ══ -->
-  <main id="chat-area">
-
-    <!-- Barra de contexto (sección activa) -->
-    <div id="ctx-bar">
-      <div class="ctx-left">
-        <span id="ctx-ico"></span>
-        <span id="ctx-lbl"></span>
-      </div>
-      <button class="ctx-back" onclick="volverMenu()">✕ CAMBIAR PLATAFORMA</button>
-    </div>
-
-    <!-- Mensajes -->
-    <div id="msgs">
-      <!-- Pantalla de bienvenida (se oculta al primer mensaje) -->
-      <div id="welcome">
-        <div class="wlc-logo">
-          <div class="wlc-ring"></div><div class="wlc-ring"></div><div class="wlc-ring"></div>
-          <img src="imagenes/3d.png" alt="ARIA" onerror="this.style.opacity='.25'">
+      <div class="tb-right">
+        <div class="tb-status">
+          <div class="tb-status-dot"></div>
+          EN LÍNEA
         </div>
-        <div class="wlc-title" style="font-size:clamp(1rem,2.8vw,1.45rem);letter-spacing:.04em;line-height:1.3;">Reduce hasta 30% los tiempos de producción</div>
-        <p class="wlc-desc">Automatiza tu operación industrial con IA sin cambiar tu infraestructura actual. ¿Qué quieres mejorar?</p>
-        <div class="wlc-chips" id="wlc-chips">
-          <div class="wlc-chip" onclick="seleccionarPlat('produccion')">🏭 Producción</div>
-          <div class="wlc-chip" onclick="seleccionarPlat('inventarios')">📦 Inventarios</div>
-          <div class="wlc-chip" onclick="seleccionarPlat('logistica')">🚚 Logística</div>
+        <a class="tb-back" href="index.html" id="back-link">← INICIO</a>
+      </div>
+    </header>
+
+    <!-- ══ SIDEBAR ══ -->
+    <aside id="sidebar">
+      <div class="sb-section-title">// INICIA TU DIAGNÓSTICO EN 3 MIN</div>
+      <div class="sb-plats" id="sb-plats">
+        <button class="plat-btn" data-key="produccion" onclick="seleccionarPlat('produccion')">
+          <span class="plat-ico">🏭</span>
+          <span class="plat-name">Producción<span class="plat-tag">CONTROL · PROCESOS · KPI</span></span>
+        </button>
+        <button class="plat-btn" data-key="inventarios" onclick="seleccionarPlat('inventarios')">
+          <span class="plat-ico">📦</span>
+          <span class="plat-name">Inventarios<span class="plat-tag">STOCK · ENTRADAS · SALIDAS</span></span>
+        </button>
+        <button class="plat-btn" data-key="logistica" onclick="seleccionarPlat('logistica')">
+          <span class="plat-ico">🚚</span>
+          <span class="plat-name">Logística<span class="plat-tag">RUTAS · ENTREGAS · SUPPLY CHAIN</span></span>
+        </button>
+      </div>
+
+      <div class="sb-divider"></div>
+      <div class="sb-contact">
+        <div class="sb-contact-lbl">CONTACTO DIRECTO</div>
+        <div class="sb-contact-item">📧 <a
+            href="/cdn-cgi/l/email-protection#71121e1f051012051e31151005100208025f1c09"><span class="__cf_email__"
+              data-cfemail="23404c4d574240574c6347425742505a500d4e5b">[email&#160;protected]</span></a></div>
+        <div class="sb-contact-item">📞 +52 (55) 1017-6436</div>
+        <div class="sb-contact-item">📍 Ciudad de México</div>
+      </div>
+    </aside>
+
+    <!-- Overlay mobile -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" style="display:none;"></div>
+
+    <!-- ══ CHAT AREA ══ -->
+    <main id="chat-area">
+
+      <!-- Barra de contexto (sección activa) -->
+      <div id="ctx-bar">
+        <div class="ctx-left">
+          <span id="ctx-ico"></span>
+          <span id="ctx-lbl"></span>
+        </div>
+        <button class="ctx-back" onclick="volverMenu()">✕ CAMBIAR PLATAFORMA</button>
+      </div>
+
+      <!-- Mensajes -->
+      <div id="msgs">
+        <!-- Pantalla de bienvenida (se oculta al primer mensaje) -->
+        <div id="welcome">
+          <div class="wlc-logo">
+            <div class="wlc-ring"></div>
+            <div class="wlc-ring"></div>
+            <div class="wlc-ring"></div>
+            <img src="imagenes/3d.png" alt="ARIA" onerror="this.style.opacity='.25'">
+          </div>
+          <div class="wlc-title" style="font-size:clamp(1rem,2.8vw,1.45rem);letter-spacing:.04em;line-height:1.3;">
+            Reduce hasta 30% los tiempos de producción</div>
+          <p class="wlc-desc">Automatiza tu operación industrial con IA sin cambiar tu infraestructura actual. ¿Qué
+            quieres mejorar?</p>
+          <div class="wlc-chips" id="wlc-chips">
+            <div class="wlc-chip" onclick="seleccionarPlat('produccion')">🏭 Producción</div>
+            <div class="wlc-chip" onclick="seleccionarPlat('inventarios')">📦 Inventarios</div>
+            <div class="wlc-chip" onclick="seleccionarPlat('logistica')">🚚 Logística</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Quick buttons contextuales -->
-    <div id="quick-row" style="display:none;"></div>
+      <!-- Quick buttons contextuales -->
+      <div id="quick-row" style="display:none;"></div>
 
-    <!-- Input -->
-    <div id="input-row">
-      <input id="chat-input" type="text" placeholder="Escribe tu pregunta sobre cualquier plataforma DATASYS..."
-        onkeypress="if(event.key==='Enter')sendChat()">
-      <button id="send-btn" onclick="sendChat()">➤</button>
-    </div>
+      <!-- Input -->
+      <div id="input-row">
+        <input id="chat-input" type="text" placeholder="Escribe tu pregunta sobre cualquier plataforma DATASYS..."
+          onkeypress="if(event.key==='Enter')sendChat()">
+        <button id="send-btn" onclick="sendChat()">➤</button>
+      </div>
 
-  </main>
-</div>
+    </main>
+  </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-/* ══════════════════════════════════════════════════
-   ARIA — Página independiente
-   Sin API. 100% local desde js/*.js
-   ══════════════════════════════════════════════════ */
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+  <script>
+    /* ══════════════════════════════════════════════════
+       ARIA — Página independiente
+       Sin API. 100% local desde js/*.js
+       ══════════════════════════════════════════════════ */
 
-/* ── Detectar si venimos de mobile o desktop ── */
-(function(){
-  var ua = navigator.userAgent;
-  var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-  var isMac = /Macintosh|MacIntel/i.test(ua);
-  var isWin = /Win32|Win64|Windows/i.test(ua);
-  var backEl = document.getElementById('back-link');
-  if(backEl){
-    backEl.href = (isMobile && !isMac && !isWin) ? 'index_mobile.html' : 'index.html';
-  }
-})();
+    /* ── Detectar si venimos de mobile o desktop ── */
+    (function () {
+      var ua = navigator.userAgent;
+      var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+      var isMac = /Macintosh|MacIntel/i.test(ua);
+      var isWin = /Win32|Win64|Windows/i.test(ua);
+      var backEl = document.getElementById('back-link');
+      if (backEl) {
+        backEl.href = (isMobile && !isMac && !isWin) ? 'index_mobile.html' : 'index.html';
+      }
+    })();
 
-/* ── ARIA_DB: carga las 10 bases de js/ ── */
-var ARIA_DB = {
-  "produccion":  typeof ARIA_produccion  !== "undefined" ? ARIA_produccion  : [],
-  "inventarios": typeof ARIA_inventarios !== "undefined" ? ARIA_inventarios : [],
-  "logistica":   typeof ARIA_logistica   !== "undefined" ? ARIA_logistica   : []
-};
+    /* ── ARIA_DB: carga las 10 bases de js/ ── */
+    var ARIA_DB = {
+      "produccion": typeof ARIA_produccion !== "undefined" ? ARIA_produccion : [],
+      "inventarios": typeof ARIA_inventarios !== "undefined" ? ARIA_inventarios : [],
+      "logistica": typeof ARIA_logistica !== "undefined" ? ARIA_logistica : []
+    };
 
-/* ── SECCIONES: alias + labels ── */
-var ARIA_SECCIONES = {
-  "produccion":  { alias:["producción","produccion","producir","manufactura","planta","proceso","procesos","kpi","rendimiento","línea","linea"], label:"🏭 Producción",   url_desktop:"Desktop/produccion_datasys.html",  url_mobile:"mobile/produccion_datasys_mobile.html" },
-  "inventarios": { alias:["inventario","inventarios","stock","almacén","almacen","entrada","salida","existencias","bodega","mercancía","mercancia"], label:"📦 Inventarios", url_desktop:"Desktop/inventarios_datasys.html", url_mobile:"mobile/inventarios_datasys_mobile.html" },
-  "logistica":   { alias:["logística","logistica","ruta","rutas","entrega","entregas","transporte","supply chain","cadena","distribución","distribucion","flete"], label:"🚚 Logística",   url_desktop:"Desktop/logistica_datasys.html",   url_mobile:"mobile/logistica_datasys_mobile.html" }
-};
+    /* ── SECCIONES: alias + labels ── */
+    var ARIA_SECCIONES = {
+      "produccion": { alias: ["producción", "produccion", "producir", "manufactura", "planta", "proceso", "procesos", "kpi", "rendimiento", "línea", "linea"], label: "🏭 Producción", url_desktop: "Desktop/produccion_datasys.html", url_mobile: "mobile/produccion_datasys_mobile.html" },
+      "inventarios": { alias: ["inventario", "inventarios", "stock", "almacén", "almacen", "entrada", "salida", "existencias", "bodega", "mercancía", "mercancia"], label: "📦 Inventarios", url_desktop: "Desktop/inventarios_datasys.html", url_mobile: "mobile/inventarios_datasys_mobile.html" },
+      "logistica": { alias: ["logística", "logistica", "ruta", "rutas", "entrega", "entregas", "transporte", "supply chain", "cadena", "distribución", "distribucion", "flete"], label: "🚚 Logística", url_desktop: "Desktop/logistica_datasys.html", url_mobile: "mobile/logistica_datasys_mobile.html" }
+    };
 
-/* ── Quick buttons por sección ── */
-var QUICK_BY_SECTION = {
-  produccion:  ["¿Qué métricas monitorean?","Control de calidad","Eficiencia por línea","Reportes de producción"],
-  inventarios: ["¿Cómo funciona el sistema?","Control de entradas/salidas","Alertas de stock bajo","Integración ERP"],
-  logistica:   ["Seguimiento de rutas","Costos de distribución","¿Qué es supply chain?","Tiempos de entrega"]
-};
+    /* ── Quick buttons por sección ── */
+    var QUICK_BY_SECTION = {
+      produccion: ["¿Qué métricas monitorean?", "Control de calidad", "Eficiencia por línea", "Reportes de producción"],
+      inventarios: ["¿Cómo funciona el sistema?", "Control de entradas/salidas", "Alertas de stock bajo", "Integración ERP"],
+      logistica: ["Seguimiento de rutas", "Costos de distribución", "¿Qué es supply chain?", "Tiempos de entrega"]
+    };
 
-/* ── Respuesta global cuando no hay sección activa ── */
-var RESPUESTA_GLOBAL_DATASYS = [
-  { claves:["hola","hi","buenas","buenos","buen día","saludos","qué tal","que tal","hey"],
-    respuesta:"¡Hola! Soy <b>ARIA</b>, asistente IA del ecosistema <b>DATASYS</b>. Cubrimos <b>3 áreas clave</b>: Producción, Inventarios y Logística. Puedes seleccionar una en el menú lateral o preguntarme directamente. ¿En qué te puedo ayudar?" },
-  { claves:["gracias","perfecto","ok","listo","entendido","excelente","genial","bien"],
-    respuesta:"Con mucho gusto 😊 Si tienes más dudas o quieres ver una plataforma, usa el menú lateral o escríbeme. También puedes contactarnos en <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a>." },
-  { claves:["servicio","servicios","ofrecen","hacen","plataformas","ecosistema","qué es datasys","que es"],
-    respuesta:"DATASYS cubre <b>3 áreas operativas clave</b>:<br>🏭 Producción · 📦 Inventarios · 🚚 Logística<br><br>Toca cualquier área del menú lateral para saber más." },
-  { claves:["contacto","correo","email","teléfono","telefono","llamar","whatsapp","ubicación","ubicacion","dónde","donde"],
-    respuesta:"Puedes contactarnos por:<br>• <b>Email:</b> <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a><br>• <b>Teléfono/WhatsApp:</b> +52 (55) 1017-6436<br>• <b>Sede:</b> Ciudad de México, México<br>Respondemos en menos de <b>24 horas hábiles</b>." },
-  { claves:["precio","costo","cuánto","cuanto","presupuesto","cotización","cotizacion","tarifa","inversión","inversion"],
-    respuesta:"Los precios varían según la plataforma y alcance del proyecto. Para una cotización personalizada escríbenos a <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a> o al <b>+52 (55) 1017-6436</b>. Selecciona una plataforma en el menú para ver precios específicos." },
-  { claves:["contratar","iniciar","empezar","cómo","como","proceso","pasos","quiero","arrancar"],
-    respuesta:"Para iniciar con DATASYS:<br>1. Selecciona la plataforma de tu interés en el menú lateral<br>2. Contáctanos en <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a><br>3. Agendamos una sesión sin costo<br>4. Entregamos propuesta en 48 hrs" }
-];
+    /* ── Respuesta global cuando no hay sección activa ── */
+    var RESPUESTA_GLOBAL_DATASYS = [
+      {
+        claves: ["hola", "hi", "buenas", "buenos", "buen día", "saludos", "qué tal", "que tal", "hey"],
+        respuesta: "¡Hola! Soy <b>ARIA</b>, asistente IA del ecosistema <b>DATASYS</b>. Cubrimos <b>3 áreas clave</b>: Producción, Inventarios y Logística. Puedes seleccionar una en el menú lateral o preguntarme directamente. ¿En qué te puedo ayudar?"
+      },
+      {
+        claves: ["gracias", "perfecto", "ok", "listo", "entendido", "excelente", "genial", "bien"],
+        respuesta: "Con mucho gusto 😊 Si tienes más dudas o quieres ver una plataforma, usa el menú lateral o escríbeme. También puedes contactarnos en <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a>."
+      },
+      {
+        claves: ["servicio", "servicios", "ofrecen", "hacen", "plataformas", "ecosistema", "qué es datasys", "que es"],
+        respuesta: "DATASYS cubre <b>3 áreas operativas clave</b>:<br>🏭 Producción · 📦 Inventarios · 🚚 Logística<br><br>Toca cualquier área del menú lateral para saber más."
+      },
+      {
+        claves: ["contacto", "correo", "email", "teléfono", "telefono", "llamar", "whatsapp", "ubicación", "ubicacion", "dónde", "donde"],
+        respuesta: "Puedes contactarnos por:<br>• <b>Email:</b> <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a><br>• <b>Teléfono/WhatsApp:</b> +52 (55) 1017-6436<br>• <b>Sede:</b> Ciudad de México, México<br>Respondemos en menos de <b>24 horas hábiles</b>."
+      },
+      {
+        claves: ["precio", "costo", "cuánto", "cuanto", "presupuesto", "cotización", "cotizacion", "tarifa", "inversión", "inversion"],
+        respuesta: "Los precios varían según la plataforma y alcance del proyecto. Para una cotización personalizada escríbenos a <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a> o al <b>+52 (55) 1017-6436</b>. Selecciona una plataforma en el menú para ver precios específicos."
+      },
+      {
+        claves: ["contratar", "iniciar", "empezar", "cómo", "como", "proceso", "pasos", "quiero", "arrancar"],
+        respuesta: "Para iniciar con DATASYS:<br>1. Selecciona la plataforma de tu interés en el menú lateral<br>2. Contáctanos en <a href='mailto:contacto@datasys.mx' style='color:var(--cyan)'>contacto@datasys.mx</a><br>3. Agendamos una sesión sin costo<br>4. Entregamos propuesta en 48 hrs"
+      }
+    ];
 
-/* ── Soluciones por Tamaño de Empresa ── */
-var SOLUCIONES_TAMAÑO = {
-  "produccion": {
-    "1 - 20 empleados": "Solución recomendada: <b>Software de Control de Órdenes Ligero</b>. Estandariza tus procesos básicos sin gran inversión. Ahorro estimado: 15% en tiempo de producción.  → cotización estimada: $ 750 USD MENSUALES",
-    "20 - 100 empleados": "Solución recomendada: <b>ERP de Producción Modular</b> con alertas de calidad automatizadas. Ahorro estimado: 20% en tiempo de producción y mermas. → cotización estimada: $ 800 USD MENSUALES",
-    "+ 100 empleados": "Solución recomendada: <b>Automatización de procesos con IA y monitoreo en tiempo real</b>. Ahorro estimado: 25% en tiempo de producción. → cotización estimada: $ 1000 USD MENSUALES"
-  },
-  "inventarios": {
-    "1 - 20 empleados": "Solución recomendada: <b>Sistema Básico de Entradas y Salidas en la Nube</b>. Ideal para visualizar tu stock al instante. Precisión de inventario: +90%. → cotización estimada: $ 299.00 USD",
-    "20 - 100 empleados": "Solución recomendada: <b>Gestor de Inventarios Multi-Almacén</b> con códigos de barras. Optimiza tus reabastecimientos. Reducción de quiebres de stock: 30%. → cotización estimada: $ 299.00 USD",
-    "+ 100 empleados": "Solución recomendada: <b>WMS inteligente impulsado por IA</b> con predicción de demanda y rotación. Análisis predictivo. Precisión de stock: 99.9%. → cotización estimada: $ 299.00 USD"
-  },
-  "logistica": {
-    "1 - 20 empleados": "Solución recomendada: <b>Rastreo GPS Simplificado</b> para unidades. Monitorea ubicación en tiempo real. Aumento de entregas exitosas: 15%. → cotización estimada: $ 500 USD MENSUALES",
-    "20 - 100 empleados": "Solución recomendada: <b>Optimizador de Rutas Dinámico</b>. Reduce el consumo de combustible y tiempos de entrega. Ahorro en combustible: 20%. → cotización estimada: $ 700  USD MENSUALES", 
-    "+ 100 empleados": "Solución recomendada: <b>Plataforma Integral de Supply Chain con IA</b>. Control de flotillas, análisis predictivo de rutas y control de costos. Reducción en tiempos de entrega: 30%. → cotización estimada: $ 1000 USD MENSUALES"
-  }
-};
+    /* ── Soluciones por Tamaño de Empresa ── */
+    var SOLUCIONES_TAMAÑO = {
+      "produccion": {
+        "1 - 20 empleados": "Solución recomendada: <b>Software de Control de Órdenes Ligero</b>. Estandariza tus procesos básicos sin gran inversión. Ahorro estimado: 15% en tiempo de producción.  → cotización estimada: $ 750 USD MENSUALES",
+        "20 - 100 empleados": "Solución recomendada: <b>ERP de Producción Modular</b> con alertas de calidad automatizadas. Ahorro estimado: 20% en tiempo de producción y mermas. → cotización estimada: $ 800 USD MENSUALES",
+        "+ 100 empleados": "Solución recomendada: <b>Automatización de procesos con IA y monitoreo en tiempo real</b>. Ahorro estimado: 25% en tiempo de producción. → cotización estimada: $ 1000 USD MENSUALES"
+      },
+      "inventarios": {
+        "1 - 20 empleados": "Solución recomendada: <b>Sistema Básico de Entradas y Salidas QR</b>. Ideal para visualizar tu stock al instante. Precisión de inventario: +90%. → cotización estimada: $ 299.00 USD",
+        "20 - 100 empleados": "Solución recomendada: <b>Gestor de Inventarios Multi-Almacén</b> con códigos de barras. Optimiza tus reabastecimientos. Reducción de quiebres de stock: 30%. → cotización estimada: $ 299.00 USD",
+        "+ 100 empleados": "Solución recomendada: <b>WMS inteligente impulsado por IA</b> con predicción de demanda y rotación. Análisis predictivo. Precisión de stock: 99.9%. → cotización estimada: $ 299.00 USD<br><br><a href='../demo/inventario_IA_datasys.html' target='_blank' style='display:inline-block;margin-top:8px;padding:11px 22px;font-family:Orbitron,monospace;font-size:.55rem;font-weight:700;letter-spacing:3px;background:var(--cyan);color:var(--dark);border:none;cursor:pointer;text-decoration:none;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);'>🚀 VER DEMO EN VIVO →</a>"
+      },
+      "logistica": {
+        "1 - 20 empleados": "Solución recomendada: <b>Rastreo GPS Simplificado</b> para unidades. Monitorea ubicación en tiempo real. Aumento de entregas exitosas: 15%. → cotización estimada: $ 500 USD MENSUALES",
+        "20 - 100 empleados": "Solución recomendada: <b>Optimizador de Rutas Dinámico</b>. Reduce el consumo de combustible y tiempos de entrega. Ahorro en combustible: 20%. → cotización estimada: $ 700  USD MENSUALES",
+        "+ 100 empleados": "Solución recomendada: <b>Plataforma Integral de Supply Chain con IA</b>. Control de flotillas, análisis predictivo de rutas y control de costos. Reducción en tiempos de entrega: 30%. → cotización estimada: $ 1000 USD MENSUALES"
+      }
+    };
 
-/* ── Estado ── */
-var ariaSeccion = "";
-var sidebarOpen = false;
-var esperandoTamaño = false;
+    /* ── Estado ── */
+    var ariaSeccion = "";
+    var sidebarOpen = false;
+    var esperandoTamaño = false;
 
-/* ── TOGGLE BTN: habilitar / deshabilitar ── */
-function setSidebarToggle(enabled){
-  var btn = document.getElementById('sidebar-toggle');
-  if(!btn) return;
-  if(enabled){
-    btn.classList.remove('disabled');
-    btn.title = 'Menú de plataformas';
-  } else {
-    btn.classList.add('disabled');
-    // Cerrar sidebar si estaba abierto
-    var sb = document.getElementById('sidebar');
-    var ov = document.getElementById('sidebar-overlay');
-    sidebarOpen = false;
-    if(sb) sb.classList.remove('open');
-    if(ov) ov.style.display = 'none';
-    btn.title = 'Selecciona una plataforma primero';
-  }
-}
+    /* ── TOGGLE BTN: habilitar / deshabilitar ── */
+    function setSidebarToggle(enabled) {
+      var btn = document.getElementById('sidebar-toggle');
+      if (!btn) return;
+      if (enabled) {
+        btn.classList.remove('disabled');
+        btn.title = 'Menú de plataformas';
+      } else {
+        btn.classList.add('disabled');
+        // Cerrar sidebar si estaba abierto
+        var sb = document.getElementById('sidebar');
+        var ov = document.getElementById('sidebar-overlay');
+        sidebarOpen = false;
+        if (sb) sb.classList.remove('open');
+        if (ov) ov.style.display = 'none';
+        btn.title = 'Selecciona una plataforma primero';
+      }
+    }
 
-/* ── HELPERS DE DOM ── */
-function getMsgs(){ return document.getElementById('msgs'); }
-function esconderBienvenida(){
-  var w = document.getElementById('welcome');
-  if(w){ w.style.display='none'; }
-}
+    /* ── HELPERS DE DOM ── */
+    function getMsgs() { return document.getElementById('msgs'); }
+    function esconderBienvenida() {
+      var w = document.getElementById('welcome');
+      if (w) { w.style.display = 'none'; }
+    }
 
-/* ── MOSTRAR SIDEBAR ── */
-function mostrarSidebar(){
-  var app = document.getElementById('app');
-  if(app) app.classList.add('sidebar-visible');
-}
+    /* ── MOSTRAR SIDEBAR ── */
+    function mostrarSidebar() {
+      var app = document.getElementById('app');
+      if (app) app.classList.add('sidebar-visible');
+    }
 
-/* ── SIDEBAR ── */
-function toggleSidebar(){
-  var sb = document.getElementById('sidebar');
-  var ov = document.getElementById('sidebar-overlay');
-  sidebarOpen = !sidebarOpen;
-  sb.classList.toggle('open', sidebarOpen);
-  if(ov) ov.style.display = sidebarOpen ? 'block' : 'none';
-}
+    /* ── SIDEBAR ── */
+    function toggleSidebar() {
+      var sb = document.getElementById('sidebar');
+      var ov = document.getElementById('sidebar-overlay');
+      sidebarOpen = !sidebarOpen;
+      sb.classList.toggle('open', sidebarOpen);
+      if (ov) ov.style.display = sidebarOpen ? 'block' : 'none';
+    }
 
-/* ── MENSAJES ── */
-function addBot(html){
-  esconderBienvenida();
-  var w = getMsgs();
-  // Typing indicator
-  var tp = document.createElement('div');
-  tp.className = 'msg bot';
-  tp.innerHTML = '<div class="msg-av"><img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'"></div><div class="bubble"><div class="typing-bub"><span></span><span></span><span></span></div></div>';
-  w.appendChild(tp);
-  // Scroll al inicio del mensaje (typing indicator)
-  tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  setTimeout(function(){
-    tp.querySelector('.bubble').innerHTML = html;
-    // Scroll al inicio del mensaje ya renderizado
-    setTimeout(function(){
+    /* ── MENSAJES ── */
+    function addBot(html) {
+      esconderBienvenida();
+      var w = getMsgs();
+      // Typing indicator
+      var tp = document.createElement('div');
+      tp.className = 'msg bot';
+      tp.innerHTML = '<div class="msg-av"><img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'"></div><div class="bubble"><div class="typing-bub"><span></span><span></span><span></span></div></div>';
+      w.appendChild(tp);
+      // Scroll al inicio del mensaje (typing indicator)
       tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 60);
+      setTimeout(function () {
+        tp.querySelector('.bubble').innerHTML = html;
+        // Scroll al inicio del mensaje ya renderizado
+        setTimeout(function () {
+          tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 60);
 
-    // Detectar trigger de diagnóstico
-    var trigger = tp.querySelector('.aria-trigger[data-trigger]');
-    if(trigger){
-      var t = trigger.getAttribute('data-trigger');
-      setTimeout(function(){
-        if(t === 'diagnostico-inventarios') iniciarDiagnostico('inventarios');
-        else if(t === 'diagnostico-logistica') iniciarDiagnostico('logistica');
-        else if(t === 'diagnostico-produccion') iniciarDiagnostico('produccion');
-      }, 20000);
+        // Detectar trigger de diagnóstico
+        var trigger = tp.querySelector('.aria-trigger[data-trigger]');
+        if (trigger) {
+          var t = trigger.getAttribute('data-trigger');
+          setTimeout(function () {
+            if (t === 'diagnostico-inventarios') iniciarDiagnostico('inventarios');
+            else if (t === 'diagnostico-logistica') iniciarDiagnostico('logistica');
+            else if (t === 'diagnostico-produccion') iniciarDiagnostico('produccion');
+          }, 1000);
+        }
+      }, 520);
     }
-  }, 520);
-}
 
-function addUsr(txt){
-  // Solo mostrar sidebar en desktop
-  if(window.innerWidth > 768) mostrarSidebar();
-  esconderBienvenida();
-  var w = getMsgs();
-  var m = document.createElement('div');
-  m.className = 'msg usr';
-  m.innerHTML = '<div class="msg-av-usr">TÚ</div><div class="bubble"></div>';
-  m.querySelector('.bubble').textContent = txt;
-  w.appendChild(m);
-  m.scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-/* ── QUICK BUTTONS ── */
-
-/* Categorías para Apps & Software */
-var APPS_CATEGORIAS = [
-  { label:'🏆 Experiencia',     preguntas:[
-    { label:'Caso de éxito real',       pregunta:'¿Puedes mostrarme un caso de éxito donde el diseño haya resuelto un problema de negocio real?' },
-    { label:'Mi industria',             pregunta:'¿Has diseñado para mi industria? ¿Cuáles son los estándares UX que mis competidores ignoran?' },
-    { label:'Años en el mercado',       pregunta:'¿Cuánta experiencia tienen y qué proyectos han desarrollado?' }
-  ]},
-  { label:'🎯 Estrategia',      preguntas:[
-    { label:'Validar diseño',           pregunta:'¿Cómo validan que el diseño le va a gustar a mis usuarios finales?' },
-    { label:'Presupuesto limitado',     pregunta:'Si mi presupuesto es limitado, ¿qué funciones para el MVP me recomiendan?' },
-    { label:'Propuesta de valor',       pregunta:'¿Cómo definen la estrategia y modelo de negocio de una app?' }
-  ]},
-  { label:'⚙️ Servicio Técnico', preguntas:[
-    { label:'Entrega a developers',     pregunta:'¿Cómo entregan los archivos a los desarrolladores? (entrega a developers y handoff)' },
-    { label:'iOS y Android nativo',     pregunta:'¿Conocen las guías nativas de iOS y Android? ¿Por qué seguirlas o romperlas?' },
-    { label:'Crear una app paso a paso',pregunta:'¿Cuáles son los pasos para crear una aplicación móvil desde cero?' }
-  ]},
-  { label:'🤝 Confianza',       preguntas:[
-    { label:'Propiedad del código',     pregunta:'¿Quién es el dueño de los archivos fuente y la propiedad intelectual al terminar?' },
-    { label:'Cambios post-lanzamiento', pregunta:'¿Qué pasa si después del lanzamiento descubrimos que un flujo de usuario es confuso?' }
-  ]},
-  { label:'🚀 Logística',       preguntas:[
-    { label:'Cuentas de developer',     pregunta:'¿Cuánto cuesta publicar en App Store y Google Play? ¿Qué cuentas necesito?' },
-    { label:'Requisitos legales',       pregunta:'¿Qué requisitos legales necesito para publicar mi app?' },
-    { label:'ASO y posicionamiento',    pregunta:'¿Qué es el ASO y cómo ayudan a posicionar la app en las tiendas?' }
-  ]}
-];
-
-var _appsCatActiva = -1;
-
-function renderAppsCategories(){
-  var row = document.getElementById('quick-row');
-  if(!row) return;
-  row.style.display = 'flex';
-  row.style.flexDirection = 'column';
-  row.style.gap = '6px';
-  row.style.padding = '10px 24px';
-
-  var catHtml = '<div id="apps-cat-row" style="display:flex;flex-wrap:wrap;gap:6px;">'
-    + APPS_CATEGORIAS.map(function(c, i){
-        return '<button class="qchip apps-cat-btn" data-idx="'+i+'" style="font-weight:600;border-color:rgba(0,229,255,.35);color:var(--cyan);" onclick="toggleAppsCategory('+i+')">'
-          + c.label + '</button>';
-      }).join('')
-    + '</div>'
-    + '<div id="apps-sub-row" style="display:flex;flex-wrap:wrap;gap:6px;min-height:0;"></div>';
-
-  row.innerHTML = catHtml;
-  _appsCatActiva = -1;
-}
-
-function toggleAppsCategory(idx){
-  var subRow = document.getElementById('apps-sub-row');
-  var btns = document.querySelectorAll('.apps-cat-btn');
-  if(_appsCatActiva === idx){
-    // Deseleccionar
-    btns.forEach(function(b){ b.style.background='rgba(0,229,255,.04)'; b.style.borderColor='rgba(0,229,255,.35)'; });
-    if(subRow) subRow.innerHTML = '';
-    _appsCatActiva = -1;
-    return;
-  }
-  _appsCatActiva = idx;
-  btns.forEach(function(b, i){
-    b.style.background = i===idx ? 'rgba(0,229,255,.18)' : 'rgba(0,229,255,.04)';
-    b.style.borderColor = i===idx ? 'var(--cyan)' : 'rgba(0,229,255,.35)';
-  });
-  var preguntas = APPS_CATEGORIAS[idx].preguntas;
-  if(subRow){
-    subRow.innerHTML = preguntas.map(function(p){
-      return '<button class="qchip" style="font-size:.7rem;" onclick="enviarPregunta(\''+p.pregunta.replace(/'/g,"\\'")+'\')">'+p.label+'</button>';
-    }).join('');
-  }
-}
-
-function renderQuickBtns(key){
-  var row = document.getElementById('quick-row');
-  if(!row) return;
-  if(key === 'apps'){
-    renderAppsCategories();
-    return;
-  }
-  row.style.flexDirection = '';
-  row.style.gap = '';
-  row.style.padding = '';
-  var btns = key ? (QUICK_BY_SECTION[key] || []) : [];
-  if(btns.length === 0){ row.style.display='none'; return; }
-  row.style.display='flex';
-  row.innerHTML = btns.map(function(b){
-    return '<button class="qchip" onclick="enviarPregunta(\''+b.replace(/'/g,"\\'")+'\')">' + b + '</button>';
-  }).join('');
-}
-
-/* ── CONTEXT BAR ── */
-function actualizarCtx(){
-  var bar = document.getElementById('ctx-bar');
-  var ico = document.getElementById('ctx-ico');
-  var lbl = document.getElementById('ctx-lbl');
-  if(!bar) return;
-  if(ariaSeccion && ARIA_SECCIONES[ariaSeccion]){
-    var parts = ARIA_SECCIONES[ariaSeccion].label.split(' ');
-    if(ico) ico.textContent = parts[0];
-    if(lbl) lbl.textContent = parts.slice(1).join(' ').toUpperCase();
-    bar.classList.add('show');
-  } else {
-    bar.classList.remove('show');
-  }
-}
-
-/* ── SIDEBAR ACTIVE STATE ── */
-function activarPlatBtn(key){
-  document.querySelectorAll('.plat-btn').forEach(function(b){
-    b.classList.toggle('active', b.dataset.key === key);
-  });
-}
-
-/* ── SELECCIONAR PLATAFORMA (desde sidebar) ── */
-function seleccionarPlat(key){
-  if(!ARIA_SECCIONES[key]) return;
-
-  // Cerrar sidebar en mobile ANTES de procesar
-  if(window.innerWidth <= 768){
-    var sb = document.getElementById('sidebar');
-    var ov = document.getElementById('sidebar-overlay');
-    sidebarOpen = false;
-    if(sb) sb.classList.remove('open');
-    if(ov) ov.style.display = 'none';
-  }
-
-  // Evitar duplicar mensaje si ya está en esta sección
-  if(ariaSeccion === key && esperandoTamaño) return;
-
-  ariaSeccion = key;
-  if(typeof registrarSeccion === 'function') registrarSeccion(key);
-  esperandoTamaño = true;
-  actualizarCtx();
-  activarPlatBtn(key);
-  renderTamanosEmpresa();
-  setSidebarToggle(true); // habilitar ☰
-
-  var lbl = ARIA_SECCIONES[key].label;
-  var saludo = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ', <b>' + ARIA_USER.nombre + '</b>' : '';
-  addBot('Perfecto' + saludo + ', vamos a <b>' + lbl + '</b>.<br>Para darte la recomendación más precisa: ¿cuántos empleados tiene tu empresa?');
-}
-
-function renderTamanosEmpresa() {
-  var row = document.getElementById('quick-row');
-  if(!row) return;
-  row.style.flexDirection = '';
-  row.style.gap = '';
-  row.style.padding = '';
-  row.style.display = 'flex';
-  var btns = ["1 - 20 empleados", "20 - 100 empleados", "+ 100 empleados"];
-  row.innerHTML = btns.map(function(b){
-    return '<button class="qchip" onclick="'
-      + 'if(typeof ARIA_USER!==\'undefined\') ARIA_USER.rangoEmpleados=\'' + b + '\';'
-      + 'enviarPregunta(\'' + b + '\')">' + b + '</button>';
-  }).join('');
-}
-
-/* ── DIAGNÓSTICO GUIADO — botones de info clave post-solución ── */
-var DIAGNOSTICO_PASOS = {
-  inventarios: [
-    {
-      pregunta: '¿Cómo controlan su inventario actualmente?',
-      opciones: ['En Excel / hojas de cálculo', 'Sistema desactualizado', 'Sin sistema, es manual', 'Ya tenemos sistema pero falla']
-    },
-    {
-      pregunta: '¿Cuál es su mayor problema hoy?',
-      opciones: ['Quiebres de stock frecuentes', 'No sé qué tengo en bodega', 'Mermas y diferencias de inventario', 'Procesos muy lentos']
-    },
-    {
-      pregunta: '¿Con qué urgencia necesitan la solución?',
-      opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
-    },
-    {
-      pregunta: '¿Quién toma la decisión de compra?',
-      opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+    function addUsr(txt) {
+      // Solo mostrar sidebar en desktop
+      if (window.innerWidth > 768) mostrarSidebar();
+      esconderBienvenida();
+      var w = getMsgs();
+      var m = document.createElement('div');
+      m.className = 'msg usr';
+      m.innerHTML = '<div class="msg-av-usr">TÚ</div><div class="bubble"></div>';
+      m.querySelector('.bubble').textContent = txt;
+      w.appendChild(m);
+      m.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  ],
-  logistica: [
-    {
-      pregunta: '¿Cómo gestionan sus entregas actualmente?',
-      opciones: ['Todo en Excel / WhatsApp', 'Sin sistema formal', 'Sistema propio que ya no alcanza', 'Tercerizamos todo']
-    },
-    {
-      pregunta: '¿Cuál es su mayor dolor en logística?',
-      opciones: ['Entregas tardías o fallidas', 'No sé dónde están mis unidades', 'Alto costo de combustible', 'Clientes se quejan constantemente']
-    },
-    {
-      pregunta: '¿Con qué urgencia necesitan la solución?',
-      opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
-    },
-    {
-      pregunta: '¿Quién toma la decisión de compra?',
-      opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+
+    /* ── QUICK BUTTONS ── */
+
+    /* Categorías para Apps & Software */
+    var APPS_CATEGORIAS = [
+      {
+        label: '🏆 Experiencia', preguntas: [
+          { label: 'Caso de éxito real', pregunta: '¿Puedes mostrarme un caso de éxito donde el diseño haya resuelto un problema de negocio real?' },
+          { label: 'Mi industria', pregunta: '¿Has diseñado para mi industria? ¿Cuáles son los estándares UX que mis competidores ignoran?' },
+          { label: 'Años en el mercado', pregunta: '¿Cuánta experiencia tienen y qué proyectos han desarrollado?' }
+        ]
+      },
+      {
+        label: '🎯 Estrategia', preguntas: [
+          { label: 'Validar diseño', pregunta: '¿Cómo validan que el diseño le va a gustar a mis usuarios finales?' },
+          { label: 'Presupuesto limitado', pregunta: 'Si mi presupuesto es limitado, ¿qué funciones para el MVP me recomiendan?' },
+          { label: 'Propuesta de valor', pregunta: '¿Cómo definen la estrategia y modelo de negocio de una app?' }
+        ]
+      },
+      {
+        label: '⚙️ Servicio Técnico', preguntas: [
+          { label: 'Entrega a developers', pregunta: '¿Cómo entregan los archivos a los desarrolladores? (entrega a developers y handoff)' },
+          { label: 'iOS y Android nativo', pregunta: '¿Conocen las guías nativas de iOS y Android? ¿Por qué seguirlas o romperlas?' },
+          { label: 'Crear una app paso a paso', pregunta: '¿Cuáles son los pasos para crear una aplicación móvil desde cero?' }
+        ]
+      },
+      {
+        label: '🤝 Confianza', preguntas: [
+          { label: 'Propiedad del código', pregunta: '¿Quién es el dueño de los archivos fuente y la propiedad intelectual al terminar?' },
+          { label: 'Cambios post-lanzamiento', pregunta: '¿Qué pasa si después del lanzamiento descubrimos que un flujo de usuario es confuso?' }
+        ]
+      },
+      {
+        label: '🚀 Logística', preguntas: [
+          { label: 'Cuentas de developer', pregunta: '¿Cuánto cuesta publicar en App Store y Google Play? ¿Qué cuentas necesito?' },
+          { label: 'Requisitos legales', pregunta: '¿Qué requisitos legales necesito para publicar mi app?' },
+          { label: 'ASO y posicionamiento', pregunta: '¿Qué es el ASO y cómo ayudan a posicionar la app en las tiendas?' }
+        ]
+      }
+    ];
+
+    var _appsCatActiva = -1;
+
+    function renderAppsCategories() {
+      var row = document.getElementById('quick-row');
+      if (!row) return;
+      row.style.display = 'flex';
+      row.style.flexDirection = 'column';
+      row.style.gap = '6px';
+      row.style.padding = '10px 24px';
+
+      var catHtml = '<div id="apps-cat-row" style="display:flex;flex-wrap:wrap;gap:6px;">'
+        + APPS_CATEGORIAS.map(function (c, i) {
+          return '<button class="qchip apps-cat-btn" data-idx="' + i + '" style="font-weight:600;border-color:rgba(0,229,255,.35);color:var(--cyan);" onclick="toggleAppsCategory(' + i + ')">'
+            + c.label + '</button>';
+        }).join('')
+        + '</div>'
+        + '<div id="apps-sub-row" style="display:flex;flex-wrap:wrap;gap:6px;min-height:0;"></div>';
+
+      row.innerHTML = catHtml;
+      _appsCatActiva = -1;
     }
-  ],
-  produccion: [
-    {
-      pregunta: '¿Cómo monitorean su producción hoy?',
-      opciones: ['Hojas de papel / Excel', 'Sistema desactualizado', 'De forma visual sin datos', 'Ya tenemos algo pero es insuficiente']
-    },
-    {
-      pregunta: '¿Cuál es su mayor problema en planta?',
-      opciones: ['Paros no planificados frecuentes', 'No sé mi OEE real', 'Alta tasa de rechazos / scrap', 'Retrasos en órdenes de producción']
-    },
-    {
-      pregunta: '¿Con qué urgencia necesitan la solución?',
-      opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
-    },
-    {
-      pregunta: '¿Quién toma la decisión de compra?',
-      opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+
+    function toggleAppsCategory(idx) {
+      var subRow = document.getElementById('apps-sub-row');
+      var btns = document.querySelectorAll('.apps-cat-btn');
+      if (_appsCatActiva === idx) {
+        // Deseleccionar
+        btns.forEach(function (b) { b.style.background = 'rgba(0,229,255,.04)'; b.style.borderColor = 'rgba(0,229,255,.35)'; });
+        if (subRow) subRow.innerHTML = '';
+        _appsCatActiva = -1;
+        return;
+      }
+      _appsCatActiva = idx;
+      btns.forEach(function (b, i) {
+        b.style.background = i === idx ? 'rgba(0,229,255,.18)' : 'rgba(0,229,255,.04)';
+        b.style.borderColor = i === idx ? 'var(--cyan)' : 'rgba(0,229,255,.35)';
+      });
+      var preguntas = APPS_CATEGORIAS[idx].preguntas;
+      if (subRow) {
+        subRow.innerHTML = preguntas.map(function (p) {
+          return '<button class="qchip" style="font-size:.7rem;" onclick="enviarPregunta(\'' + p.pregunta.replace(/'/g, "\\'") + '\')">' + p.label + '</button>';
+        }).join('');
+      }
     }
-  ]
-};
 
-var _diagPaso = 0;
-var _diagRespuestas = [];
-
-function iniciarDiagnostico(seccion) {
-  _diagPaso = 0;
-  _diagRespuestas = [];
-
-  // Texto puente personalizado antes de las preguntas
-  var secLabel = {inventarios:'Inventarios', logistica:'Logística', produccion:'Producción'}[seccion] || seccion;
-  var tamano = (typeof ARIA_USER !== 'undefined' && ARIA_USER.tamaño) || null;
-  var rangoEmpleados = (typeof ARIA_USER !== 'undefined' && ARIA_USER.rangoEmpleados) || null;
-
-  // Texto legible del rango
-  var tamanoTexto = '';
-  if (rangoEmpleados) {
-    tamanoTexto = rangoEmpleados;
-  } else if (tamano === 'pequeña') {
-    tamanoTexto = '1 - 20 empleados';
-  } else if (tamano === 'mediana') {
-    tamanoTexto = '20 - 100 empleados';
-  } else if (tamano === 'grande') {
-    tamanoTexto = '+ 100 empleados';
-  }
-
-  var msg = '📊 Sabemos que tienes un reto en tu área de '
-    + '<b>' + secLabel + '</b>'
-    + (tamanoTexto ? ' y que tu empresa cuenta con <b>' + tamanoTexto + '</b>' : '')
-    + '.<br><br>'
-    + 'Te hemos propuesto una solución que en el <b style="color:#00ff88;">90% de los casos</b> '
-    + 'resuelve el problema satisfactoriamente. '
-    + 'El <b>10% restante también tiene solución</b> — solo hay que conocer un poco más tu operación.<br><br>'
-    + '<button onclick="this.parentNode.innerHTML=\'<span style=\\\'opacity:.4;font-size:.8rem;\\\'>Diagnóstico iniciado ✓</span>\';'
-    + 'if(typeof siguientePasoDiagnostico===\'function\') siguientePasoDiagnostico(\'' + seccion + '\');" '
-    + 'style="margin-top:4px;padding:12px 20px;font-family:\'Orbitron\',monospace;font-size:.55rem;font-weight:700;'
-    + 'letter-spacing:3px;background:transparent;color:var(--cyan);border:1px solid var(--cyan);cursor:pointer;'
-    + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
-    + '🔍 CONTINUAR CON EL DIAGNÓSTICO</button>';
-
-  addBot(msg);
-}
-
-function siguientePasoDiagnostico(seccion) {
-  var pasos = DIAGNOSTICO_PASOS[seccion];
-  if (!pasos || _diagPaso >= pasos.length) {
-    mostrarResumenDiagnostico(seccion);
-    return;
-  }
-  var paso = pasos[_diagPaso];
-  renderBotonesDiagnostico(paso.pregunta, paso.opciones, seccion);
-}
-
-function renderBotonesDiagnostico(pregunta, opciones, seccion) {
-  var row = document.getElementById('quick-row');
-  if (!row) return;
-
-  // Mostrar pregunta en el chat
-  var nombre = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ARIA_USER.nombre + ', ' : '';
-  addBot('🔍 <b>' + nombre + pregunta + '</b>');
-
-  // Renderizar botones horizontales con wrap
-  row.style.display = 'flex';
-  row.style.flexDirection = 'row';
-  row.style.flexWrap = 'wrap';
-  row.style.gap = '6px';
-  row.style.padding = '8px 16px';
-  row.innerHTML = opciones.map(function(op) {
-    return '<button class="qchip" style="flex:1;min-width:140px;max-width:48%;text-align:center;padding:9px 12px;font-size:.72rem;border-color:rgba(0,229,255,.2);" '
-      + 'onclick="responderDiagnostico(\'' + seccion + '\',\'' + op.replace(/'/g,"\\'") + '\')">'
-      + op + '</button>';
-  }).join('');
-}
-
-function responderDiagnostico(seccion, respuesta) {
-  // Registrar respuesta como dolor si aplica
-  if (typeof ARIA_USER !== 'undefined') {
-    ARIA_USER.dolor.push(respuesta);
-  }
-  _diagRespuestas.push(respuesta);
-  addUsr(respuesta);
-  _diagPaso++;
-  setTimeout(function() {
-    siguientePasoDiagnostico(seccion);
-  }, 400);
-}
-
-function mostrarResumenDiagnostico(seccion) {
-  var r = _diagRespuestas;
-  var nombre = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? '<b>' + ARIA_USER.nombre + '</b>, ' : '';
-  var secLabel = {inventarios:'Inventarios',logistica:'Logística',produccion:'Producción'}[seccion] || seccion;
-
-  var resumen = '✅ ' + nombre + 'gracias por compartir esta información.<br><br>'
-    + '<div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:12px 14px;margin:6px 0;">'
-    + '<div style="font-family:\'Orbitron\',monospace;font-size:.45rem;letter-spacing:3px;color:var(--cyan);margin-bottom:8px;opacity:.7;">// DIAGNÓSTICO COMPLETADO · ' + secLabel.toUpperCase() + '</div>'
-    + r.map(function(resp, i) {
-        return '<div style="font-size:.82rem;padding:4px 0;border-bottom:1px solid rgba(0,229,255,.06);display:flex;gap:8px;">'
-          + '<span style="color:var(--cyan);flex-shrink:0;">' + (i+1) + '.</span>'
-          + '<span style="opacity:.8;">' + resp + '</span></div>';
-      }).join('')
-    + '</div><br>'
-    + 'Con base en tu diagnóstico, tenemos una solución que encaja exactamente con tu operación. '
-    + 'Un especialista DATASYS te contactará en <b>menos de 2 horas</b> para mostrarte cómo lo resolvemos paso a paso.<br><br>'
-    + '<button onclick="iniciarCierreVenta(\'' + seccion + '\')" style="'
-    + 'padding:12px 20px;font-family:\'Orbitron\',monospace;font-size:.55rem;font-weight:700;'
-    + 'letter-spacing:3px;background:var(--cyan);color:var(--dark);border:none;cursor:pointer;'
-    + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
-    + '📩 HABLAR CON UN ESPECIALISTA →</button>';
-
-  addBot(resumen);
-
-  // Limpiar botones y volver a quick chips normales
-  setTimeout(function() {
-    var row = document.getElementById('quick-row');
-    if (row) {
+    function renderQuickBtns(key) {
+      var row = document.getElementById('quick-row');
+      if (!row) return;
+      if (key === 'apps') {
+        renderAppsCategories();
+        return;
+      }
       row.style.flexDirection = '';
       row.style.gap = '';
       row.style.padding = '';
+      var btns = key ? (QUICK_BY_SECTION[key] || []) : [];
+      if (btns.length === 0) { row.style.display = 'none'; return; }
+      row.style.display = 'flex';
+      row.innerHTML = btns.map(function (b) {
+        return '<button class="qchip" onclick="enviarPregunta(\'' + b.replace(/'/g, "\\'") + '\')">' + b + '</button>';
+      }).join('');
     }
-    renderQuickBtns(seccion);
-  }, 600);
-}
 
-/* ── VOLVER AL MENÚ ── */
-function volverMenu(){
-  ariaSeccion = '';
-  esperandoTamaño = false;
-  actualizarCtx();
-  activarPlatBtn('');
-  renderQuickBtns('');
-  setSidebarToggle(false); // deshabilitar ☰
-  addBot('Volviste al menú general de ARIA. ¿Sobre cuál área quieres saber más?<br><span style="opacity:.4;font-size:.8em;">Usa el menú lateral o escribe: producción, inventarios o logística.</span>');
-}
-
-/* ── BÚSQUEDA LOCAL ── */
-function buscarLocal(texto){
-  var t = texto.toLowerCase();
-  // Sección activa: busca solo en esa base
-  if(ariaSeccion && ARIA_DB[ariaSeccion]){
-    var base = ARIA_DB[ariaSeccion];
-    for(var i=0;i<base.length;i++){
-      if(base[i].claves && base[i].claves.some(function(c){ return t.includes(c); })){
-        return base[i].respuesta;
+    /* ── CONTEXT BAR ── */
+    function actualizarCtx() {
+      var bar = document.getElementById('ctx-bar');
+      var ico = document.getElementById('ctx-ico');
+      var lbl = document.getElementById('ctx-lbl');
+      if (!bar) return;
+      if (ariaSeccion && ARIA_SECCIONES[ariaSeccion]) {
+        var parts = ARIA_SECCIONES[ariaSeccion].label.split(' ');
+        if (ico) ico.textContent = parts[0];
+        if (lbl) lbl.textContent = parts.slice(1).join(' ').toUpperCase();
+        bar.classList.add('show');
+      } else {
+        bar.classList.remove('show');
       }
     }
-    return null;
-  }
-  // Sin sección: busca en todas las bases combinadas
-  var todas = [];
-  Object.keys(ARIA_DB).forEach(function(k){ todas = todas.concat(ARIA_DB[k]||[]); });
-  for(var j=0;j<todas.length;j++){
-    if(todas[j].claves && todas[j].claves.some(function(c){ return t.includes(c); })){
-      return todas[j].respuesta;
+
+    /* ── SIDEBAR ACTIVE STATE ── */
+    function activarPlatBtn(key) {
+      document.querySelectorAll('.plat-btn').forEach(function (b) {
+        b.classList.toggle('active', b.dataset.key === key);
+      });
     }
-  }
-  return null;
-}
 
-/* ── DETECTAR SECCIÓN por texto ── */
-function detectarSeccion(texto){
-  var t = texto.toLowerCase();
-  var keys = Object.keys(ARIA_SECCIONES);
-  for(var i=0;i<keys.length;i++){
-    var k = keys[i];
-    if(ARIA_SECCIONES[k].alias.some(function(a){ return t.includes(a); })){
-      return k;
-    }
-  }
-  return null;
-}
+    /* ── SELECCIONAR PLATAFORMA (desde sidebar) ── */
+    function seleccionarPlat(key) {
+      if (!ARIA_SECCIONES[key]) return;
 
-/* ── RESPUESTA FALLBACK sin match local ── */
-function fallback(){
-  if(ariaSeccion && ARIA_SECCIONES[ariaSeccion]){
-    var s = ARIA_SECCIONES[ariaSeccion];
-    var isMob = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    var url = isMob ? s.url_mobile : s.url_desktop;
-    return 'No tengo esa información específica aquí, pero puedes ver todo sobre <b>'+s.label+'</b> en la plataforma completa:<br><a href="'+url+'" style="color:var(--cyan)">→ Ver plataforma completa</a><br><br>O contáctanos: <a href="mailto:contacto@datasys.mx" style="color:var(--cyan)">contacto@datasys.mx</a> · +52 (55) 1017-6436';
-  }
-  return '¿Sobre cuál área quieres saber más? Puedes seleccionarla en el menú lateral o preguntarme directamente.<br><span style="opacity:.5;font-size:.8em;">🏭 producción · 📦 inventarios · 🚚 logística</span>';
-}
-
-/* ── PROCESADOR PRINCIPAL (v2 con Motor de Ventas) ── */
-function procesarMensaje(texto){
-  var t = texto.toLowerCase();
-
-  // SALIDA: volver al menú
-  if(["salir","inicio","volver","home","menu","menú","regresar","todas","general","atrás","atras"].some(function(c){ return t.includes(c); })){
-    volverMenu(); return;
-  }
-
-  // ── MOTOR DE VENTAS: acumular perfil del usuario ──
-  if(typeof detectarContexto === 'function') detectarContexto(texto);
-
-  // ── FLUJO: esperando tamaño de empresa ──
-  if (esperandoTamaño) {
-    if (t.includes("1") || t.includes("20") || t.includes("100") || t.includes("empleado") || t.includes("pequeña") || t.includes("mediana") || t.includes("grande")) {
-      var tamano = (typeof resolverTamanoTexto === 'function') ? resolverTamanoTexto(texto) : "mediana";
-
-      // Si está disponible la versión v2 del discurso usa esa, sino la v1
-      if (ariaSeccion && typeof SOLUCIONES_TAMAÑO_V2 !== 'undefined'
-          && SOLUCIONES_TAMAÑO_V2[ariaSeccion] && SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano]) {
-        var html = SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano](tamano);
-        addBot(html);
-      } else if (ariaSeccion && SOLUCIONES_TAMAÑO[ariaSeccion]) {
-        // fallback a v1
-        var keyV1 = tamano === 'pequeña' ? '1 - 20 empleados' : tamano === 'mediana' ? '20 - 100 empleados' : '+ 100 empleados';
-        var solucion = SOLUCIONES_TAMAÑO[ariaSeccion][keyV1] || '';
-        addBot(solucion);
+      // Cerrar sidebar en mobile ANTES de procesar
+      if (window.innerWidth <= 768) {
+        var sb = document.getElementById('sidebar');
+        var ov = document.getElementById('sidebar-overlay');
+        sidebarOpen = false;
+        if (sb) sb.classList.remove('open');
+        if (ov) ov.style.display = 'none';
       }
+
+      // Evitar duplicar mensaje si ya está en esta sección
+      if (ariaSeccion === key && esperandoTamaño) return;
+
+      ariaSeccion = key;
+      if (typeof registrarSeccion === 'function') registrarSeccion(key);
+      esperandoTamaño = true;
+      actualizarCtx();
+      activarPlatBtn(key);
+      renderTamanosEmpresa();
+      setSidebarToggle(true); // habilitar ☰
+
+      var lbl = ARIA_SECCIONES[key].label;
+      var saludo = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ', <b>' + ARIA_USER.nombre + '</b>' : '';
+      addBot('Perfecto' + saludo + ', vamos a <b>' + lbl + '</b>.<br>Para darte la recomendación más precisa: ¿cuántos empleados tiene tu empresa?');
+    }
+
+    function renderTamanosEmpresa() {
+      var row = document.getElementById('quick-row');
+      if (!row) return;
+      row.style.flexDirection = '';
+      row.style.gap = '';
+      row.style.padding = '';
+      row.style.display = 'flex';
+      var btns = ["1 - 20 empleados", "20 - 100 empleados", "+ 100 empleados"];
+      row.innerHTML = btns.map(function (b) {
+        return '<button class="qchip" onclick="'
+          + 'if(typeof ARIA_USER!==\'undefined\') ARIA_USER.rangoEmpleados=\'' + b + '\';'
+          + 'enviarPregunta(\'' + b + '\')">' + b + '</button>';
+      }).join('');
+    }
+
+    /* ── DIAGNÓSTICO GUIADO — botones de info clave post-solución ── */
+    var DIAGNOSTICO_PASOS = {
+      inventarios: [
+        {
+          pregunta: '¿Cómo controlan su inventario actualmente?',
+          opciones: ['En Excel / hojas de cálculo', 'Sistema desactualizado', 'Sin sistema, es manual', 'Ya tenemos sistema pero falla']
+        },
+        {
+          pregunta: '¿Cuál es su mayor problema hoy?',
+          opciones: ['Quiebres de stock frecuentes', 'No sé qué tengo en bodega', 'Mermas y diferencias de inventario', 'Procesos muy lentos']
+        },
+        {
+          pregunta: '¿Con qué urgencia necesitan la solución?',
+          opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
+        },
+        {
+          pregunta: '¿Quién toma la decisión de compra?',
+          opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+        }
+      ],
+      logistica: [
+        {
+          pregunta: '¿Cómo gestionan sus entregas actualmente?',
+          opciones: ['Todo en Excel / WhatsApp', 'Sin sistema formal', 'Sistema propio que ya no alcanza', 'Tercerizamos todo']
+        },
+        {
+          pregunta: '¿Cuál es su mayor dolor en logística?',
+          opciones: ['Entregas tardías o fallidas', 'No sé dónde están mis unidades', 'Alto costo de combustible', 'Clientes se quejan constantemente']
+        },
+        {
+          pregunta: '¿Con qué urgencia necesitan la solución?',
+          opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
+        },
+        {
+          pregunta: '¿Quién toma la decisión de compra?',
+          opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+        }
+      ],
+      produccion: [
+        {
+          pregunta: '¿Cómo monitorean su producción hoy?',
+          opciones: ['Hojas de papel / Excel', 'Sistema desactualizado', 'De forma visual sin datos', 'Ya tenemos algo pero es insuficiente']
+        },
+        {
+          pregunta: '¿Cuál es su mayor problema en planta?',
+          opciones: ['Paros no planificados frecuentes', 'No sé mi OEE real', 'Alta tasa de rechazos / scrap', 'Retrasos en órdenes de producción']
+        },
+        {
+          pregunta: '¿Con qué urgencia necesitan la solución?',
+          opciones: ['Urgente — este mes', 'En 1 a 3 meses', 'Estoy evaluando opciones', 'Solo quiero información']
+        },
+        {
+          pregunta: '¿Quién toma la decisión de compra?',
+          opciones: ['Yo mismo', 'Mi director / jefe', 'Comité o consejo', 'Estoy en el proceso de aprobación']
+        }
+      ]
+    };
+
+    var _diagPaso = 0;
+    var _diagRespuestas = [];
+
+    function iniciarDiagnostico(seccion) {
+      _diagPaso = 0;
+      _diagRespuestas = [];
+
+      // Texto puente personalizado antes de las preguntas
+      var secLabel = { inventarios: 'Inventarios', logistica: 'Logística', produccion: 'Producción' }[seccion] || seccion;
+      var tamano = (typeof ARIA_USER !== 'undefined' && ARIA_USER.tamaño) || null;
+      var rangoEmpleados = (typeof ARIA_USER !== 'undefined' && ARIA_USER.rangoEmpleados) || null;
+
+      // Texto legible del rango
+      var tamanoTexto = '';
+      if (rangoEmpleados) {
+        tamanoTexto = rangoEmpleados;
+      } else if (tamano === 'pequeña') {
+        tamanoTexto = '1 - 20 empleados';
+      } else if (tamano === 'mediana') {
+        tamanoTexto = '20 - 100 empleados';
+      } else if (tamano === 'grande') {
+        tamanoTexto = '+ 100 empleados';
+      }
+
+      var msg = '📊 Sabemos que tienes un reto en tu área de '
+        + '<b>' + secLabel + '</b>'
+        + (tamanoTexto ? ' y que tu empresa cuenta con <b>' + tamanoTexto + '</b>' : '')
+        + '.<br><br>'
+        + 'Te hemos propuesto una solución que en el <b style="color:#00ff88;">90% de los casos</b> '
+        + 'resuelve el problema satisfactoriamente. '
+        + 'El <b>10% restante también tiene solución</b> — solo hay que conocer un poco más tu operación.<br><br>'
+        + '<button onclick="this.parentNode.innerHTML=\'<span style=\\\'opacity:.4;font-size:.8rem;\\\'>Diagnóstico iniciado ✓</span>\';'
+        + 'if(typeof siguientePasoDiagnostico===\'function\') siguientePasoDiagnostico(\'' + seccion + '\');" '
+        + 'style="margin-top:4px;padding:12px 20px;font-family:\'Orbitron\',monospace;font-size:.55rem;font-weight:700;'
+        + 'letter-spacing:3px;background:transparent;color:var(--cyan);border:1px solid var(--cyan);cursor:pointer;'
+        + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
+        + '🔍 CONTINUAR CON EL DIAGNÓSTICO</button>';
+
+      addBot(msg);
+    }
+
+    function siguientePasoDiagnostico(seccion) {
+      var pasos = DIAGNOSTICO_PASOS[seccion];
+      if (!pasos || _diagPaso >= pasos.length) {
+        mostrarResumenDiagnostico(seccion);
+        return;
+      }
+      var paso = pasos[_diagPaso];
+      renderBotonesDiagnostico(paso.pregunta, paso.opciones, seccion);
+    }
+
+    function renderBotonesDiagnostico(pregunta, opciones, seccion) {
+      var row = document.getElementById('quick-row');
+      if (!row) return;
+
+      // Mostrar pregunta en el chat
+      var nombre = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ARIA_USER.nombre + ', ' : '';
+      addBot('🔍 <b>' + nombre + pregunta + '</b>');
+
+      // Renderizar botones horizontales con wrap
+      row.style.display = 'flex';
+      row.style.flexDirection = 'row';
+      row.style.flexWrap = 'wrap';
+      row.style.gap = '6px';
+      row.style.padding = '8px 16px';
+      row.innerHTML = opciones.map(function (op) {
+        return '<button class="qchip" style="flex:1;min-width:140px;max-width:48%;text-align:center;padding:9px 12px;font-size:.72rem;border-color:rgba(0,229,255,.2);" '
+          + 'onclick="responderDiagnostico(\'' + seccion + '\',\'' + op.replace(/'/g, "\\'") + '\')">'
+          + op + '</button>';
+      }).join('');
+    }
+
+    function responderDiagnostico(seccion, respuesta) {
+      // Registrar respuesta como dolor si aplica
+      if (typeof ARIA_USER !== 'undefined') {
+        ARIA_USER.dolor.push(respuesta);
+      }
+      _diagRespuestas.push(respuesta);
+      addUsr(respuesta);
+      _diagPaso++;
+      setTimeout(function () {
+        siguientePasoDiagnostico(seccion);
+      }, 400);
+    }
+
+    function mostrarResumenDiagnostico(seccion) {
+      var r = _diagRespuestas; // [0]=control actual, [1]=mayor problema, [2]=urgencia, [3]=decisor
+      var nombre = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? '<b>' + ARIA_USER.nombre + '</b>, ' : '';
+      var secLabel = { inventarios: 'Inventarios', logistica: 'Logística', produccion: 'Producción' }[seccion] || seccion;
+      var tamano = (typeof ARIA_USER !== 'undefined' && ARIA_USER.rangoEmpleados) || '';
+
+      /* ── MOTOR DE ANÁLISIS COMBINATORIO ── */
+
+      // 1. Eficiencia base según control actual (pregunta 1)
+      var efBase = 70;
+      var controlActual = r[0] || '';
+      if (controlActual.includes('Excel') || controlActual.includes('hojas')) efBase = 94;
+      else if (controlActual.includes('desactualizado') || controlActual.includes('viejo')) efBase = 88;
+      else if (controlActual.includes('manual') || controlActual.includes('papel')) efBase = 97;
+      else if (controlActual.includes('falla') || controlActual.includes('insuficiente')) efBase = 82;
+
+      // 2. Ajuste por problema principal (pregunta 2)
+      var problema = r[1] || '';
+      var mejoraClave = '';
+      var accionClave = '';
+      if (problema.includes('Quiebres') || problema.includes('stock')) {
+        efBase = Math.min(efBase + 2, 99);
+        mejoraClave = 'eliminación de quiebres de stock';
+        accionClave = 'Sistema de alertas automáticas y reabastecimiento inteligente';
+      } else if (problema.includes('No sé') || problema.includes('bodega') || problema.includes('inventario')) {
+        mejoraClave = 'visibilidad total del inventario en tiempo real';
+        accionClave = 'Panel de control con existencias, ubicaciones y movimientos en vivo';
+      } else if (problema.includes('Merma') || problema.includes('diferencia')) {
+        mejoraClave = 'reducción de mermas y diferencias de inventario';
+        accionClave = 'Trazabilidad por lote/serie y auditoría automática de movimientos';
+      } else if (problema.includes('lento') || problema.includes('lenta') || problema.includes('proceso')) {
+        mejoraClave = 'automatización de procesos lentos';
+        accionClave = 'Captura por QR/código de barras y flujos digitales sin papel';
+      } else if (problema.includes('paro') || problema.includes('downtime')) {
+        mejoraClave = 'reducción de paros no planificados';
+        accionClave = 'Monitoreo en tiempo real con alertas predictivas';
+      } else if (problema.includes('entrega') || problema.includes('ruta')) {
+        mejoraClave = 'optimización de entregas y rutas';
+        accionClave = 'Planificación automática de rutas y seguimiento GPS en vivo';
+      } else {
+        mejoraClave = 'eficiencia operativa general';
+        accionClave = 'Digitalización completa de procesos con panel de control centralizado';
+      }
+
+      // 3. Urgencia → descuento en precio (pregunta 3)
+      var urgencia = r[2] || '';
+      var descPct = 0;
+      var urgenciaMsg = '';
+      if (urgencia.includes('este mes') || urgencia.includes('Urgente')) {
+        descPct = 15;
+        urgenciaMsg = '⚡ Por tu urgencia, aplicamos un <b style="color:#00ff88;">15% de descuento adicional</b> si confirmas hoy.';
+      } else if (urgencia.includes('1 a 3') || urgencia.includes('1-3')) {
+        descPct = 8;
+        urgenciaMsg = '🎯 Tenemos disponibilidad para implementar en tu plazo. Aplicamos <b style="color:#00ff88;">8% de descuento</b> al apartar tu lugar.';
+      } else if (urgencia.includes('evaluando') || urgencia.includes('Evaluando')) {
+        urgenciaMsg = '📋 Tomate tu tiempo. Te dejamos toda la información para que decidas con calidad.';
+      } else {
+        urgenciaMsg = '💡 Cuando estés listo, estaremos aquí para darte el mejor precio.';
+      }
+
+      // 4. Tono según decisor (pregunta 4)
+      var decisor = r[3] || '';
+      var decisorMsg = '';
+      if (decisor.includes('Yo mismo') || decisor.includes('yo')) {
+        decisorMsg = 'Como tomador de decisión directo, podemos avanzar de inmediato.';
+      } else if (decisor.includes('director') || decisor.includes('jefe')) {
+        decisorMsg = 'Te preparamos un resumen ejecutivo listo para presentar a tu director.';
+      } else if (decisor.includes('Comité') || decisor.includes('consejo')) {
+        decisorMsg = 'Te damos un dossier completo para sustentar la decisión ante el comité.';
+      } else if (decisor.includes('aprobación') || decisor.includes('proceso')) {
+        decisorMsg = 'Te acompañamos en el proceso de aprobación con toda la documentación necesaria.';
+      }
+
+      // 5. Precio con descuento
+      var precioBase = 1.99;
+      var precioFinal = descPct > 0 ? (precioBase * (1 - descPct / 100)).toFixed(2) : precioBase.toFixed(2);
+
+      /* ── CONSTRUIR RESPUESTA ── */
+      var resumen = '✅ ' + nombre + 'gracias por compartir esta información. Aquí está tu diagnóstico:<br><br>'
+
+        // Bloque diagnóstico
+        + '<div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:14px;margin:6px 0;">'
+        + '<div style="font-family:\'Orbitron\',monospace;font-size:.45rem;letter-spacing:3px;color:var(--cyan);margin-bottom:10px;opacity:.7;">// DIAGNÓSTICO COMPLETADO · ' + secLabel.toUpperCase() + (tamano ? ' · ' + tamano.toUpperCase() : '') + '</div>'
+
+        // Respuestas resumidas
+        + r.map(function (resp, i) {
+          var labels = ['Control actual', 'Mayor problema', 'Urgencia', 'Decisor'];
+          return '<div style="font-size:.8rem;padding:5px 0;border-bottom:1px solid rgba(0,229,255,.06);display:flex;gap:8px;align-items:baseline;">'
+            + '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.38rem;letter-spacing:2px;color:rgba(0,229,255,.45);min-width:80px;">' + (labels[i] || '') + '</span>'
+            + '<span style="opacity:.85;">' + resp + '</span></div>';
+        }).join('')
+        + '</div><br>'
+
+        // Análisis inteligente
+        + '<div style="background:rgba(0,15,30,.6);border:1px solid rgba(0,229,255,.2);border-radius:6px;padding:14px;margin:6px 0;">'
+        + '<div style="font-family:\'Orbitron\',monospace;font-size:.45rem;letter-spacing:3px;color:var(--cyan);margin-bottom:10px;opacity:.7;">// ANÁLISIS Y SOLUCIÓN PROPUESTA</div>'
+
+        // Qué se puede hacer
+        + '<div style="margin-bottom:12px;">'
+        + '<div style="font-size:.75rem;opacity:.5;margin-bottom:4px;font-family:\'Share Tech Mono\',monospace;letter-spacing:2px;">QUÉ HAREMOS</div>'
+        + '<div style="font-size:.88rem;">' + accionClave + '.</div>'
+        + '</div>'
+
+        // Eficiencia esperada — barra visual
+        + '<div style="margin-bottom:12px;">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">'
+        + '<span style="font-size:.75rem;opacity:.5;font-family:\'Share Tech Mono\',monospace;letter-spacing:2px;">EFICIENCIA ESPERADA</span>'
+        + '<span style="font-family:\'Orbitron\',monospace;font-size:.9rem;font-weight:900;color:#00ff88;">+' + efBase + '%</span>'
+        + '</div>'
+        + '<div style="background:rgba(0,229,255,.08);border-radius:4px;height:8px;overflow:hidden;">'
+        + '<div style="height:100%;width:' + efBase + '%;background:linear-gradient(90deg,#00e5ff,#00ff88);border-radius:4px;transition:width 1s ease;"></div>'
+        + '</div>'
+        + '<div style="font-size:.75rem;opacity:.5;margin-top:4px;">Mejora en <b style="opacity:.9;color:var(--white);">' + mejoraClave + '</b></div>'
+        + '</div>'
+
+        // Precio
+        + '<div style="background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.15);border-radius:4px;padding:10px 12px;margin-bottom:10px;">'
+        + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+        + (descPct > 0
+          ? '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:rgba(200,220,255,.3);text-decoration:line-through;">$' + precioBase.toFixed(2) + ' USD</span>'
+          : '')
+        + '<span style="font-family:\'Orbitron\',monospace;font-size:1.3rem;font-weight:900;color:#00ff88;text-shadow:0 0 16px rgba(0,255,136,.4);">$' + precioFinal + ' USD</span>'
+        + '<span style="font-size:.75rem;opacity:.45;">precio de introducción / mes</span>'
+        + (descPct > 0 ? '<span style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444;font-family:\'Orbitron\',monospace;font-size:.36rem;padding:2px 7px;border-radius:3px;">-' + descPct + '% hoy</span>' : '')
+        + '</div>'
+        + '</div>'
+
+        // Urgencia
+        + '<div style="font-size:.82rem;margin-bottom:10px;">' + urgenciaMsg + '</div>'
+
+        // Decisor
+        + '<div style="font-size:.8rem;opacity:.6;margin-bottom:12px;">👤 ' + decisorMsg + '</div>'
+
+        // Botón CTA
+        + '<button onclick="iniciarCierreVenta(\'' + seccion + '\')" style="'
+        + 'width:100%;padding:13px;font-family:\'Orbitron\',monospace;font-size:.58rem;font-weight:700;'
+        + 'letter-spacing:3px;background:var(--cyan);color:var(--dark);border:none;cursor:pointer;'
+        + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
+        + '📩 CONTACTAR A UN ESPECIALISTA →</button>'
+        + '</div>';
+
+      addBot(resumen);
+
+      // Limpiar botones y volver a quick chips normales
+      setTimeout(function () {
+        var row = document.getElementById('quick-row');
+        if (row) {
+          row.style.flexDirection = '';
+          row.style.flexWrap = '';
+          row.style.gap = '';
+          row.style.padding = '';
+        }
+        renderQuickBtns(seccion);
+      }, 600);
+    }
+
+    /* ── VOLVER AL MENÚ ── */
+    function volverMenu() {
+      ariaSeccion = '';
       esperandoTamaño = false;
-      renderQuickBtns(ariaSeccion);
-      return;
+      actualizarCtx();
+      activarPlatBtn('');
+      renderQuickBtns('');
+      setSidebarToggle(false); // deshabilitar ☰
+      addBot('Volviste al menú general de ARIA. ¿Sobre cuál área quieres saber más?<br><span style="opacity:.4;font-size:.8em;">Usa el menú lateral o escribe: producción, inventarios o logística.</span>');
     }
-    // No coincide tamaño → procesar como duda normal
-    esperandoTamaño = false;
-    renderQuickBtns(ariaSeccion);
-  }
 
-  // ── MOTOR DE VENTAS: interceptar intención de precio/cotización ──
-  if(typeof respuestaInteligente === 'function' && ariaSeccion){
-    var inteligente = respuestaInteligente(texto, ariaSeccion);
-    if(inteligente){ addBot(inteligente); return; }
-  }
-
-  // ── BUSCAR en base local (global o sección activa) ──
-  var local = buscarLocal(texto);
-  if(local){ addBot(local); return; }
-
-  // ── Sin sección: detectar por texto ──
-  if(!ariaSeccion){
-    var destino = detectarSeccion(texto);
-    if(destino){
-      seleccionarPlat(destino);
-      return;
-    }
-    // Respuestas globales
-    for(var i=0;i<RESPUESTA_GLOBAL_DATASYS.length;i++){
-      var item = RESPUESTA_GLOBAL_DATASYS[i];
-      if(item.claves.some(function(c){ return t.includes(c); })){
-        addBot(item.respuesta); return;
+    /* ── BÚSQUEDA LOCAL ── */
+    function buscarLocal(texto) {
+      var t = texto.toLowerCase();
+      // Sección activa: busca solo en esa base
+      if (ariaSeccion && ARIA_DB[ariaSeccion]) {
+        var base = ARIA_DB[ariaSeccion];
+        for (var i = 0; i < base.length; i++) {
+          if (base[i].claves && base[i].claves.some(function (c) { return t.includes(c); })) {
+            return base[i].respuesta;
+          }
+        }
+        return null;
       }
+      // Sin sección: busca en todas las bases combinadas
+      var todas = [];
+      Object.keys(ARIA_DB).forEach(function (k) { todas = todas.concat(ARIA_DB[k] || []); });
+      for (var j = 0; j < todas.length; j++) {
+        if (todas[j].claves && todas[j].claves.some(function (c) { return t.includes(c); })) {
+          return todas[j].respuesta;
+        }
+      }
+      return null;
     }
-  }
 
-  // ── Sin match: preguntas de descubrimiento antes de fallback genérico ──
-  if(ariaSeccion && typeof siguientePreguntaDescubrimiento === 'function'){
-    var discovery = siguientePreguntaDescubrimiento(ariaSeccion);
-    if(discovery){
-      addBot(discovery);
-      return;
+    /* ── DETECTAR SECCIÓN por texto ── */
+    function detectarSeccion(texto) {
+      var t = texto.toLowerCase();
+      var keys = Object.keys(ARIA_SECCIONES);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        if (ARIA_SECCIONES[k].alias.some(function (a) { return t.includes(a); })) {
+          return k;
+        }
+      }
+      return null;
     }
-  }
 
-  // ── Último recurso: fallback ──
-  addBot(fallback());
-}
-
-/* ── ENVIAR ── */
-function sendChat(){
-  var inp = document.getElementById('chat-input');
-  var val = inp ? inp.value.trim() : '';
-  if(!val) return;
-  inp.value = '';
-  addUsr(val);
-  procesarMensaje(val);
-}
-
-function enviarPregunta(txt){
-  addUsr(txt);
-  procesarMensaje(txt);
-}
-
-/* ── INIT: mensaje de bienvenida ── */
-window.addEventListener('DOMContentLoaded', function(){
-  // Deshabilitar ☰ al inicio — se habilita al seleccionar sección
-  setSidebarToggle(false);
-
-  // Bienvenida automática tras 600ms
-  setTimeout(function(){
-    var w = getMsgs();
-    var wp = document.getElementById('welcome');
-    if(wp && wp.style.display !== 'none'){
-      // La pantalla de bienvenida ya está visible, no agregar mensaje adicional
+    /* ── RESPUESTA FALLBACK sin match local ── */
+    function fallback() {
+      if (ariaSeccion && ARIA_SECCIONES[ariaSeccion]) {
+        var s = ARIA_SECCIONES[ariaSeccion];
+        var isMob = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        var url = isMob ? s.url_mobile : s.url_desktop;
+        return 'No tengo esa información específica aquí, pero puedes ver todo sobre <b>' + s.label + '</b> en la plataforma completa:<br><a href="' + url + '" style="color:var(--cyan)">→ Ver plataforma completa</a><br><br>O contáctanos: <a href="mailto:contacto@datasys.mx" style="color:var(--cyan)">contacto@datasys.mx</a> · +52 (55) 1017-6436';
+      }
+      return '¿Sobre cuál área quieres saber más? Puedes seleccionarla en el menú lateral o preguntarme directamente.<br><span style="opacity:.5;font-size:.8em;">🏭 producción · 📦 inventarios · 🚚 logística</span>';
     }
-  }, 600);
 
-  // Soporte URL param ?plat=apps
-  var params = new URLSearchParams(window.location.search);
-  var platParam = params.get('plat');
-  if(platParam && ARIA_SECCIONES[platParam]){
-    seleccionarPlat(platParam);
-  }
-});
-</script>
+    /* ── PROCESADOR PRINCIPAL (v2 con Motor de Ventas) ── */
+    function procesarMensaje(texto) {
+      var t = texto.toLowerCase();
 
-<!-- ══ MODAL ACUSE ARIA ══ -->
-<div id="ariaAcuseModal" style="position:fixed;inset:0;z-index:99200;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.95);backdrop-filter:blur(14px);">
-  <div style="background:#060f1c;border:1px solid rgba(0,229,255,.35);max-width:480px;width:92%;padding:0;animation:modalIn .4s both;position:relative;">
-    <div style="padding:16px 24px 12px;border-bottom:1px solid rgba(0,229,255,.12);display:flex;align-items:center;justify-content:space-between;">
-      <div>
-        <div style="font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">MENSAJE ENVIADO</div>
-        <div style="font-family:'Orbitron',sans-serif;font-size:.76rem;font-weight:700;color:var(--cyan);letter-spacing:2px;">ACUSE DE RECIBO</div>
+      // SALIDA: volver al menú
+      if (["salir", "inicio", "volver", "home", "menu", "menú", "regresar", "todas", "general", "atrás", "atras"].some(function (c) { return t.includes(c); })) {
+        volverMenu(); return;
+      }
+
+      // ── MOTOR DE VENTAS: acumular perfil del usuario ──
+      if (typeof detectarContexto === 'function') detectarContexto(texto);
+
+      // ── FLUJO: esperando tamaño de empresa ──
+      if (esperandoTamaño) {
+        if (t.includes("1") || t.includes("20") || t.includes("100") || t.includes("empleado") || t.includes("pequeña") || t.includes("mediana") || t.includes("grande")) {
+          var tamano = (typeof resolverTamanoTexto === 'function') ? resolverTamanoTexto(texto) : "mediana";
+
+          // Si está disponible la versión v2 del discurso usa esa, sino la v1
+          if (ariaSeccion && typeof SOLUCIONES_TAMAÑO_V2 !== 'undefined'
+            && SOLUCIONES_TAMAÑO_V2[ariaSeccion] && SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano]) {
+            var html = SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano](tamano);
+            // Si la función ya renderizó las frases animadas, no llamar addBot
+            if (html !== '__ARIA_FRASES_RENDERED__') addBot(html);
+          } else if (ariaSeccion && SOLUCIONES_TAMAÑO[ariaSeccion]) {
+            // fallback a v1
+            var keyV1 = tamano === 'pequeña' ? '1 - 20 empleados' : tamano === 'mediana' ? '20 - 100 empleados' : '+ 100 empleados';
+            var solucion = SOLUCIONES_TAMAÑO[ariaSeccion][keyV1] || '';
+            addBot(solucion);
+          }
+          esperandoTamaño = false;
+          renderQuickBtns(ariaSeccion);
+          return;
+        }
+        // No coincide tamaño → procesar como duda normal
+        esperandoTamaño = false;
+        renderQuickBtns(ariaSeccion);
+      }
+
+      // ── MOTOR DE VENTAS: interceptar intención de precio/cotización ──
+      if (typeof respuestaInteligente === 'function' && ariaSeccion) {
+        var inteligente = respuestaInteligente(texto, ariaSeccion);
+        if (inteligente) { addBot(inteligente); return; }
+      }
+
+      // ── BUSCAR en base local (global o sección activa) ──
+      var local = buscarLocal(texto);
+      if (local) { addBot(local); return; }
+
+      // ── Sin sección: detectar por texto ──
+      if (!ariaSeccion) {
+        var destino = detectarSeccion(texto);
+        if (destino) {
+          seleccionarPlat(destino);
+          return;
+        }
+        // Respuestas globales
+        for (var i = 0; i < RESPUESTA_GLOBAL_DATASYS.length; i++) {
+          var item = RESPUESTA_GLOBAL_DATASYS[i];
+          if (item.claves.some(function (c) { return t.includes(c); })) {
+            addBot(item.respuesta); return;
+          }
+        }
+      }
+
+      // ── Sin match: preguntas de descubrimiento antes de fallback genérico ──
+      if (ariaSeccion && typeof siguientePreguntaDescubrimiento === 'function') {
+        var discovery = siguientePreguntaDescubrimiento(ariaSeccion);
+        if (discovery) {
+          addBot(discovery);
+          return;
+        }
+      }
+
+      // ── Último recurso: fallback ──
+      addBot(fallback());
+    }
+
+    /* ── ENVIAR ── */
+    function sendChat() {
+      var inp = document.getElementById('chat-input');
+      var val = inp ? inp.value.trim() : '';
+      if (!val) return;
+      inp.value = '';
+      addUsr(val);
+      procesarMensaje(val);
+    }
+
+    function enviarPregunta(txt) {
+      addUsr(txt);
+      procesarMensaje(txt);
+    }
+
+    /* ── INIT: mensaje de bienvenida ── */
+    window.addEventListener('DOMContentLoaded', function () {
+      // Deshabilitar ☰ al inicio — se habilita al seleccionar sección
+      setSidebarToggle(false);
+
+      // Bienvenida automática tras 600ms
+      setTimeout(function () {
+        var w = getMsgs();
+        var wp = document.getElementById('welcome');
+        if (wp && wp.style.display !== 'none') {
+          // La pantalla de bienvenida ya está visible, no agregar mensaje adicional
+        }
+      }, 600);
+
+      // Soporte URL param ?plat=apps
+      var params = new URLSearchParams(window.location.search);
+      var platParam = params.get('plat');
+      if (platParam && ARIA_SECCIONES[platParam]) {
+        seleccionarPlat(platParam);
+      }
+    });
+  </script>
+
+  <!-- ══ MODAL ACUSE ARIA ══ -->
+  <div id="ariaAcuseModal"
+    style="position:fixed;inset:0;z-index:99200;display:none;align-items:center;justify-content:center;background:rgba(3,13,24,.95);backdrop-filter:blur(14px);">
+    <div
+      style="background:#060f1c;border:1px solid rgba(0,229,255,.35);max-width:480px;width:92%;padding:0;animation:modalIn .4s both;position:relative;">
+      <div
+        style="padding:16px 24px 12px;border-bottom:1px solid rgba(0,229,255,.12);display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div
+            style="font-family:'Share Tech Mono',monospace;font-size:.44rem;letter-spacing:3px;color:#00ff88;margin-bottom:4px;">
+            MENSAJE ENVIADO</div>
+          <div
+            style="font-family:'Orbitron',sans-serif;font-size:.76rem;font-weight:700;color:var(--cyan);letter-spacing:2px;">
+            ACUSE DE RECIBO</div>
+        </div>
+        <button onclick="document.getElementById('ariaAcuseModal').style.display='none'"
+          style="background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer;">✕</button>
       </div>
-      <button onclick="document.getElementById('ariaAcuseModal').style.display='none'" style="background:none;border:none;color:#aaa;font-size:1.2rem;cursor:pointer;">✕</button>
-    </div>
-    <div style="padding:20px 24px;">
-      <div style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.12);margin-bottom:14px;">
-        <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;opacity:.6;">FOLIO</span>
-        <span id="aa_folio" style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--cyan);"></span>
-        <span id="aa_fecha" style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.4;"></span>
+      <div style="padding:20px 24px;">
+        <div
+          style="display:flex;justify-content:space-between;padding:8px 12px;background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.12);margin-bottom:14px;">
+          <span style="font-family:'Share Tech Mono',monospace;font-size:.44rem;color:#aaa;opacity:.6;">FOLIO</span>
+          <span id="aa_folio"
+            style="font-family:'Orbitron',sans-serif;font-size:.68rem;font-weight:700;color:var(--cyan);"></span>
+          <span id="aa_fecha"
+            style="font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#aaa;opacity:.4;"></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
+          <div
+            style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+            <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">NOMBRE</span>
+            <span id="aa_nombre"
+              style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span>
+          </div>
+          <div
+            style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+            <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">EMAIL</span>
+            <span id="aa_email"
+              style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:var(--cyan);font-weight:600;"></span>
+          </div>
+          <div
+            style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+            <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">TELÉFONO</span>
+            <span id="aa_phone"
+              style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span>
+          </div>
+          <div
+            style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+            <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">SERVICIO</span>
+            <span id="aa_service"
+              style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f0c040;font-weight:700;"></span>
+          </div>
+          <div style="padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
+            <span
+              style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;display:block;margin-bottom:3px;">MENSAJE</span>
+            <span id="aa_msg"
+              style="font-family:'Rajdhani',sans-serif;font-size:.84rem;color:#fff;line-height:1.5;"></span>
+          </div>
+        </div>
+        <div
+          style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#00ff88;line-height:1.8;margin-bottom:14px;">
+          Mensaje enviado a contacto@datasys.mx<br>Tiempo de respuesta: menos de 24 horas
+        </div>
+        <button onclick="document.getElementById('ariaAcuseModal').style.display='none'"
+          style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid var(--cyan);color:var(--cyan);cursor:pointer;">CERRAR</button>
       </div>
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;">
-        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">NOMBRE</span>
-          <span id="aa_nombre" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span>
-        </div>
-        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">EMAIL</span>
-          <span id="aa_email" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:var(--cyan);font-weight:600;"></span>
-        </div>
-        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">TELÉFONO</span>
-          <span id="aa_phone" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#fff;font-weight:600;"></span>
-        </div>
-        <div style="display:grid;grid-template-columns:80px 1fr;gap:8px;padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;">SERVICIO</span>
-          <span id="aa_service" style="font-family:'Rajdhani',sans-serif;font-size:.88rem;color:#f0c040;font-weight:700;"></span>
-        </div>
-        <div style="padding:7px 12px;background:rgba(0,229,255,.03);border-left:2px solid rgba(0,229,255,.3);">
-          <span style="font-family:'Share Tech Mono',monospace;font-size:.4rem;color:#aaa;opacity:.5;display:block;margin-bottom:3px;">MENSAJE</span>
-          <span id="aa_msg" style="font-family:'Rajdhani',sans-serif;font-size:.84rem;color:#fff;line-height:1.5;"></span>
-        </div>
-      </div>
-      <div style="padding:9px 12px;background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.15);font-family:'Share Tech Mono',monospace;font-size:.42rem;color:#00ff88;line-height:1.8;margin-bottom:14px;">
-        Mensaje enviado a contacto@datasys.mx<br>Tiempo de respuesta: menos de 24 horas
-      </div>
-      <button onclick="document.getElementById('ariaAcuseModal').style.display='none'" style="width:100%;padding:11px;font-family:'Orbitron',sans-serif;font-size:.58rem;font-weight:700;letter-spacing:3px;background:transparent;border:1px solid var(--cyan);color:var(--cyan);cursor:pointer;">CERRAR</button>
     </div>
   </div>
-</div>
 
-<script>
-function toggleAriaForm(){
-  var wrap = document.getElementById('aria-form-wrap');
-  var btn  = document.getElementById('af_toggle_btn');
-  if(!wrap) return;
-  if(wrap.style.maxHeight === '0px' || wrap.style.maxHeight === ''){
-    wrap.style.maxHeight = '700px';
-    wrap.style.opacity   = '1';
-    if(btn) btn.style.background = 'rgba(0,229,255,.15)';
-    if(btn) btn.style.color = 'var(--cyan)';
-    if(btn) btn.style.border = '1px solid var(--cyan)';
-  } else {
-    wrap.style.maxHeight = '0px';
-    wrap.style.opacity   = '0';
-    if(btn) btn.style.background = 'var(--cyan)';
-    if(btn) btn.style.color = 'var(--dark)';
-    if(btn) btn.style.border = 'none';
-  }
-}
-function sendAriaForm(){
-  var name    = (document.getElementById('af_name')||{}).value||'';
-  var email   = (document.getElementById('af_email')||{}).value||'';
-  var phone   = (document.getElementById('af_phone')||{}).value||'';
-  var empresa = (document.getElementById('af_empresa')||{}).value||'';
-  var service = (document.getElementById('af_service')||{}).value||'';
-  var message = (document.getElementById('af_message')||{}).value||'';
-  var errEl   = document.getElementById('af_error');
-  var btn     = document.getElementById('af_btn');
-  name=name.trim(); email=email.trim(); phone=phone.trim(); message=message.trim();
-  if(errEl) errEl.style.display='none';
-  if(!name)   { if(errEl){errEl.textContent='Ingresa tu nombre.'; errEl.style.display='block';} return; }
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-              { if(errEl){errEl.textContent='Ingresa un email válido.'; errEl.style.display='block';} return; }
-  empresa=empresa.trim();
-  if(!empresa){ if(errEl){errEl.textContent='Ingresa el nombre de tu empresa.'; errEl.style.display='block';} return; }
-  if(!message){ if(errEl){errEl.textContent='Escribe tu mensaje.'; errEl.style.display='block';} return; }
-  var folio = 'DS-'+Math.floor(Math.random()*90000+10000);
-  var fecha = new Date().toLocaleString('es-MX',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  if(btn){ btn.textContent='Enviando...'; btn.disabled=true; btn.style.background='rgba(0,229,255,.12)'; btn.style.color='var(--cyan)'; }
-  fetch('https://formspree.io/f/meelpnqr',{
-    method:'POST',
-    headers:{'Accept':'application/json','Content-Type':'application/json'},
-    body:JSON.stringify({name:name,email:email,phone:phone||'N/A',empresa:empresa,service:service,message:message,folio:folio,fecha:fecha,_replyto:email})
-  })
-  .then(function(r){ return r.json().then(function(d){return{ok:r.ok,data:d};}); })
-  .then(function(res){
-    if(res.ok){
-      document.getElementById('aa_folio').textContent   = folio;
-      document.getElementById('aa_fecha').textContent   = fecha;
-      document.getElementById('aa_nombre').textContent  = name;
-      document.getElementById('aa_email').textContent   = email;
-      document.getElementById('aa_phone').textContent   = phone||'—';
-      document.getElementById('aa_service').textContent = service;
-      document.getElementById('aa_msg').textContent     = message;
-      document.getElementById('ariaAcuseModal').style.display='flex';
+  <script>
+    function toggleAriaForm() {
       var wrap = document.getElementById('aria-form-wrap');
-      if(wrap) wrap.innerHTML='<div style="text-align:center;padding:16px;font-family:Orbitron,sans-serif;font-size:.62rem;color:#00ff88;letter-spacing:2px;">✅ MENSAJE ENVIADO<br><span style=\"font-size:.5rem;opacity:.6;\">Folio: '+folio+'</span></div>';
-    } else {
-      if(errEl){errEl.textContent='Error al enviar. Intenta de nuevo.'; errEl.style.display='block';}
-      if(btn){ btn.textContent='ENVIAR MENSAJE'; btn.disabled=false; btn.style.background='var(--cyan)'; btn.style.color='var(--dark)'; }
+      var btn = document.getElementById('af_toggle_btn');
+      if (!wrap) return;
+      if (wrap.style.maxHeight === '0px' || wrap.style.maxHeight === '') {
+        wrap.style.maxHeight = '700px';
+        wrap.style.opacity = '1';
+        if (btn) btn.style.background = 'rgba(0,229,255,.15)';
+        if (btn) btn.style.color = 'var(--cyan)';
+        if (btn) btn.style.border = '1px solid var(--cyan)';
+      } else {
+        wrap.style.maxHeight = '0px';
+        wrap.style.opacity = '0';
+        if (btn) btn.style.background = 'var(--cyan)';
+        if (btn) btn.style.color = 'var(--dark)';
+        if (btn) btn.style.border = 'none';
+      }
     }
-  })
-  .catch(function(){
-    if(errEl){errEl.textContent='Sin conexión. Intenta de nuevo.'; errEl.style.display='block';}
-    if(btn){ btn.textContent='ENVIAR MENSAJE'; btn.disabled=false; btn.style.background='var(--cyan)'; btn.style.color='var(--dark)'; }
-  });
-}
-</script>
+    function sendAriaForm() {
+      var name = (document.getElementById('af_name') || {}).value || '';
+      var email = (document.getElementById('af_email') || {}).value || '';
+      var phone = (document.getElementById('af_phone') || {}).value || '';
+      var empresa = (document.getElementById('af_empresa') || {}).value || '';
+      var service = (document.getElementById('af_service') || {}).value || '';
+      var message = (document.getElementById('af_message') || {}).value || '';
+      var errEl = document.getElementById('af_error');
+      var btn = document.getElementById('af_btn');
+      name = name.trim(); email = email.trim(); phone = phone.trim(); message = message.trim();
+      if (errEl) errEl.style.display = 'none';
+      if (!name) { if (errEl) { errEl.textContent = 'Ingresa tu nombre.'; errEl.style.display = 'block'; } return; }
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { if (errEl) { errEl.textContent = 'Ingresa un email válido.'; errEl.style.display = 'block'; } return; }
+      empresa = empresa.trim();
+      if (!empresa) { if (errEl) { errEl.textContent = 'Ingresa el nombre de tu empresa.'; errEl.style.display = 'block'; } return; }
+      if (!message) { if (errEl) { errEl.textContent = 'Escribe tu mensaje.'; errEl.style.display = 'block'; } return; }
+      var folio = 'DS-' + Math.floor(Math.random() * 90000 + 10000);
+      var fecha = new Date().toLocaleString('es-MX', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      if (btn) { btn.textContent = 'Enviando...'; btn.disabled = true; btn.style.background = 'rgba(0,229,255,.12)'; btn.style.color = 'var(--cyan)'; }
+      fetch('https://formspree.io/f/meelpnqr', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, email: email, phone: phone || 'N/A', empresa: empresa, service: service, message: message, folio: folio, fecha: fecha, _replyto: email })
+      })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, data: d }; }); })
+        .then(function (res) {
+          if (res.ok) {
+            document.getElementById('aa_folio').textContent = folio;
+            document.getElementById('aa_fecha').textContent = fecha;
+            document.getElementById('aa_nombre').textContent = name;
+            document.getElementById('aa_email').textContent = email;
+            document.getElementById('aa_phone').textContent = phone || '—';
+            document.getElementById('aa_service').textContent = service;
+            document.getElementById('aa_msg').textContent = message;
+            document.getElementById('ariaAcuseModal').style.display = 'flex';
+            var wrap = document.getElementById('aria-form-wrap');
+            if (wrap) wrap.innerHTML = '<div style="text-align:center;padding:16px;font-family:Orbitron,sans-serif;font-size:.62rem;color:#00ff88;letter-spacing:2px;">✅ MENSAJE ENVIADO<br><span style=\"font-size:.5rem;opacity:.6;\">Folio: ' + folio + '</span></div>';
+          } else {
+            if (errEl) { errEl.textContent = 'Error al enviar. Intenta de nuevo.'; errEl.style.display = 'block'; }
+            if (btn) { btn.textContent = 'ENVIAR MENSAJE'; btn.disabled = false; btn.style.background = 'var(--cyan)'; btn.style.color = 'var(--dark)'; }
+          }
+        })
+        .catch(function () {
+          if (errEl) { errEl.textContent = 'Sin conexión. Intenta de nuevo.'; errEl.style.display = 'block'; }
+          if (btn) { btn.textContent = 'ENVIAR MENSAJE'; btn.disabled = false; btn.style.background = 'var(--cyan)'; btn.style.color = 'var(--dark)'; }
+        });
+    }
+  </script>
 </body>
+
 </html>
