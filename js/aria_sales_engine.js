@@ -14,17 +14,17 @@
    PERFIL DE USUARIO — se construye durante la sesión
 ────────────────────────────────────────────────── */
 var ARIA_USER = {
-  nombre:        null,   // capturado por nombre detectado
-  empresa:       null,   // capturado al mencionarlo
-  tamaño:        null,   // "pequeña" | "mediana" | "grande"
-  empleados:     null,   // string raw del usuario
-  sector:        null,   // "manufactura" | "alimentos" | "retail" | etc.
-  dolor:         [],     // problemas mencionados: ["mermas","paros","rutas"]
-  interes:       [],     // secciones visitadas en sesión
+  nombre: null,   // capturado por nombre detectado
+  empresa: null,   // capturado al mencionarlo
+  tamaño: null,   // "pequeña" | "mediana" | "grande"
+  empleados: null,   // string raw del usuario
+  sector: null,   // "manufactura" | "alimentos" | "retail" | etc.
+  dolor: [],     // problemas mencionados: ["mermas","paros","rutas"]
+  interes: [],     // secciones visitadas en sesión
   preguntasHechas: 0,
   señalesCompra: 0,      // counter: a 3+ → modo cierre
   ultimaSeccion: null,
-  sesionInicio:  Date.now(),
+  sesionInicio: Date.now(),
   demoSolicitada: false
 };
 
@@ -34,19 +34,19 @@ var ARIA_USER = {
 ────────────────────────────────────────────────── */
 var ARIA_PRICING = {
   produccion: {
-    pequeña:  { base: 750,  label: "BÁSICO",       ahorro: "15%", plazo: "2-3 sem" },
-    mediana:  { base: 800,  label: "PROFESIONAL",  ahorro: "20%", plazo: "3-4 sem" },
-    grande:   { base: 1000, label: "ENTERPRISE",   ahorro: "25%", plazo: "4-6 sem" }
+    pequeña: { base: 750, label: "BÁSICO", ahorro: "15%", plazo: "2-3 sem" },
+    mediana: { base: 800, label: "PROFESIONAL", ahorro: "20%", plazo: "3-4 sem" },
+    grande: { base: 1000, label: "ENTERPRISE", ahorro: "25%", plazo: "4-6 sem" }
   },
   inventarios: {
-    pequeña:  { base: 299, label: "BÁSICO",       ahorro: "90% precisión", plazo: "1 sem" },
-    mediana:  { base: 299, label: "PROFESIONAL",  ahorro: "30% menos quiebres", plazo: "2 sem" },
-    grande:   { base: 299, label: "ENTERPRISE",   ahorro: "99.9% exactitud", plazo: "3-4 sem" }
+    pequeña: { base: 299, label: "BÁSICO", ahorro: "90% precisión", plazo: "1 sem" },
+    mediana: { base: 299, label: "PROFESIONAL", ahorro: "30% menos quiebres", plazo: "2 sem" },
+    grande: { base: 299, label: "ENTERPRISE", ahorro: "99.9% exactitud", plazo: "3-4 sem" }
   },
   logistica: {
-    pequeña:  { base: 299,  label: "BÁSICO",       ahorro: "15% más entregas", plazo: "1 sem" },
-    mediana:  { base: 299,  label: "PROFESIONAL",  ahorro: "20% combustible", plazo: "2 sem" },
-    grande:   { base: 299, label: "ENTERPRISE",   ahorro: "30% menos tiempos", plazo: "2-3 sem" }
+    pequeña: { base: 299, label: "BÁSICO", ahorro: "15% más entregas", plazo: "1 sem" },
+    mediana: { base: 299, label: "PROFESIONAL", ahorro: "20% combustible", plazo: "2 sem" },
+    grande: { base: 299, label: "ENTERPRISE", ahorro: "30% menos tiempos", plazo: "2-3 sem" }
   }
 };
 
@@ -62,41 +62,41 @@ var ARIA_DESCUENTOS = {
    DETECTOR DE SEÑALES DE COMPRA
 ────────────────────────────────────────────────── */
 var SEÑALES_COMPRA = [
-  "cuánto","cuanto","precio","costo","cotización","cotizacion","presupuesto","tarifa","inversión","inversion",
-  "contratar","implementar","empezar","iniciar","arrancar","cuándo","cuando podemos","próximos pasos",
-  "demo","prueba","piloto","mis datos","mi empresa","quiero","necesito","urge","urgente","ya","ahora"
+  "cuánto", "cuanto", "precio", "costo", "cotización", "cotizacion", "presupuesto", "tarifa", "inversión", "inversion",
+  "contratar", "implementar", "empezar", "iniciar", "arrancar", "cuándo", "cuando podemos", "próximos pasos",
+  "demo", "prueba", "piloto", "mis datos", "mi empresa", "quiero", "necesito", "urge", "urgente", "ya", "ahora"
 ];
 
 var DOLORES_DETECTADOS = {
-  "paro":"paros de máquina",
-  "merma":"mermas de material",
-  "retraso":"retrasos en entrega",
-  "quiebre":"quiebres de stock",
-  "manual":"procesos manuales",
-  "excel":"dependencia de Excel",
-  "visibili":"falta de visibilidad",
-  "calidad":"problemas de calidad",
-  "devoluc":"devoluciones de cliente",
-  "ruta":"rutas ineficientes",
-  "combusti":"gasto alto de combustible",
-  "inventar":"descontrol de inventario",
-  "lote":"trazabilidad de lotes",
-  "auditor":"problemas de auditoría"
+  "paro": "paros de máquina",
+  "merma": "mermas de material",
+  "retraso": "retrasos en entrega",
+  "quiebre": "quiebres de stock",
+  "manual": "procesos manuales",
+  "excel": "dependencia de Excel",
+  "visibili": "falta de visibilidad",
+  "calidad": "problemas de calidad",
+  "devoluc": "devoluciones de cliente",
+  "ruta": "rutas ineficientes",
+  "combusti": "gasto alto de combustible",
+  "inventar": "descontrol de inventario",
+  "lote": "trazabilidad de lotes",
+  "auditor": "problemas de auditoría"
 };
 
 var SECTORES_DETECTADOS = {
-  "aliment":"alimentos y bebidas",
-  "farmac":"farmacéutico",
-  "automo":"automotriz",
-  "textil":"textil",
-  "plástic":"plásticos",
-  "electrón":"electrónica",
-  "retail":"retail/comercio",
-  "construc":"construcción",
-  "químic":"químico",
-  "logístic":"logística 3PL",
-  "ecommerc":"e-commerce",
-  "manufact":"manufactura general"
+  "aliment": "alimentos y bebidas",
+  "farmac": "farmacéutico",
+  "automo": "automotriz",
+  "textil": "textil",
+  "plástic": "plásticos",
+  "electrón": "electrónica",
+  "retail": "retail/comercio",
+  "construc": "construcción",
+  "químic": "químico",
+  "logístic": "logística 3PL",
+  "ecommerc": "e-commerce",
+  "manufact": "manufactura general"
 };
 
 /* ──────────────────────────────────────────────────
@@ -126,19 +126,19 @@ function detectarContexto(texto) {
   }
 
   // Detectar dolores
-  Object.keys(DOLORES_DETECTADOS).forEach(function(k) {
+  Object.keys(DOLORES_DETECTADOS).forEach(function (k) {
     if (t.includes(k) && ARIA_USER.dolor.indexOf(DOLORES_DETECTADOS[k]) === -1) {
       ARIA_USER.dolor.push(DOLORES_DETECTADOS[k]);
     }
   });
 
   // Detectar sector
-  Object.keys(SECTORES_DETECTADOS).forEach(function(k) {
+  Object.keys(SECTORES_DETECTADOS).forEach(function (k) {
     if (t.includes(k)) ARIA_USER.sector = SECTORES_DETECTADOS[k];
   });
 
   // Contar señales de compra
-  SEÑALES_COMPRA.forEach(function(s) {
+  SEÑALES_COMPRA.forEach(function (s) {
     if (t.includes(s)) ARIA_USER.señalesCompra++;
   });
 
@@ -158,7 +158,7 @@ function calcularPrecio(seccion, tamano) {
   var pct = 0;
 
   // Combo: visitó más de 1 sección
-  var secciones = ARIA_USER.interes.filter(function(s, i, a){ return a.indexOf(s) === i; }).length;
+  var secciones = ARIA_USER.interes.filter(function (s, i, a) { return a.indexOf(s) === i; }).length;
   if (secciones >= 3) {
     pct += ARIA_DESCUENTOS.combo3;
     descuentosAplicados.push("20% combo 3 módulos");
@@ -201,7 +201,7 @@ function generarCotizacion(seccion, tamano) {
   var p = calcularPrecio(seccion, tamano);
   if (!p) return '';
 
-  var sectores = {"produccion":"Producción","inventarios":"Inventarios","logistica":"Logística"};
+  var sectores = { "produccion": "Producción", "inventarios": "Inventarios", "logistica": "Logística" };
   var secLabel = sectores[seccion] || seccion;
 
   var saludo = ARIA_USER.nombre ? ', <b>' + ARIA_USER.nombre + '</b>' : '';
@@ -211,7 +211,7 @@ function generarCotizacion(seccion, tamano) {
   if (p.descuentos.length > 0) {
     descBlock = '<div style="margin:8px 0;padding:8px 10px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.2);border-radius:4px;font-size:.78rem;">'
       + '🏷️ <b style="color:#00ff88;">Descuentos aplicados:</b><br>'
-      + p.descuentos.map(function(d){ return '&nbsp;&nbsp;✓ ' + d; }).join('<br>')
+      + p.descuentos.map(function (d) { return '&nbsp;&nbsp;✓ ' + d; }).join('<br>')
       + '</div>';
   }
 
@@ -224,9 +224,9 @@ function generarCotizacion(seccion, tamano) {
 
   var ahorroBlock = p.pctTotal > 0
     ? '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:rgba(0,229,255,.04);border-radius:4px;margin-bottom:4px;">'
-      + '<span style="font-size:.8rem;opacity:.6;">Precio base</span>'
-      + '<span style="font-size:.85rem;text-decoration:line-through;opacity:.4;">$' + p.base.toLocaleString() + ' USD</span>'
-      + '</div>'
+    + '<span style="font-size:.8rem;opacity:.6;">Precio base</span>'
+    + '<span style="font-size:.85rem;text-decoration:line-through;opacity:.4;">$' + p.base.toLocaleString() + ' USD</span>'
+    + '</div>'
     : '';
 
   return '<div style="background:rgba(6,15,28,.97);border:1px solid rgba(0,229,255,.3);border-radius:6px;padding:14px;margin-top:8px;">'
@@ -277,7 +277,7 @@ function discursoVentas(seccion) {
   // Línea de dolor personalizada
   var dolorFrase = '';
   if (dolores.length > 0) {
-    dolorFrase = 'Mencionaste que tienes retos con <b>' + dolores.slice(0,2).join('</b> y <b>') + '</b>. Exactamente eso es lo que resolvemos.<br><br>';
+    dolorFrase = 'Mencionaste que tienes retos con <b>' + dolores.slice(0, 2).join('</b> y <b>') + '</b>. Exactamente eso es lo que resolvemos.<br><br>';
   }
 
   // Línea de sector
@@ -302,9 +302,65 @@ function discursoVentas(seccion) {
 
   return dolorFrase + sectorFrase
     + saludo + 'enemos la solución exacta' + enEmpresa + enSector + '.<br><br>'
-    + 'La Plataforma de <b>' + {"produccion":"Producción","inventarios":"Inventarios","logistica":"Logística"}[seccion] + ' DATASYS</b> '
+    + 'La Plataforma de <b>' + { "produccion": "Producción", "inventarios": "Inventarios", "logistica": "Logística" }[seccion] + ' DATASYS</b> '
     + (base[seccion] || '') + '.<br><br>'
     + 'Con tu tamaño de operación, el ROI promedio es de <b>3-5 meses</b>.';
+}
+
+/* ──────────────────────────────────────────────────
+   DISCURSO DE VENTAS PRODUCCIÓN — versión animada por frases
+────────────────────────────────────────────────── */
+function _discursoVentasFrases(seccion, tamano) {
+  var nombre = ARIA_USER.nombre ? ARIA_USER.nombre : null;
+  var empresa = ARIA_USER.empresa;
+  var sector = ARIA_USER.sector;
+  var dolores = ARIA_USER.dolor;
+
+  var saludo = nombre ? nombre + ', t' : 'T';
+  var enEmpresa = empresa ? ' en <b>' + empresa + '</b>' : '';
+  var enSector = sector ? ' del sector <b>' + sector + '</b>' : '';
+
+  var base = {
+    produccion: 'ofrece visibilidad total de tus líneas de producción, OEE en tiempo real y alertas automáticas antes de que ocurra un paro',
+    inventarios: 'elimina los quiebres de stock, automatiza tus reabastecimientos y da trazabilidad completa por lote o serie',
+    logistica: 'optimiza tus rutas, reduce hasta 30% el kilometraje y garantiza entregas perfectas con prueba digital'
+  };
+
+  var seccionLabel = { "produccion": "Producción", "inventarios": "Inventarios", "logistica": "Logística" }[seccion] || seccion;
+
+  var frases = [];
+
+  // Frase 1: dolor detectado (si existe)
+  if (dolores.length > 0) {
+    frases.push('Mencionaste que tienes retos con <b>' + dolores.slice(0, 2).join('</b> y <b>') + '</b>. Exactamente eso es lo que resolvemos.');
+  }
+
+  // Frase 2: sector detectado (si existe)
+  var SECTOR_CASOS = {
+    "alimentos y bebidas": "empresas de alimentos con trazabilidad y fechas de caducidad",
+    "farmacéutico": "la industria farmacéutica con control de lotes y regulaciones",
+    "automotriz": "la cadena automotriz con JIT y calidad zero defects",
+    "retail/comercio": "retail omnicanal con inventario en tiempo real",
+    "manufactura general": "manufactura discreta y por proceso"
+  };
+  if (sector && SECTOR_CASOS[sector]) {
+    frases.push('Trabajamos con <b>' + SECTOR_CASOS[sector] + '</b>.');
+  }
+
+  // Frase 3: gancho principal
+  frases.push('<span style="font-size:1rem;">' + saludo + 'enemos la solución exacta' + enEmpresa + enSector + '.</span>');
+
+  // Frase 4: descripción de la plataforma
+  frases.push('La Plataforma de <b>' + seccionLabel + ' DATASYS</b> ' + (base[seccion] || '') + '.');
+
+  // Frase 5: ROI
+  frases.push('Con tu tamaño de operación, el ROI promedio es de <b>3-5 meses</b>.');
+
+  // Frase 6: cotización
+  var c = generarCotizacion(seccion, tamano);
+  frases.push(c);
+
+  addBotFrases(frases);
 }
 
 /* ──────────────────────────────────────────────────
@@ -312,7 +368,7 @@ function discursoVentas(seccion) {
 ────────────────────────────────────────────────── */
 function iniciarCierreVenta(seccion) {
   ARIA_USER.demoSolicitada = true;
-  var secLabel = {"produccion":"Producción","inventarios":"Inventarios","logistica":"Logística"}[seccion] || seccion;
+  var secLabel = { "produccion": "Producción", "inventarios": "Inventarios", "logistica": "Logística" }[seccion] || seccion;
 
   // Pre-llenar el formulario con datos conocidos
   var html = generarFormularioCierre(seccion, secLabel);
@@ -355,6 +411,180 @@ function generarFormularioCierre(seccion, secLabel) {
 }
 
 /* ──────────────────────────────────────────────────
+   HELPER: renderiza frases una a una con delay entre cada una
+   Cada frase aparece con fade-in suave (20ms entre frases)
+────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════
+   ARIA TYPEWRITER ENGINE
+   · Frases de texto → se escriben letra por letra
+   · Bloques HTML complejos (div, button) → aparecen
+     de golpe con fade-in (no se pueden escribir char
+     a char porque tienen etiquetas HTML anidadas)
+   · Cursor parpadeante mientras escribe
+   · Pausa natural entre frases
+   ══════════════════════════════════════════════════ */
+
+/* ── Inyectar estilos del cursor una sola vez ── */
+function _ariaInjectStyles() {
+  if (document.getElementById('aria-tw-style')) return;
+  var st = document.createElement('style');
+  st.id = 'aria-tw-style';
+  st.textContent = [
+    '@keyframes ariaCursor{0%,100%{opacity:1;}50%{opacity:0;}}',
+    '@keyframes ariaBlockIn{0%{opacity:0;transform:translateY(5px);}100%{opacity:1;transform:none;}}',
+    '.aria-cursor{display:inline-block;width:2px;height:1em;background:var(--cyan,#00e5ff);',
+    'vertical-align:middle;margin-left:2px;animation:ariaCursor .7s step-end infinite;}'
+  ].join('');
+  document.head.appendChild(st);
+}
+
+/* ── Detecta si una frase es HTML complejo (tiene etiquetas div/button/span con style) ── */
+function _esHtmlComplejo(str) {
+  return /^<(div|button|table|ul|ol|span\s+style)[^>]*>/i.test(str.trim());
+}
+
+/* ── Extrae el texto plano de un HTML simple (sin etiquetas div/button anidados) ── */
+function _htmlSimpleATokens(html) {
+  // Divide la cadena en tokens: texto plano y etiquetas HTML
+  var tokens = [];
+  var re = /(<[^>]+>)|([^<]+)/g;
+  var m;
+  while ((m = re.exec(html)) !== null) {
+    if (m[1]) tokens.push({ type: 'tag', val: m[1] });
+    else if (m[2]) tokens.push({ type: 'text', val: m[2] });
+  }
+  return tokens;
+}
+
+/* ── Escribe una frase de texto letra por letra usando tokens ── */
+function _typeTokens(container, tokens, speed, onDone) {
+  var cursor = document.createElement('span');
+  cursor.className = 'aria-cursor';
+  container.appendChild(cursor);
+
+  var ti = 0; // índice de token actual
+  var ci = 0; // índice de carácter dentro del token de texto
+  var built = ''; // HTML acumulado ya escrito
+
+  function tick() {
+    if (ti >= tokens.length) {
+      // Terminó — quitar cursor
+      if (cursor.parentNode) cursor.parentNode.removeChild(cursor);
+      if (typeof onDone === 'function') onDone();
+      return;
+    }
+    var tok = tokens[ti];
+    if (tok.type === 'tag') {
+      // Etiqueta HTML: agregar completa de golpe
+      built += tok.val;
+      container.innerHTML = built;
+      container.appendChild(cursor);
+      ti++;
+      setTimeout(tick, 0);
+    } else {
+      // Texto: agregar un carácter
+      if (ci < tok.val.length) {
+        built += tok.val[ci];
+        ci++;
+        container.innerHTML = built;
+        container.appendChild(cursor);
+        var msgs = document.getElementById('msgs');
+        if (msgs) msgs.scrollTop = msgs.scrollHeight;
+        // Velocidad variable: más lento en puntuación final de frase
+        var ch = tok.val[ci - 1];
+        var delay = /[.!?]/.test(ch) ? speed * 6 : /[,;:]/.test(ch) ? speed * 3 : speed;
+        setTimeout(tick, delay);
+      } else {
+        ti++;
+        ci = 0;
+        setTimeout(tick, 0);
+      }
+    }
+  }
+  tick();
+}
+
+/* ── Renderiza array de frases en la burbuja una por una ── */
+function _renderFrasesEnBurbuja(bubble, frases, onDone) {
+  _ariaInjectStyles();
+  bubble.innerHTML = '';
+  var msgs = document.getElementById('msgs');
+
+  var SPEED = 30;   // ms por carácter — lento y visible
+  var PAUSE_FRASE = 1500; // ms de pausa entre frases — 1.5 segundos
+
+  function procesarFrase(idx) {
+    if (idx >= frases.length) {
+      if (typeof onDone === 'function') setTimeout(onDone, 80);
+      return;
+    }
+
+    var frase = frases[idx];
+    var wrapper = document.createElement('div');
+    wrapper.style.cssText = 'margin-bottom:8px;';
+    bubble.appendChild(wrapper);
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+
+    if (_esHtmlComplejo(frase)) {
+      // Bloque HTML complejo: aparecer de golpe con fade-in
+      wrapper.style.cssText = 'margin-bottom:8px;animation:ariaBlockIn .4s ease both;opacity:0;';
+      wrapper.innerHTML = frase;
+      // Forzar reflow para que la animación arranque
+      void wrapper.offsetWidth;
+      wrapper.style.opacity = '';
+      if (msgs) msgs.scrollTop = msgs.scrollHeight;
+      setTimeout(function () { procesarFrase(idx + 1); }, PAUSE_FRASE);
+    } else {
+      // Texto o HTML simple: typewriter carácter a carácter
+      var tokens = _htmlSimpleATokens(frase);
+      _typeTokens(wrapper, tokens, SPEED, function () {
+        setTimeout(function () { procesarFrase(idx + 1); }, PAUSE_FRASE);
+      });
+    }
+  }
+
+  procesarFrase(0);
+}
+
+/* ──────────────────────────────────────────────────
+   addBotFrases — versión typewriter de addBot
+   frases: array de strings HTML
+   onDone: callback opcional al terminar
+────────────────────────────────────────────────── */
+function addBotFrases(frases, onDone) {
+  var welcome = document.getElementById('welcome');
+  if (welcome) welcome.style.display = 'none';
+
+  var msgs = document.getElementById('msgs');
+  if (!msgs) return;
+
+  // Burbuja vacía con typing indicator inicial
+  var tp = document.createElement('div');
+  tp.className = 'msg bot';
+  tp.innerHTML = '<div class="msg-av"><img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'"></div><div class="bubble"><div class="typing-bub"><span></span><span></span><span></span></div></div>';
+  msgs.appendChild(tp);
+  tp.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(function () {
+    var bubble = tp.querySelector('.bubble');
+    if (!bubble) return;
+    _renderFrasesEnBurbuja(bubble, frases, function () {
+      // Detectar trigger de diagnóstico
+      var trigger = bubble.querySelector('.aria-trigger[data-trigger]');
+      if (trigger) {
+        var t = trigger.getAttribute('data-trigger');
+        setTimeout(function () {
+          if (t === 'diagnostico-inventarios') iniciarDiagnostico('inventarios');
+          else if (t === 'diagnostico-logistica') iniciarDiagnostico('logistica');
+          else if (t === 'diagnostico-produccion') iniciarDiagnostico('produccion');
+        }, 2000);
+      }
+      if (typeof onDone === 'function') onDone();
+    });
+  }, 400);
+}
+
+/* ──────────────────────────────────────────────────
    RESPUESTA PERSONALIZADA — INVENTARIOS
    Usada para los 3 tamaños de empresa
 ────────────────────────────────────────────────── */
@@ -365,22 +595,28 @@ function _respuestaInventarios(tamano) {
   // Datos por tamaño
   var datos = {
     pequeña: {
-      mejora: "90% de precisión en el primer mes de operación",
+      producto: "📦 Sistema Básico de Entradas y Salidas",
+      mejora: "99.9% de precisión en el primer mes de operación",
       plan: "BÁSICO",
       precioNormal: "$299 USD",
-      precioOferta: "$1.99 USD"
+      precioOferta: "$1.99 USD",
+      demoUrl: "demo/inventario_datasys.html"
     },
     mediana: {
-      mejora: "95% de reducción de quiebres de stock en el primer mes",
+      producto: "📦 Sistema Entradas y Salidas por QR",
+      mejora: "99.9% de precisión en inventario en el primer mes de operación",
       plan: "PROFESIONAL",
-      precioNormal: "$299 USD",
-      precioOferta: "$1.99 USD"
+      precioNormal: "$599 USD",
+      precioOferta: "$2.99 USD",
+      demoUrl: "demo/inventario_qr_datasys.html"
     },
     grande: {
+      producto: "📦 WMS inteligente impulsado por IA",
       mejora: "99.9% de exactitud en inventario en el primer mes de operación",
       plan: "ENTERPRISE",
-      precioNormal: "$299 USD",
-      precioOferta: "$1.99 USD"
+      precioNormal: "$899 USD",
+      precioOferta: "$3.99 USD",
+      demoUrl: "demo/inventario_IA_datasys.html"
     }
   };
 
@@ -388,37 +624,34 @@ function _respuestaInventarios(tamano) {
   var saludo = nombre ? '<b>' + nombre + '</b>, t' : 'T';
   var enEmpresa = empresa ? ' para <b>' + empresa + '</b>' : '';
 
-  return ''
-    // Encabezado
-    + saludo + 'enemos la solución exacta' + enEmpresa + '.<br><br>'
+  // Array de frases — cada una aparece con 20ms de delay
+  var frases = [
+    // Frase 1: saludo gancho
+    '<span style="font-size:1rem;">' + saludo + 'enemos la solución exacta' + enEmpresa + '.</span>',
 
-    // Descripción del sistema
-    + '✅ Proporcionamos control de inventario por medio de <b>app móvil y página web</b>, '
-    + 'donde puedes cargar <b>stock, entradas y salidas</b> desde cualquier dispositivo.<br><br>'
+    // Frase 2: descripción del sistema
+    '✅ Proporcionamos control de inventario por medio de <b>app móvil y página web</b>, '
+    + 'donde puedes cargar <b>stock, entradas y salidas</b> desde cualquier dispositivo.',
 
-    // Producto
-    + '<div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.25);border-radius:6px;padding:14px;margin:8px 0;">'
+    // Frase 3: bloque producto + beneficios + precio + botones (todo de una vez al final)
+    '<div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.25);border-radius:6px;padding:14px;margin:8px 0;">'
     + '<div style="font-family:\'Orbitron\',monospace;font-size:.48rem;letter-spacing:3px;color:var(--cyan);margin-bottom:8px;opacity:.7;">// PRODUCTO RECOMENDADO</div>'
-    + '<div style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;">📦 Sistema de Control de Inventarios</div>'
+    + '<div style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;">' + d.producto + '</div>'
     + '<div style="font-size:.82rem;opacity:.6;margin-bottom:10px;">Plan <b style="color:var(--cyan);">' + d.plan + '</b> · Uso inmediato · Sin instalaciones complejas</div>'
-
-    // Beneficios clave
     + '<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;font-size:.82rem;">'
     + '<div>📱 <b>App móvil</b> — registra desde tu celular en tiempo real</div>'
     + '<div>🌐 <b>Página web</b> — panel de control desde cualquier navegador</div>'
     + '<div>⬆️ <b>Carga de stock</b> — entradas y salidas en segundos</div>'
     + '<div>⚡ <b>Uso inmediato</b> — operativo desde el primer día</div>'
     + '</div>'
-
-    // Mejora esperada
     + '<div style="background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.25);border-radius:4px;padding:9px 12px;">'
     + '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:#00ff88;letter-spacing:2px;">MEJORA ESPERADA</span><br>'
     + '<span style="font-size:.95rem;font-weight:700;color:#00ff88;">' + d.mejora + '</span>'
     + '</div>'
-    + '</div>'
+    + '</div>',
 
-    // Bloque de precio promocional
-    + '<div style="margin:10px 0 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:10px 14px;">'
+    // Frase 4: bloque precio
+    '<div style="margin:10px 0 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:10px 14px;">'
     + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'
     + '<span style="font-family:\'Orbitron\',monospace;font-size:.85rem;font-weight:700;letter-spacing:1px;color:rgba(200,220,255,.35);text-decoration:line-through;">COSTO NORMAL ' + d.precioNormal + '</span>'
     + '<span style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444;font-family:\'Orbitron\',monospace;font-size:.38rem;font-weight:700;letter-spacing:2px;padding:2px 8px;border-radius:3px;animation:pricePulse 2s ease-in-out infinite;">⏰ TIEMPO LIMITADO</span>'
@@ -428,51 +661,46 @@ function _respuestaInventarios(tamano) {
     + '<span style="font-size:.75rem;opacity:.5;">precio de introducción</span>'
     + '</div>'
     + '<div style="font-size:.72rem;color:rgba(0,229,255,.5);margin-top:5px;">🎬 Videos ilustrativos · Fácil uso · Implementación incluida</div>'
-    + '</div>'
+    + '</div>',
 
-    // 3 BOTONES EN UNA SOLA FILA — mismo estilo, icono grande a la izquierda
-    + '<div style="display:flex;gap:6px;margin-top:4px;">'
-
-    // Botón 1: COMPRAR
+    // Frase 5: 3 botones de acción
+    '<div style="display:flex;gap:6px;margin-top:4px;">'
     + '<button onclick="iniciarCierreVenta(\'inventarios\')" title="Comprar ahora" style="'
     + 'flex:1;padding:10px 8px;font-family:\'Orbitron\',monospace;font-size:.46rem;font-weight:700;'
     + 'letter-spacing:2px;background:rgba(0,229,255,.06);color:rgba(0,229,255,.8);'
     + 'border:1px solid rgba(0,229,255,.3);cursor:pointer;'
     + 'clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);'
-    + 'display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.3;text-align:left;'
-    + '">'
+    + 'display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.3;text-align:left;">'
     + '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">🛒</span>'
     + '<span>COMPRAR<br>AHORA</span>'
     + '</button>'
-
-    // Botón 2: CONTÁCTANOS
     + '<button onclick="iniciarCierreVenta(\'inventarios\')" title="Contáctanos" style="'
     + 'flex:1;padding:10px 8px;font-family:\'Orbitron\',monospace;font-size:.46rem;font-weight:700;'
     + 'letter-spacing:2px;background:rgba(0,229,255,.06);color:rgba(0,229,255,.8);'
     + 'border:1px solid rgba(0,229,255,.3);cursor:pointer;'
     + 'clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);'
-    + 'display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.3;text-align:left;'
-    + '">'
+    + 'display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.3;text-align:left;">'
     + '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">📩</span>'
     + '<span>CONTÁC-<br>TANOS</span>'
     + '</button>'
-
-    // Botón 3: VER DEMO — iframe embebido en el chat
-    + '<button onclick="abrirDemoInline()" title="Ver demo del sistema" style="'
+    + '<button onclick="abrirDemoInline(\'' + d.demoUrl + '\')" title="Ver demo del sistema" style="'
     + 'flex:1;padding:10px 8px;font-family:\'Orbitron\',monospace;font-size:.46rem;font-weight:700;'
     + 'letter-spacing:2px;background:rgba(0,229,255,.06);color:rgba(0,229,255,.8);'
     + 'border:1px solid rgba(0,229,255,.3);cursor:pointer;'
     + 'clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);'
-    + 'display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.3;text-align:left;'
-    + '">'
+    + 'display:flex;align-items:center;justify-content:center;gap:8px;line-height:1.3;text-align:left;">'
     + '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">▶</span>'
     + '<span>VER<br>DEMO</span>'
     + '</button>'
-
     + '</div>'
+    + '<span class="aria-trigger" data-trigger="diagnostico-inventarios" style="display:none;"></span>'
+  ];
 
-    // Flag para que procesarMensaje lance el diagnóstico tras render
-    + '<span class="aria-trigger" data-trigger="diagnostico-inventarios" style="display:none;"></span>';
+  // Usar addBotFrases para renderizar con delay entre frases
+  addBotFrases(frases);
+
+  // Retornar cadena vacía para que el flujo existente que llama addBot no duplique
+  return '__ARIA_FRASES_RENDERED__';
 }
 
 /* ──────────────────────────────────────────────────
@@ -483,26 +711,28 @@ function _respuestaLogistica(tamano) {
   var empresa = ARIA_USER.empresa;
 
   var datos = {
-    pequeña: { mejora: "15% más entregas exitosas en el primer mes",     plan: "BÁSICO",      precioNormal: "$299 USD", precioOferta: "$1.99 USD" },
-    mediana: { mejora: "20% de ahorro en combustible en el primer mes",  plan: "PROFESIONAL", precioNormal: "$299 USD", precioOferta: "$1.99 USD" },
-    grande:  { mejora: "30% menos tiempos de entrega en el primer mes",  plan: "ENTERPRISE",  precioNormal: "$299 USD", precioOferta: "$1.99 USD" }
+    pequeña: { mejora: "15% más entregas exitosas en el primer mes", plan: "BÁSICO", precioNormal: "$299 USD", precioOferta: "$1.99 USD" },
+    mediana: { mejora: "20% de ahorro en combustible en el primer mes", plan: "PROFESIONAL", precioNormal: "$299 USD", precioOferta: "$1.99 USD" },
+    grande: { mejora: "30% menos tiempos de entrega en el primer mes", plan: "ENTERPRISE", precioNormal: "$299 USD", precioOferta: "$1.99 USD" }
   };
 
   var d = datos[tamano] || datos.grande;
   var saludo = nombre ? '<b>' + nombre + '</b>, t' : 'T';
   var enEmpresa = empresa ? ' para <b>' + empresa + '</b>' : '';
 
-  return ''
-    + saludo + 'enemos la solución exacta' + enEmpresa + '.<br><br>'
+  var frases = [
+    // Frase 1: gancho principal
+    '<span style="font-size:1rem;">' + saludo + 'enemos la solución exacta' + enEmpresa + '.</span>',
 
-    + '✅ Proporcionamos control total de tu <b>flotilla y logística</b> por medio de <b>app móvil y página web</b>: '
-    + 'seguimiento GPS, control de unidades, vencimientos y alertas en tiempo real.<br><br>'
+    // Frase 2: descripción del sistema
+    '✅ Proporcionamos control total de tu <b>flotilla y logística</b> por medio de <b>app móvil y página web</b>: '
+    + 'seguimiento GPS, control de unidades, vencimientos y alertas en tiempo real.',
 
-    + '<div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.25);border-radius:6px;padding:14px;margin:8px 0;">'
+    // Frase 3: bloque producto + beneficios + mejora esperada
+    '<div style="background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.25);border-radius:6px;padding:14px;margin:8px 0;">'
     + '<div style="font-family:\'Orbitron\',monospace;font-size:.48rem;letter-spacing:3px;color:var(--cyan);margin-bottom:8px;opacity:.7;">// PRODUCTO RECOMENDADO</div>'
     + '<div style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:4px;">🚚 Sistema de Control de Flotilla</div>'
     + '<div style="font-size:.82rem;opacity:.6;margin-bottom:10px;">Plan <b style="color:var(--cyan);">' + d.plan + '</b> · Uso inmediato · Sin instalaciones complejas</div>'
-
     + '<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px;font-size:.82rem;">'
     + '<div>📱 <b>App móvil</b> — gestión desde celular en tiempo real</div>'
     + '<div>🌐 <b>Página web</b> — panel de control desde cualquier navegador</div>'
@@ -510,15 +740,14 @@ function _respuestaLogistica(tamano) {
     + '<div>🔔 <b>Alertas automáticas</b> — verificación, seguro, tenencia</div>'
     + '<div>⚡ <b>Uso inmediato</b> — operativo desde el primer día</div>'
     + '</div>'
-
     + '<div style="background:rgba(0,255,136,.07);border:1px solid rgba(0,255,136,.25);border-radius:4px;padding:9px 12px;">'
     + '<span style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;color:#00ff88;letter-spacing:2px;">MEJORA ESPERADA</span><br>'
     + '<span style="font-size:.95rem;font-weight:700;color:#00ff88;">' + d.mejora + '</span>'
     + '</div>'
-    + '</div>'
+    + '</div>',
 
-    // Bloque de precio promocional
-    + '<div style="margin:10px 0 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:10px 14px;">'
+    // Frase 4: bloque precio
+    '<div style="margin:10px 0 12px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.18);border-radius:6px;padding:10px 14px;">'
     + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">'
     + '<span style="font-family:\'Orbitron\',monospace;font-size:.85rem;font-weight:700;letter-spacing:1px;color:rgba(200,220,255,.35);text-decoration:line-through;">COSTO NORMAL ' + d.precioNormal + '</span>'
     + '<span style="background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:#ef4444;font-family:\'Orbitron\',monospace;font-size:.38rem;font-weight:700;letter-spacing:2px;padding:2px 8px;border-radius:3px;animation:pricePulse 2s ease-in-out infinite;">⏰ TIEMPO LIMITADO</span>'
@@ -528,11 +757,10 @@ function _respuestaLogistica(tamano) {
     + '<span style="font-size:.75rem;opacity:.5;">precio de introducción</span>'
     + '</div>'
     + '<div style="font-size:.72rem;color:rgba(0,229,255,.5);margin-top:5px;">🎬 Videos ilustrativos · Fácil uso · Implementación incluida</div>'
-    + '</div>'
+    + '</div>',
 
-    // 3 BOTONES EN FILA
-    + '<div style="display:flex;gap:6px;margin-top:4px;">'
-
+    // Frase 5: 3 botones de acción
+    '<div style="display:flex;gap:6px;margin-top:4px;">'
     + '<button onclick="iniciarCierreVenta(\'logistica\')" title="Comprar ahora" style="'
     + 'flex:1;padding:10px 8px;font-family:\'Orbitron\',monospace;font-size:.46rem;font-weight:700;'
     + 'letter-spacing:2px;background:rgba(0,229,255,.06);color:rgba(0,229,255,.8);'
@@ -542,7 +770,6 @@ function _respuestaLogistica(tamano) {
     + '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">🛒</span>'
     + '<span>COMPRAR<br>AHORA</span>'
     + '</button>'
-
     + '<button onclick="iniciarCierreVenta(\'logistica\')" title="Contáctanos" style="'
     + 'flex:1;padding:10px 8px;font-family:\'Orbitron\',monospace;font-size:.46rem;font-weight:700;'
     + 'letter-spacing:2px;background:rgba(0,229,255,.06);color:rgba(0,229,255,.8);'
@@ -552,7 +779,6 @@ function _respuestaLogistica(tamano) {
     + '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">📩</span>'
     + '<span>CONTÁC-<br>TANOS</span>'
     + '</button>'
-
     + '<button onclick="abrirDemoLogisticaInline()" title="Ver demo del sistema" style="'
     + 'flex:1;padding:10px 8px;font-family:\'Orbitron\',monospace;font-size:.46rem;font-weight:700;'
     + 'letter-spacing:2px;background:rgba(0,229,255,.06);color:rgba(0,229,255,.8);'
@@ -562,11 +788,12 @@ function _respuestaLogistica(tamano) {
     + '<span style="font-size:1.6rem;line-height:1;flex-shrink:0;">▶</span>'
     + '<span>VER<br>DEMO</span>'
     + '</button>'
-
     + '</div>'
+    + '<span class="aria-trigger" data-trigger="diagnostico-logistica" style="display:none;"></span>'
+  ];
 
-    // Flag para diagnóstico guiado post-solución
-    + '<span class="aria-trigger" data-trigger="diagnostico-logistica" style="display:none;"></span>';
+  addBotFrases(frases);
+  return '__ARIA_FRASES_RENDERED__';
 }
 
 /* ──────────────────────────────────────────────────
@@ -574,41 +801,38 @@ function _respuestaLogistica(tamano) {
 ────────────────────────────────────────────────── */
 var SOLUCIONES_TAMAÑO_V2 = {
   produccion: {
-    pequeña: function(t) {
-      var d = discursoVentas('produccion');
-      var c = generarCotizacion('produccion', 'pequeña');
-      return d + '<br>' + c;
+    pequeña: function (t) {
+      _discursoVentasFrases('produccion', 'pequeña');
+      return '__ARIA_FRASES_RENDERED__';
     },
-    mediana: function(t) {
-      var d = discursoVentas('produccion');
-      var c = generarCotizacion('produccion', 'mediana');
-      return d + '<br>' + c;
+    mediana: function (t) {
+      _discursoVentasFrases('produccion', 'mediana');
+      return '__ARIA_FRASES_RENDERED__';
     },
-    grande: function(t) {
-      var d = discursoVentas('produccion');
-      var c = generarCotizacion('produccion', 'grande');
-      return d + '<br>' + c;
+    grande: function (t) {
+      _discursoVentasFrases('produccion', 'grande');
+      return '__ARIA_FRASES_RENDERED__';
     }
   },
   inventarios: {
-    pequeña: function(t) {
+    pequeña: function (t) {
       return _respuestaInventarios('pequeña');
     },
-    mediana: function(t) {
+    mediana: function (t) {
       return _respuestaInventarios('mediana');
     },
-    grande: function(t) {
+    grande: function (t) {
       return _respuestaInventarios('grande');
     }
   },
   logistica: {
-    pequeña: function(t) {
+    pequeña: function (t) {
       return _respuestaLogistica('pequeña');
     },
-    mediana: function(t) {
+    mediana: function (t) {
       return _respuestaLogistica('mediana');
     },
-    grande: function(t) {
+    grande: function (t) {
       return _respuestaLogistica('grande');
     }
   }
@@ -619,8 +843,8 @@ var SOLUCIONES_TAMAÑO_V2 = {
 ────────────────────────────────────────────────── */
 function resolverTamanoTexto(texto) {
   var t = texto.toLowerCase();
-  if (t.includes("1") && t.includes("20")) return "pequeña";
   if (t.includes("20") && t.includes("100")) return "mediana";
+  if (t.includes("1") && t.includes("20")) return "pequeña";
   if (t.includes("100") || t.includes("+ 100")) return "grande";
   // fallback por empleados detectados
   if (ARIA_USER.tamaño) return ARIA_USER.tamaño;
@@ -635,7 +859,7 @@ function respuestaInteligente(texto, seccion) {
   var t = texto.toLowerCase();
 
   // Detectar intención de cotización/precio → mostrar pricing dinámico
-  if (["precio","costo","cuánto","cuanto","cotización","cotizacion","presupuesto","tarifa","inversión","inversion","plan","planes"].some(function(k){ return t.includes(k); })) {
+  if (["precio", "costo", "cuánto", "cuanto", "cotización", "cotizacion", "presupuesto", "tarifa", "inversión", "inversion", "plan", "planes"].some(function (k) { return t.includes(k); })) {
     if (seccion && ARIA_USER.tamaño) {
       return generarCotizacion(seccion, ARIA_USER.tamaño);
     }
@@ -714,8 +938,8 @@ function abrirDemoPhone() {
   var modal = document.createElement('div');
   modal.id = 'demoPhoneModal';
   modal.style.cssText = [
-    'position:fixed','inset:0','z-index:99900',
-    'display:flex','align-items:center','justify-content:center',
+    'position:fixed', 'inset:0', 'z-index:99900',
+    'display:flex', 'align-items:center', 'justify-content:center',
     'background:rgba(3,13,24,.96)',
     'backdrop-filter:blur(18px)',
     '-webkit-backdrop-filter:blur(18px)',
@@ -736,136 +960,136 @@ function abrirDemoPhone() {
     'background:rgba(3,13,24,.9);border-bottom:1px solid rgba(0,229,255,.12);',
     'backdrop-filter:blur(16px);z-index:10;">',
 
-      '<div style="display:flex;align-items:center;gap:10px;',
-      'font-family:Orbitron,sans-serif;font-size:.62rem;letter-spacing:4px;color:#00e5ff;',
-      'text-shadow:0 0 14px rgba(0,229,255,.5);">',
-        '<div style="width:7px;height:7px;border-radius:50%;background:#00e5ff;',
-        'box-shadow:0 0 10px #00e5ff;animation:demoBlink 2s ease-in-out infinite;"></div>',
-        'DATASYS',
-        '<span style="font-family:Share Tech Mono,monospace;font-size:.48rem;',
-        'letter-spacing:3px;color:rgba(0,229,255,.5);font-weight:400;">',
-        '· DEMO SISTEMA DE INVENTARIOS</span>',
-      '</div>',
+    '<div style="display:flex;align-items:center;gap:10px;',
+    'font-family:Orbitron,sans-serif;font-size:.62rem;letter-spacing:4px;color:#00e5ff;',
+    'text-shadow:0 0 14px rgba(0,229,255,.5);">',
+    '<div style="width:7px;height:7px;border-radius:50%;background:#00e5ff;',
+    'box-shadow:0 0 10px #00e5ff;animation:demoBlink 2s ease-in-out infinite;"></div>',
+    'DATASYS',
+    '<span style="font-family:Share Tech Mono,monospace;font-size:.48rem;',
+    'letter-spacing:3px;color:rgba(0,229,255,.5);font-weight:400;">',
+    '· DEMO SISTEMA DE INVENTARIOS</span>',
+    '</div>',
 
-      '<div style="display:flex;gap:10px;align-items:center;">',
-        '<span style="font-family:Share Tech Mono,monospace;font-size:.42rem;',
-        'letter-spacing:2px;color:rgba(0,229,255,.4);">// VISTA MÓVIL · PREVIEW</span>',
-        '<button onclick="document.getElementById(\'demoPhoneModal\').style.display=\'none\'" ',
-        'style="padding:5px 16px;font-family:Share Tech Mono,monospace;font-size:.44rem;',
-        'letter-spacing:2px;color:#00e5ff;background:transparent;',
-        'border:1px solid rgba(0,229,255,.25);cursor:pointer;transition:all .2s;" ',
-        'onmouseover="this.style.background=\'rgba(0,229,255,.08)\'" ',
-        'onmouseout="this.style.background=\'transparent\'">✕ CERRAR</button>',
-      '</div>',
+    '<div style="display:flex;gap:10px;align-items:center;">',
+    '<span style="font-family:Share Tech Mono,monospace;font-size:.42rem;',
+    'letter-spacing:2px;color:rgba(0,229,255,.4);">// VISTA MÓVIL · PREVIEW</span>',
+    '<button onclick="document.getElementById(\'demoPhoneModal\').style.display=\'none\'" ',
+    'style="padding:5px 16px;font-family:Share Tech Mono,monospace;font-size:.44rem;',
+    'letter-spacing:2px;color:#00e5ff;background:transparent;',
+    'border:1px solid rgba(0,229,255,.25);cursor:pointer;transition:all .2s;" ',
+    'onmouseover="this.style.background=\'rgba(0,229,255,.08)\'" ',
+    'onmouseout="this.style.background=\'transparent\'">✕ CERRAR</button>',
+    '</div>',
     '</div>',
 
     /* ── SCENE ── */
     '<div style="position:absolute;inset:50px 0 0;display:flex;align-items:center;justify-content:center;">',
 
-      /* Info panel izquierdo */
-      '<div style="position:absolute;left:calc(50% - 222px - 200px);top:50%;transform:translateY(-50%);',
-      'width:180px;display:flex;flex-direction:column;gap:16px;">',
-        _infoPanelCard('// DISPOSITIVO', 'iPhone 15 Pro', '390 × 844 · 3x RETINA'),
-        _infoPanelCard('// VIEWPORT', '390px', 'MOBILE · PORTRAIT'),
-        _infoPanelCard('// MÓDULO', 'INVENTARIOS', 'DATASYS DEMO LIVE'),
-      '</div>',
+    /* Info panel izquierdo */
+    '<div style="position:absolute;left:calc(50% - 222px - 200px);top:50%;transform:translateY(-50%);',
+    'width:180px;display:flex;flex-direction:column;gap:16px;">',
+    _infoPanelCard('// DISPOSITIVO', 'iPhone 15 Pro', '390 × 844 · 3x RETINA'),
+    _infoPanelCard('// VIEWPORT', '390px', 'MOBILE · PORTRAIT'),
+    _infoPanelCard('// MÓDULO', 'INVENTARIOS', 'DATASYS DEMO LIVE'),
+    '</div>',
 
-      /* Phone wrap */
-      '<div style="position:relative;display:flex;align-items:center;justify-content:center;">',
+    /* Phone wrap */
+    '<div style="position:relative;display:flex;align-items:center;justify-content:center;">',
 
-        /* Glow trails */
-        '<div style="position:absolute;top:20%;right:calc(100% - 10px);width:70px;height:60%;',
-        'background:linear-gradient(90deg,transparent,rgba(0,229,255,.05));',
-        'pointer-events:none;border-radius:40px;transform:scaleX(-1);"></div>',
-        '<div style="position:absolute;top:20%;left:calc(100% - 10px);width:70px;height:60%;',
-        'background:linear-gradient(90deg,transparent,rgba(0,229,255,.05));',
-        'pointer-events:none;border-radius:40px;"></div>',
+    /* Glow trails */
+    '<div style="position:absolute;top:20%;right:calc(100% - 10px);width:70px;height:60%;',
+    'background:linear-gradient(90deg,transparent,rgba(0,229,255,.05));',
+    'pointer-events:none;border-radius:40px;transform:scaleX(-1);"></div>',
+    '<div style="position:absolute;top:20%;left:calc(100% - 10px);width:70px;height:60%;',
+    'background:linear-gradient(90deg,transparent,rgba(0,229,255,.05));',
+    'pointer-events:none;border-radius:40px;"></div>',
 
-        /* Shell */
-        '<div style="position:relative;width:418px;height:900px;',
-        'background:linear-gradient(145deg,#1a2535 0%,#0c1624 40%,#060d18 100%);',
-        'border-radius:52px;',
-        'box-shadow:0 0 0 1px rgba(0,229,255,.2),0 0 0 2px rgba(0,20,40,.8),',
-        '0 0 60px rgba(0,229,255,.14),0 40px 120px rgba(0,0,0,.7),',
-        'inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.4);',
-        'animation:demoPhoneFloat 6s ease-in-out infinite;">',
+    /* Shell */
+    '<div style="position:relative;width:418px;height:900px;',
+    'background:linear-gradient(145deg,#1a2535 0%,#0c1624 40%,#060d18 100%);',
+    'border-radius:52px;',
+    'box-shadow:0 0 0 1px rgba(0,229,255,.2),0 0 0 2px rgba(0,20,40,.8),',
+    '0 0 60px rgba(0,229,255,.14),0 40px 120px rgba(0,0,0,.7),',
+    'inset 0 1px 0 rgba(255,255,255,.06),inset 0 -1px 0 rgba(0,0,0,.4);',
+    'animation:demoPhoneFloat 6s ease-in-out infinite;">',
 
-          /* Side buttons */
-          '<div style="position:absolute;left:-4px;top:140px;width:4px;height:36px;',
-          'background:linear-gradient(90deg,#0d1e30,#1a2e44);border-radius:3px;"></div>',
-          '<div style="position:absolute;left:-4px;top:188px;width:4px;height:36px;',
-          'background:linear-gradient(90deg,#0d1e30,#1a2e44);border-radius:3px;"></div>',
-          '<div style="position:absolute;right:-4px;top:180px;width:4px;height:60px;',
-          'background:linear-gradient(90deg,#1a2e44,#0d1e30);border-radius:3px;"></div>',
+    /* Side buttons */
+    '<div style="position:absolute;left:-4px;top:140px;width:4px;height:36px;',
+    'background:linear-gradient(90deg,#0d1e30,#1a2e44);border-radius:3px;"></div>',
+    '<div style="position:absolute;left:-4px;top:188px;width:4px;height:36px;',
+    'background:linear-gradient(90deg,#0d1e30,#1a2e44);border-radius:3px;"></div>',
+    '<div style="position:absolute;right:-4px;top:180px;width:4px;height:60px;',
+    'background:linear-gradient(90deg,#1a2e44,#0d1e30);border-radius:3px;"></div>',
 
-          /* Screen area */
-          '<div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;',
-          'border-radius:40px;overflow:hidden;background:#000;">',
+    /* Screen area */
+    '<div style="position:absolute;top:14px;left:14px;right:14px;bottom:14px;',
+    'border-radius:40px;overflow:hidden;background:#000;">',
 
-            /* Status bar */
-            '<div style="position:absolute;top:0;left:0;right:0;height:66px;z-index:50;',
-            'display:flex;align-items:center;justify-content:space-between;padding:0 24px;',
-            'pointer-events:none;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);">',
-              '<span id="demoStatusTime" style="font-family:Orbitron,sans-serif;font-size:.55rem;',
-              'font-weight:700;color:#fff;letter-spacing:1px;">9:41</span>',
-              '<div style="display:flex;align-items:center;gap:4px;font-size:.5rem;',
-              'color:#fff;font-family:Share Tech Mono,monospace;">',
-                '<span>▲▲▲</span><span>WiFi</span>',
-                '<div style="width:22px;height:11px;border:1px solid rgba(255,255,255,.6);',
-                'border-radius:2px;padding:1.5px;position:relative;display:inline-flex;align-items:center;">',
-                  '<div style="width:70%;height:100%;background:#fff;border-radius:1px;"></div>',
-                  '<div style="position:absolute;right:-4px;width:3px;height:5px;',
-                  'background:rgba(255,255,255,.5);border-radius:0 1px 1px 0;"></div>',
-                '</div>',
-              '</div>',
-            '</div>',
+    /* Status bar */
+    '<div style="position:absolute;top:0;left:0;right:0;height:66px;z-index:50;',
+    'display:flex;align-items:center;justify-content:space-between;padding:0 24px;',
+    'pointer-events:none;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);">',
+    '<span id="demoStatusTime" style="font-family:Orbitron,sans-serif;font-size:.55rem;',
+    'font-weight:700;color:#fff;letter-spacing:1px;">9:41</span>',
+    '<div style="display:flex;align-items:center;gap:4px;font-size:.5rem;',
+    'color:#fff;font-family:Share Tech Mono,monospace;">',
+    '<span>▲▲▲</span><span>WiFi</span>',
+    '<div style="width:22px;height:11px;border:1px solid rgba(255,255,255,.6);',
+    'border-radius:2px;padding:1.5px;position:relative;display:inline-flex;align-items:center;">',
+    '<div style="width:70%;height:100%;background:#fff;border-radius:1px;"></div>',
+    '<div style="position:absolute;right:-4px;width:3px;height:5px;',
+    'background:rgba(255,255,255,.5);border-radius:0 1px 1px 0;"></div>',
+    '</div>',
+    '</div>',
+    '</div>',
 
-            /* Dynamic island */
-            '<div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);',
-            'width:120px;height:34px;background:#000;border-radius:20px;z-index:60;',
-            'display:flex;align-items:center;justify-content:center;gap:10px;">',
-              '<div style="width:12px;height:12px;border-radius:50%;background:#0a0a0a;',
-              'border:1px solid #111;position:relative;">',
-                '<div style="position:absolute;top:2px;left:2px;width:4px;height:4px;',
-                'border-radius:50%;background:rgba(0,229,255,.2);"></div>',
-              '</div>',
-              '<div style="width:40px;height:4px;background:#111;border-radius:4px;"></div>',
-            '</div>',
+    /* Dynamic island */
+    '<div style="position:absolute;top:14px;left:50%;transform:translateX(-50%);',
+    'width:120px;height:34px;background:#000;border-radius:20px;z-index:60;',
+    'display:flex;align-items:center;justify-content:center;gap:10px;">',
+    '<div style="width:12px;height:12px;border-radius:50%;background:#0a0a0a;',
+    'border:1px solid #111;position:relative;">',
+    '<div style="position:absolute;top:2px;left:2px;width:4px;height:4px;',
+    'border-radius:50%;background:rgba(0,229,255,.2);"></div>',
+    '</div>',
+    '<div style="width:40px;height:4px;background:#111;border-radius:4px;"></div>',
+    '</div>',
 
-            /* IFRAME */
-            '<iframe id="demoPhoneIframe" src="demo/index_administracion.html" ',
-            'style="position:absolute;top:66px;left:0;right:0;bottom:20px;',
-            'width:100%;height:calc(100% - 86px);border:none;background:#030d18;" ',
-            'scrolling="yes" title="Demo Inventarios DATASYS"></iframe>',
+    /* IFRAME */
+    '<iframe id="demoPhoneIframe" src="demo/index_administracion.html" ',
+    'style="position:absolute;top:66px;left:0;right:0;bottom:20px;',
+    'width:100%;height:calc(100% - 86px);border:none;background:#030d18;" ',
+    'scrolling="yes" title="Demo Inventarios DATASYS"></iframe>',
 
-            /* Reflection shimmer */
-            '<div style="position:absolute;inset:0;',
-            'background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 40%);',
-            'border-radius:40px;pointer-events:none;z-index:70;"></div>',
+    /* Reflection shimmer */
+    '<div style="position:absolute;inset:0;',
+    'background:linear-gradient(135deg,rgba(255,255,255,.04) 0%,transparent 40%);',
+    'border-radius:40px;pointer-events:none;z-index:70;"></div>',
 
-            /* Home indicator */
-            '<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);',
-            'width:130px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;',
-            'z-index:70;pointer-events:none;"></div>',
+    /* Home indicator */
+    '<div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);',
+    'width:130px;height:5px;background:rgba(255,255,255,.18);border-radius:3px;',
+    'z-index:70;pointer-events:none;"></div>',
 
-          '</div>',/* /screen */
+    '</div>',/* /screen */
 
-          /* Reflection below phone */
-          '<div style="position:absolute;bottom:-38px;left:50%;transform:translateX(-50%);',
-          'width:418px;height:38px;',
-          'background:linear-gradient(180deg,rgba(0,229,255,.07) 0%,transparent 100%);',
-          'filter:blur(8px);border-radius:50%;pointer-events:none;"></div>',
+    /* Reflection below phone */
+    '<div style="position:absolute;bottom:-38px;left:50%;transform:translateX(-50%);',
+    'width:418px;height:38px;',
+    'background:linear-gradient(180deg,rgba(0,229,255,.07) 0%,transparent 100%);',
+    'filter:blur(8px);border-radius:50%;pointer-events:none;"></div>',
 
-        '</div>',/* /shell */
-      '</div>',/* /phone-wrap */
+    '</div>',/* /shell */
+    '</div>',/* /phone-wrap */
 
-      /* Info panel derecho */
-      '<div style="position:absolute;right:calc(50% - 222px - 200px);top:50%;transform:translateY(-50%);',
-      'width:180px;display:flex;flex-direction:column;gap:16px;">',
-        _infoPanelCard('// PÁGINAS', '9', 'PLATAFORMAS ACTIVAS'),
-        _infoPanelCard('// ESTADO', '<span style="color:#00ff88;">LIVE</span>', 'PRODUCCIÓN · v2.6'),
-        _infoPanelCard('// IA ASISTENTE', 'ARIA', '24/7 ONLINE'),
-      '</div>',
+    /* Info panel derecho */
+    '<div style="position:absolute;right:calc(50% - 222px - 200px);top:50%;transform:translateY(-50%);',
+    'width:180px;display:flex;flex-direction:column;gap:16px;">',
+    _infoPanelCard('// PÁGINAS', '9', 'PLATAFORMAS ACTIVAS'),
+    _infoPanelCard('// ESTADO', '<span style="color:#00ff88;">LIVE</span>', 'PRODUCCIÓN · v2.6'),
+    _infoPanelCard('// IA ASISTENTE', 'ARIA', '24/7 ONLINE'),
+    '</div>',
 
     '</div>'/* /scene */
   ].join('');
@@ -877,10 +1101,10 @@ function abrirDemoPhone() {
     var el = document.getElementById('demoStatusTime');
     if (!el) return;
     var n = new Date();
-    el.textContent = String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
+    el.textContent = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0');
   }
   tickDemoClock();
-  setInterval(tickDemoClock, 10000);
+  setInterval(tickDemoClock, 1000);
 
   // Cerrar con ESC
   document.addEventListener('keydown', function escClose(e) {
@@ -896,12 +1120,12 @@ function abrirDemoPhone() {
 function _infoPanelCard(label, val, sub) {
   return [
     '<div style="background:rgba(0,229,255,.03);border:1px solid rgba(0,229,255,.12);padding:12px 14px;">',
-      '<div style="font-family:Share Tech Mono,monospace;font-size:.38rem;letter-spacing:3px;',
-      'color:rgba(0,229,255,.5);margin-bottom:5px;">' + label + '</div>',
-      '<div style="font-family:Orbitron,sans-serif;font-size:.68rem;font-weight:700;',
-      'color:#00e5ff;letter-spacing:1px;">' + val + '</div>',
-      '<div style="font-family:Share Tech Mono,monospace;font-size:.36rem;letter-spacing:2px;',
-      'color:rgba(142,184,204,.4);margin-top:3px;">' + sub + '</div>',
+    '<div style="font-family:Share Tech Mono,monospace;font-size:.38rem;letter-spacing:3px;',
+    'color:rgba(0,229,255,.5);margin-bottom:5px;">' + label + '</div>',
+    '<div style="font-family:Orbitron,sans-serif;font-size:.68rem;font-weight:700;',
+    'color:#00e5ff;letter-spacing:1px;">' + val + '</div>',
+    '<div style="font-family:Share Tech Mono,monospace;font-size:.36rem;letter-spacing:2px;',
+    'color:rgba(142,184,204,.4);margin-top:3px;">' + sub + '</div>',
     '</div>'
   ].join('');
 }
@@ -909,71 +1133,90 @@ function _infoPanelCard(label, val, sub) {
 /* ──────────────────────────────────────────────────
    DEMO INLINE — iframe embebido directo en el chat
 ────────────────────────────────────────────────── */
-function abrirDemoInline() {
-  // Evitar duplicados
+function abrirDemoInline(url) {
+  var demoUrl = url || 'demo/inventario_IA_datasys.html';
+  var msgs = document.getElementById('msgs');
+  if (!msgs) return;
+
+  // Evitar duplicados y asegurar que se muestre al final
   if (document.getElementById('demoInlineWrap')) {
     var existing = document.getElementById('demoInlineWrap');
-    existing.style.display = existing.style.display === 'none' ? 'block' : 'none';
+    var parentMsg = existing.closest ? existing.closest('.msg.bot') : null;
+    if (parentMsg) msgs.appendChild(parentMsg); // Mover al final
+
+    existing.style.display = 'block';
+    var f = document.getElementById('demoInlineFrame');
+    if (f) {
+      if (f.src.indexOf(demoUrl) === -1) f.src = demoUrl;
+      f.style.height = '520px'; // Asegurar que esté expandido
+    }
+
+    if (parentMsg) {
+      var btns = parentMsg.querySelectorAll('button');
+      for (var i = 0; i < btns.length; i++) {
+        if (btns[i].textContent.includes('MOSTRAR')) btns[i].textContent = '▲ OCULTAR';
+      }
+    }
+
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(function () { msgs.scrollTop = msgs.scrollHeight; }, 400);
     return;
   }
 
   // Crear burbuja bot nueva en el chat
-  var msgs = document.getElementById('msgs');
-  if (!msgs) return;
-
   var wrap = document.createElement('div');
   wrap.className = 'msg bot';
   wrap.style.cssText = 'align-self:flex-start;max-width:96%;width:96%;animation:msgIn .3s ease both;';
 
   wrap.innerHTML = [
     '<div class="msg-av">',
-      '<img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'">',
+    '<img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'">',
     '</div>',
     '<div class="bubble" style="width:100%;padding:0;overflow:hidden;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);">',
 
-      // Header de la burbuja
-      '<div style="display:flex;align-items:center;justify-content:space-between;',
-      'padding:9px 14px;border-bottom:1px solid rgba(0,229,255,.12);',
-      'background:rgba(0,229,255,.06);">',
-        '<div style="display:flex;align-items:center;gap:8px;">',
-          '<div style="width:6px;height:6px;border-radius:50%;background:#00ff88;',
-          'box-shadow:0 0 8px #00ff88;animation:pulse-green 2s ease-in-out infinite;"></div>',
-          '<span style="font-family:\'Orbitron\',monospace;font-size:.5rem;letter-spacing:3px;',
-          'color:var(--cyan);">DEMO · SISTEMA DE INVENTARIOS</span>',
-        '</div>',
-        '<div style="display:flex;gap:6px;">',
-          '<button onclick="var f=document.getElementById(\'demoInlineFrame\');f.src=f.src;" ',
-          'title="Recargar" style="font-family:\'Share Tech Mono\',monospace;font-size:.45rem;',
-          'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
-          'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">↺</button>',
-          '<button onclick="',
-            'var w=document.getElementById(\'demoInlineWrap\');',
-            'var f=document.getElementById(\'demoInlineFrame\');',
-            'var btn=this;',
-            'if(f.style.height===\'0px\'||f.style.height===\'\'){',
-              'f.style.height=\'520px\';btn.textContent=\'▲ OCULTAR\';',
-            '}else{f.style.height=\'0px\';btn.textContent=\'▼ MOSTRAR\';}" ',
-          'style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;',
-          'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
-          'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">▲ OCULTAR</button>',
-        '</div>',
-      '</div>',
+    // Header de la burbuja
+    '<div style="display:flex;align-items:center;justify-content:space-between;',
+    'padding:9px 14px;border-bottom:1px solid rgba(0,229,255,.12);',
+    'background:rgba(0,229,255,.06);">',
+    '<div style="display:flex;align-items:center;gap:8px;">',
+    '<div style="width:6px;height:6px;border-radius:50%;background:#00ff88;',
+    'box-shadow:0 0 8px #00ff88;animation:pulse-green 2s ease-in-out infinite;"></div>',
+    '<span style="font-family:\'Orbitron\',monospace;font-size:.5rem;letter-spacing:3px;',
+    'color:var(--cyan);">DEMO · SISTEMA DE INVENTARIOS</span>',
+    '</div>',
+    '<div style="display:flex;gap:6px;">',
+    '<button onclick="var f=document.getElementById(\'demoInlineFrame\');f.src=f.src;" ',
+    'title="Recargar" style="font-family:\'Share Tech Mono\',monospace;font-size:.45rem;',
+    'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
+    'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">↺</button>',
+    '<button onclick="',
+    'var w=document.getElementById(\'demoInlineWrap\');',
+    'var f=document.getElementById(\'demoInlineFrame\');',
+    'var btn=this;',
+    'if(f.style.height===\'0px\'||f.style.height===\'\'){',
+    'f.style.height=\'520px\';btn.textContent=\'▲ OCULTAR\';',
+    '}else{f.style.height=\'0px\';btn.textContent=\'▼ MOSTRAR\';}" ',
+    'style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;',
+    'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
+    'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">▲ OCULTAR</button>',
+    '</div>',
+    '</div>',
 
-      // Iframe
-      '<div id="demoInlineWrap">',
-        '<iframe id="demoInlineFrame" src="demo/index_administracion.html" ',
-        'style="display:block;width:100%;height:520px;border:none;',
-        'background:#030d18;transition:height .35s ease;" ',
-        'scrolling="yes" title="Demo Inventarios DATASYS"></iframe>',
-      '</div>',
+    // Iframe
+    '<div id="demoInlineWrap">',
+    '<iframe id="demoInlineFrame" src="' + demoUrl + '" ',
+    'style="display:block;width:100%;height:520px;border:none;',
+    'background:#030d18;transition:height .35s ease;" ',
+    'scrolling="yes" title="Demo Inventarios DATASYS"></iframe>',
+    '</div>',
 
-      // Footer
-      '<div style="padding:7px 14px;border-top:1px solid rgba(0,229,255,.08);',
-      'font-family:\'Share Tech Mono\',monospace;font-size:.4rem;',
-      'letter-spacing:2px;color:rgba(0,229,255,.3);display:flex;justify-content:space-between;">',
-        '<span>DATASYS · SISTEMA DE CONTROL DE INVENTARIOS</span>',
-        '<span style="color:#00ff88;">● LIVE DEMO</span>',
-      '</div>',
+    // Footer
+    '<div style="padding:7px 14px;border-top:1px solid rgba(0,229,255,.08);',
+    'font-family:\'Share Tech Mono\',monospace;font-size:.4rem;',
+    'letter-spacing:2px;color:rgba(0,229,255,.3);display:flex;justify-content:space-between;">',
+    '<span>DATASYS · SISTEMA DE CONTROL DE INVENTARIOS</span>',
+    '<span style="color:#00ff88;">● LIVE DEMO</span>',
+    '</div>',
 
     '</div>'
   ].join('');
@@ -982,7 +1225,7 @@ function abrirDemoInline() {
   msgs.scrollTop = msgs.scrollHeight;
 
   // Scroll suave al iframe tras render
-  setTimeout(function() {
+  setTimeout(function () {
     msgs.scrollTop = msgs.scrollHeight;
   }, 400);
 }
@@ -992,18 +1235,32 @@ function abrirDemoInline() {
    iframe embebido directo en el chat
 ────────────────────────────────────────────────── */
 function abrirDemoLogisticaInline() {
-  var DEMO_ID   = 'demoLogisticaWrap';
+  var DEMO_ID = 'demoLogisticaWrap';
   var IFRAME_ID = 'demoLogisticaFrame';
-
-  // Toggle si ya existe
-  if (document.getElementById(DEMO_ID)) {
-    var ex = document.getElementById(DEMO_ID);
-    ex.style.display = ex.style.display === 'none' ? 'block' : 'none';
-    return;
-  }
-
   var msgs = document.getElementById('msgs');
   if (!msgs) return;
+
+  // Mostrar si ya existe y asegurar que esté al final
+  if (document.getElementById(DEMO_ID)) {
+    var ex = document.getElementById(DEMO_ID);
+    var parentMsg = ex.closest ? ex.closest('.msg.bot') : null;
+    if (parentMsg) msgs.appendChild(parentMsg); // Mover al final
+
+    ex.style.display = 'block';
+    var f = document.getElementById(IFRAME_ID);
+    if (f) f.style.height = '520px'; // Asegurar que esté expandido
+
+    if (parentMsg) {
+      var btns = parentMsg.querySelectorAll('button');
+      for (var i = 0; i < btns.length; i++) {
+        if (btns[i].textContent.includes('MOSTRAR')) btns[i].textContent = '▲ OCULTAR';
+      }
+    }
+
+    msgs.scrollTop = msgs.scrollHeight;
+    setTimeout(function () { msgs.scrollTop = msgs.scrollHeight; }, 400);
+    return;
+  }
 
   var wrap = document.createElement('div');
   wrap.className = 'msg bot';
@@ -1011,58 +1268,58 @@ function abrirDemoLogisticaInline() {
 
   wrap.innerHTML = [
     '<div class="msg-av">',
-      '<img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'">',
+    '<img src="imagenes/logo.png" alt="AR" onerror="this.outerHTML=\'<span style=font-size:.8rem>⚡</span>\'">',
     '</div>',
     '<div class="bubble" style="width:100%;padding:0;overflow:hidden;',
     'background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.2);">',
 
-      // Header
-      '<div style="display:flex;align-items:center;justify-content:space-between;',
-      'padding:9px 14px;border-bottom:1px solid rgba(0,229,255,.12);',
-      'background:rgba(0,229,255,.06);">',
-        '<div style="display:flex;align-items:center;gap:8px;">',
-          '<div style="width:6px;height:6px;border-radius:50%;background:#00ff88;',
-          'box-shadow:0 0 8px #00ff88;animation:pulse-green 2s ease-in-out infinite;"></div>',
-          '<span style="font-family:\'Orbitron\',monospace;font-size:.5rem;letter-spacing:3px;',
-          'color:var(--cyan);">DEMO · SISTEMA DE CONTROL DE FLOTILLA</span>',
-        '</div>',
-        '<div style="display:flex;gap:6px;">',
-          '<button onclick="var f=document.getElementById(\'' + IFRAME_ID + '\');f.src=f.src;" ',
-          'title="Recargar" style="font-family:\'Share Tech Mono\',monospace;font-size:.45rem;',
-          'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
-          'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">↺</button>',
-          '<button onclick="',
-            'var f=document.getElementById(\'' + IFRAME_ID + '\');',
-            'var btn=this;',
-            'if(f.style.height===\'0px\'||f.style.height===\'\'){',
-              'f.style.height=\'520px\';btn.textContent=\'▲ OCULTAR\';',
-            '}else{f.style.height=\'0px\';btn.textContent=\'▼ MOSTRAR\';}" ',
-          'style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;',
-          'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
-          'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">▲ OCULTAR</button>',
-        '</div>',
-      '</div>',
+    // Header
+    '<div style="display:flex;align-items:center;justify-content:space-between;',
+    'padding:9px 14px;border-bottom:1px solid rgba(0,229,255,.12);',
+    'background:rgba(0,229,255,.06);">',
+    '<div style="display:flex;align-items:center;gap:8px;">',
+    '<div style="width:6px;height:6px;border-radius:50%;background:#00ff88;',
+    'box-shadow:0 0 8px #00ff88;animation:pulse-green 2s ease-in-out infinite;"></div>',
+    '<span style="font-family:\'Orbitron\',monospace;font-size:.5rem;letter-spacing:3px;',
+    'color:var(--cyan);">DEMO · SISTEMA DE CONTROL DE FLOTILLA</span>',
+    '</div>',
+    '<div style="display:flex;gap:6px;">',
+    '<button onclick="var f=document.getElementById(\'' + IFRAME_ID + '\');f.src=f.src;" ',
+    'title="Recargar" style="font-family:\'Share Tech Mono\',monospace;font-size:.45rem;',
+    'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
+    'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">↺</button>',
+    '<button onclick="',
+    'var f=document.getElementById(\'' + IFRAME_ID + '\');',
+    'var btn=this;',
+    'if(f.style.height===\'0px\'||f.style.height===\'\'){',
+    'f.style.height=\'520px\';btn.textContent=\'▲ OCULTAR\';',
+    '}else{f.style.height=\'0px\';btn.textContent=\'▼ MOSTRAR\';}" ',
+    'style="font-family:\'Share Tech Mono\',monospace;font-size:.42rem;',
+    'letter-spacing:1px;color:rgba(0,229,255,.5);background:none;',
+    'border:1px solid rgba(0,229,255,.15);padding:3px 9px;cursor:pointer;">▲ OCULTAR</button>',
+    '</div>',
+    '</div>',
 
-      // Iframe
-      '<div id="' + DEMO_ID + '">',
-        '<iframe id="' + IFRAME_ID + '" src="demo/flotilla_cfe.html" ',
-        'style="display:block;width:100%;height:520px;border:none;',
-        'background:#030d18;transition:height .35s ease;" ',
-        'scrolling="yes" title="Demo Flotilla DATASYS"></iframe>',
-      '</div>',
+    // Iframe
+    '<div id="' + DEMO_ID + '">',
+    '<iframe id="' + IFRAME_ID + '" src="demo/flotilla_cfe.html" ',
+    'style="display:block;width:100%;height:520px;border:none;',
+    'background:#030d18;transition:height .35s ease;" ',
+    'scrolling="yes" title="Demo Flotilla DATASYS"></iframe>',
+    '</div>',
 
-      // Footer
-      '<div style="padding:7px 14px;border-top:1px solid rgba(0,229,255,.08);',
-      'font-family:\'Share Tech Mono\',monospace;font-size:.4rem;',
-      'letter-spacing:2px;color:rgba(0,229,255,.3);display:flex;justify-content:space-between;">',
-        '<span>DATASYS · SISTEMA DE CONTROL DE FLOTILLA</span>',
-        '<span style="color:#00ff88;">● LIVE DEMO</span>',
-      '</div>',
+    // Footer
+    '<div style="padding:7px 14px;border-top:1px solid rgba(0,229,255,.08);',
+    'font-family:\'Share Tech Mono\',monospace;font-size:.4rem;',
+    'letter-spacing:2px;color:rgba(0,229,255,.3);display:flex;justify-content:space-between;">',
+    '<span>DATASYS · SISTEMA DE CONTROL DE FLOTILLA</span>',
+    '<span style="color:#00ff88;">● LIVE DEMO</span>',
+    '</div>',
 
     '</div>'
   ].join('');
 
   msgs.appendChild(wrap);
   msgs.scrollTop = msgs.scrollHeight;
-  setTimeout(function() { msgs.scrollTop = msgs.scrollHeight; }, 400);
+  setTimeout(function () { msgs.scrollTop = msgs.scrollHeight; }, 400);
 }
