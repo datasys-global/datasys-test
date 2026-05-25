@@ -1039,9 +1039,10 @@
             </div>
           </div>
         </div>
-        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+        <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;align-items:center;">
           <button class="btn btn-primary" onclick="startCamera()" id="btn-cam-start">◈ Activar cámara</button>
           <button class="btn btn-outline btn-sm" onclick="stopCamera()" id="btn-cam-stop" style="display:none;">✕ Detener</button>
+          <span id="scan-status" style="font-family:var(--mono);font-size:11px;letter-spacing:1px;"></span>
         </div>
 
         <!-- MANUAL OVERRIDE -->
@@ -1336,70 +1337,143 @@ function updateStats() {
 }
 
 // ==================== PANEL 3: SCANNER ====================
+
+// Extrae el código DSY-XXX de cualquier string (URL completa o código directo)
+function extractDSYCode(raw) {
+  // Caso 1: viene como parámetro ?code=DSY-001 en una URL
+  try {
+    const url = new URL(raw);
+    const param = url.searchParams.get('code');
+    if (param) return param.toUpperCase().trim();
+  } catch(e) {}
+  // Caso 2: es directamente DSY-001
+  const match = raw.toUpperCase().match(/DSY-\d+/);
+  if (match) return match[0];
+  // Caso 3: devolver tal cual por si el usuario ingresó algo custom
+  return raw.toUpperCase().trim();
+}
+
+let scanningActive = false;
+let rafId = null;
+
 async function startCamera() {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});
+    // Constraints optimizados para móvil — cámara trasera, resolución razonable
+    const constraints = {
+      video: {
+        facingMode: { ideal: 'environment' },
+        width:  { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    };
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
     cameraStream = stream;
     const video = document.getElementById('scan-video');
     video.srcObject = stream;
-    video.style.display = 'block';
-    document.getElementById('scan-inactive').style.display = 'none';
-    document.getElementById('scan-overlay').style.display = 'flex';
-    document.getElementById('btn-cam-start').style.display = 'none';
-    document.getElementById('btn-cam-stop').style.display = 'inline-flex';
-    scanInterval = setInterval(scanFrame, 300);
-    toast('Cámara activada', 'info');
+    video.setAttribute('playsinline', true); // crítico para iOS Safari
+    video.setAttribute('muted', true);
+
+    // Esperar a que el video esté realmente reproduciendo antes de escanear
+    video.onloadedmetadata = () => {
+      video.play().then(() => {
+        video.style.display = 'block';
+        document.getElementById('scan-inactive').style.display = 'none';
+        document.getElementById('scan-overlay').style.display = 'flex';
+        document.getElementById('btn-cam-start').style.display = 'none';
+        document.getElementById('btn-cam-stop').style.display = 'inline-flex';
+        document.getElementById('scan-status').textContent = '● ESCANEANDO...';
+        document.getElementById('scan-status').style.color = 'var(--accent2)';
+        scanningActive = true;
+        requestAnimationFrame(scanLoop);
+        toast('Cámara activada — apunta al QR', 'info');
+      }).catch(err => {
+        toast('Error al iniciar video: ' + err.message, 'error');
+      });
+    };
   } catch(e) {
-    toast('No se pudo acceder a la cámara', 'error');
+    let msg = 'No se pudo acceder a la cámara';
+    if (e.name === 'NotAllowedError')  msg = 'Permiso de cámara denegado';
+    if (e.name === 'NotFoundError')    msg = 'No se encontró cámara disponible';
+    if (e.name === 'NotReadableError') msg = 'Cámara en uso por otra app';
+    toast(msg, 'error');
   }
 }
 
 function stopCamera() {
+  scanningActive = false;
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
   if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
-  clearInterval(scanInterval);
   const video = document.getElementById('scan-video');
+  video.srcObject = null;
   video.style.display = 'none';
   document.getElementById('scan-inactive').style.display = 'flex';
   document.getElementById('scan-overlay').style.display = 'none';
   document.getElementById('btn-cam-start').style.display = 'inline-flex';
   document.getElementById('btn-cam-stop').style.display = 'none';
+  const status = document.getElementById('scan-status');
+  if (status) { status.textContent = ''; }
 }
 
-function scanFrame() {
+// Loop de escaneo con requestAnimationFrame — mucho más confiable que setInterval en móvil
+let lastScanTime = 0;
+function scanLoop(timestamp) {
+  if (!scanningActive) return;
+  rafId = requestAnimationFrame(scanLoop);
+
+  // Limitar a ~10 fps para no saturar el hilo principal
+  if (timestamp - lastScanTime < 100) return;
+  lastScanTime = timestamp;
+
   const video = document.getElementById('scan-video');
+  if (!video || video.paused || video.ended) return;
+  if (video.videoWidth === 0 || video.videoHeight === 0) return;
+
   const canvas = document.getElementById('scan-canvas');
-  if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
-  canvas.width = video.videoWidth;
+  canvas.width  = video.videoWidth;
   canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0);
-  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const code = jsQR(imgData.data, imgData.width, imgData.height);
-  if (code) {
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  let imgData;
+  try {
+    imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  } catch(e) { return; }
+
+  const result = jsQR(imgData.data, imgData.width, imgData.height, {
+    inversionAttempts: 'dontInvert'
+  });
+
+  if (result && result.data) {
+    // Flash visual de éxito
+    document.getElementById('scan-overlay').style.borderColor = 'var(--accent2)';
     stopCamera();
-    processCode(code.data);
+    const code = extractDSYCode(result.data);
+    processCode(code, result.data);
   }
 }
 
 function processManual() {
-  const v = document.getElementById('manual-code').value.trim().toUpperCase();
-  if (!v) { toast('Ingresa un código', 'error'); return; }
-  processCode(v);
+  const raw = document.getElementById('manual-code').value.trim();
+  if (!raw) { toast('Ingresa un código', 'error'); return; }
+  const code = extractDSYCode(raw);
+  processCode(code, raw);
 }
 
-function processCode(code) {
+function processCode(code, rawData) {
   currentScanCode = code;
   const p = products[code];
+
   if (!p) {
-    toast(`Código ${code} no registrado en BD`, 'error');
-    renderNoProductTicket(code);
+    // Mostrar qué se leyó del QR para debug
+    toast(`Código "${code}" no está en la BD`, 'error');
+    renderNoProductTicket(code, rawData);
     return;
   }
   document.getElementById('qty-to-remove').value = 1;
   document.getElementById('qty-to-remove').max = p.stock;
   document.getElementById('qty-controls').style.display = 'flex';
   renderPreviewTicket(p);
-  toast(`Código ${code} encontrado — ingresa cantidad`, 'info');
+  toast(`✓ ${p.name} — ingresa cantidad a retirar`, 'success');
 }
 
 function confirmExit() {
@@ -1477,7 +1551,7 @@ function renderTicket(p, qty, prev) {
   document.getElementById('btn-print').style.display = 'block';
 }
 
-function renderNoProductTicket(code) {
+function renderNoProductTicket(code, rawData) {
   document.getElementById('ticket-area').innerHTML = `
     <div class="ticket">
       <div class="ticket-header" style="background:var(--danger);">
@@ -1485,8 +1559,9 @@ function renderNoProductTicket(code) {
         <span class="ticket-header-time">${now()}</span>
       </div>
       <div class="ticket-body">
-        <div class="ticket-row"><span class="ticket-key">Código escaneado</span><span class="ticket-val accent">${code}</span></div>
-        <div class="ticket-row"><span class="ticket-key">Estado</span><span class="ticket-val danger">Sin registro</span></div>
+        <div class="ticket-row"><span class="ticket-key">Código detectado</span><span class="ticket-val accent">${code}</span></div>
+        ${rawData && rawData !== code ? `<div class="ticket-row"><span class="ticket-key">Dato QR completo</span><span class="ticket-val" style="font-size:10px;word-break:break-all;">${rawData}</span></div>` : ''}
+        <div class="ticket-row"><span class="ticket-key">Estado</span><span class="ticket-val danger">Sin registro en BD</span></div>
       </div>
       <div class="ticket-footer">Registra el producto en Base de Datos primero</div>
     </div>`;
@@ -1541,7 +1616,7 @@ renderScanHistory();
   setTimeout(() => {
     const p = products[code];
     if (!p) {
-      renderNoProductTicket(code);
+      renderNoProductTicket(code, '');
       toast(`Código ${code} no está en la base de datos`, 'error');
       return;
     }
