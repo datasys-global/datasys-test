@@ -1,0 +1,2328 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RENOVACIÓN SECCIÓN 254 — COMPROMISO</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --negro: #0A0A0A;
+      --negro2: #111111;
+      --gris: #1A1A1A;
+      --dorado: #C9A84C;
+      --dorado-bright: #FFD700;
+      --dorado-claro: #E8C870;
+      --blanco: #FFFFFF;
+      --verde: #2E7D32;
+      --naranja: #E65100;
+      --amarillo: #F9A825;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--negro);
+      color: var(--blanco);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* NAV — transparente sobre el hero, aparece al scroll */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 0.8rem 2rem;
+      background: transparent;
+      border-bottom: 1px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s, border-color 0.4s, backdrop-filter 0.4s;
+    }
+
+    nav.scrolled {
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(12px);
+      border-bottom-color: rgba(201, 168, 76, 0.15);
+    }
+
+    .nav-logo-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .nav-logo {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    .nav-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--dorado);
+      letter-spacing: 0.1em;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--dorado-bright);
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+      }
+    }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      background: radial-gradient(ellipse at center, #1a1200 0%, #0A0A0A 70%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    #particles-canvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo-wrapper {
+      width: 260px;
+      height: 260px;
+      margin: 0 auto 1.5rem;
+      animation: logoPulse 3s ease-in-out infinite, fadeInDown 1s ease both;
+    }
+
+    .logo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+    }
+
+    @keyframes logoPulse {
+
+      0%,
+      100% {
+        filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.5));
+      }
+
+      50% {
+        filter: drop-shadow(0 0 65px rgba(255, 215, 0, 1));
+      }
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-eyebrow {
+      font-size: 0.72rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--dorado);
+      margin-bottom: 0.75rem;
+      animation: fadeInUp 0.8s 0.3s ease both;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.4rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--blanco);
+      animation: fadeInUp 0.8s 0.5s ease both;
+    }
+
+    .hero-title span {
+      color: transparent;
+      -webkit-text-stroke: 2px var(--dorado-bright);
+    }
+
+    .hero-subtitle {
+      font-size: clamp(0.95rem, 2.5vw, 1.3rem);
+      color: var(--dorado-claro);
+      margin: 1.2rem 0 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      animation: fadeInUp 0.8s 0.7s ease both;
+    }
+
+    .countdown-bar {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+      animation: fadeInUp 0.8s 0.9s ease both;
+    }
+
+    .countdown-unit {
+      text-align: center;
+    }
+
+    .countdown-num {
+      display: block;
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--dorado-bright);
+      line-height: 1;
+    }
+
+    .countdown-label {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--dorado);
+      opacity: 0.7;
+    }
+
+    .countdown-sep {
+      font-size: 2.5rem;
+      color: var(--dorado);
+      align-self: center;
+      opacity: 0.5;
+      margin-top: -0.5rem;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, var(--dorado) 0%, var(--dorado-bright) 100%);
+      color: var(--negro);
+      font-weight: 700;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      animation: fadeInUp 0.8s 1.1s ease both;
+      transition: all 0.3s;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 40px rgba(255, 215, 0, 0.5);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--dorado);
+      opacity: 0.5;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      50% {
+        transform: translateX(-50%) translateY(8px);
+      }
+    }
+
+    /* DIVIDER */
+    .gold-divider {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--dorado-bright), transparent);
+    }
+
+    /* SECTIONS */
+    .section {
+      padding: 5rem 1.5rem;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    .section-eyebrow {
+      font-size: 0.68rem;
+      letter-spacing: 0.4em;
+      text-transform: uppercase;
+      color: var(--dorado);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 700;
+      color: var(--blanco);
+    }
+
+    .section-title em {
+      font-style: normal;
+      color: var(--dorado-bright);
+    }
+
+    /* CANDIDATOS */
+    .candidatos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.75rem;
+    }
+
+    .candidate-card {
+      background: var(--gris);
+      border: 1px solid rgba(201, 168, 76, 0.15);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.35s ease;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .candidate-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(201, 168, 76, 0.04) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .candidate-card:hover {
+      border-color: var(--dorado);
+      transform: translateY(-5px);
+      box-shadow: 0 18px 45px rgba(201, 168, 76, 0.2);
+    }
+
+    /* Foto del candidato */
+    .candidate-photo-wrap {
+      width: 100%;
+      height: 260px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #1a1200, #2a2000);
+      flex-shrink: 0;
+    }
+
+    .candidate-photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .candidate-card:hover .candidate-photo-wrap img {
+      transform: scale(1.04);
+    }
+
+    .candidate-photo-wrap::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 50%;
+      background: linear-gradient(transparent, var(--gris));
+      pointer-events: none;
+    }
+
+    /* Placeholder cuando no hay foto */
+    .candidate-photo-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 900;
+      color: var(--dorado);
+    }
+
+    .candidate-body {
+      padding: 1.4rem;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .candidate-num {
+      font-size: 0.6rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: rgba(201, 168, 76, 0.5);
+      margin-bottom: 0.2rem;
+    }
+
+    .candidate-position {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--dorado);
+      margin-bottom: 0.4rem;
+    }
+
+    .candidate-role-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      padding: 0.15rem 0.5rem;
+      border-radius: 20px;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .role-titular {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--dorado-bright);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+    }
+
+    .role-suplente {
+      background: rgba(255, 255, 255, 0.06);
+      color: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .candidate-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--blanco);
+      margin-bottom: 0.6rem;
+      line-height: 1.2;
+    }
+
+    .candidate-slogan {
+      font-size: 0.8rem;
+      color: rgba(255, 255, 255, 0.55);
+      font-style: italic;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+      border-left: 2px solid var(--dorado);
+      padding-left: 0.65rem;
+    }
+
+    /* Plan de trabajo */
+    .candidate-plan {
+      margin-bottom: 1.1rem;
+    }
+
+    .candidate-plan-title {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--dorado);
+      margin-bottom: 0.55rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .candidate-plan-title::before {
+      content: '';
+      display: block;
+      width: 16px;
+      height: 1px;
+      background: var(--dorado);
+    }
+
+    .plan-items {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .plan-items li {
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.7);
+      padding-left: 1rem;
+      position: relative;
+      line-height: 1.45;
+    }
+
+    .plan-items li::before {
+      content: '◆';
+      position: absolute;
+      left: 0;
+      font-size: 0.45rem;
+      color: var(--dorado);
+      top: 0.22rem;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .social-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      text-decoration: none;
+      border-radius: 2px;
+      transition: all 0.25s;
+      border: 1px solid;
+    }
+
+    .social-btn.yt {
+      color: #FF0000;
+      border-color: rgba(255, 0, 0, 0.35);
+      background: rgba(255, 0, 0, 0.07);
+    }
+
+    .social-btn.yt:hover {
+      background: rgba(255, 0, 0, 0.2);
+      border-color: #FF0000;
+    }
+
+    .social-btn.fb {
+      color: #1877F2;
+      border-color: rgba(24, 119, 242, 0.35);
+      background: rgba(24, 119, 242, 0.07);
+    }
+
+    .social-btn.fb:hover {
+      background: rgba(24, 119, 242, 0.2);
+      border-color: #1877F2;
+    }
+
+    .social-btn.tt {
+      color: #FFFFFF;
+      border-color: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .social-btn.tt:hover {
+      background: rgba(255, 255, 255, 0.14);
+      border-color: #FFFFFF;
+    }
+
+    /* ENCUESTA */
+    .poll-container {
+      max-width: 700px;
+      margin: 0 auto;
+      background: var(--gris);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .poll-header {
+      background: linear-gradient(135deg, #1a1200, #2a2000);
+      padding: 2rem;
+      text-align: center;
+      border-bottom: 2px solid var(--dorado);
+    }
+
+    .poll-question {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      font-weight: 700;
+      color: var(--blanco);
+      line-height: 1.3;
+    }
+
+    .poll-subtitle {
+      font-size: 0.72rem;
+      color: var(--dorado);
+      margin-top: 0.5rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .poll-body {
+      padding: 2rem;
+    }
+
+    .poll-option {
+      margin-bottom: 0.9rem;
+      cursor: pointer;
+    }
+
+    .poll-option-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid rgba(201, 168, 76, 0.15);
+      border-radius: 4px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: left;
+      color: var(--blanco);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .poll-option-btn:hover:not(:disabled) {
+      border-color: rgba(201, 168, 76, 0.5);
+      background: rgba(201, 168, 76, 0.06);
+    }
+
+    .poll-option-btn.selected {
+      border-color: var(--dorado-bright) !important;
+      background: rgba(255, 215, 0, 0.1) !important;
+    }
+
+    .planilla-dot {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .dot-oro {
+      background: linear-gradient(135deg, #C9A84C, #FFD700);
+    }
+
+    .dot-verde {
+      background: linear-gradient(135deg, #1B5E20, #4CAF50);
+    }
+
+    .dot-naranja {
+      background: linear-gradient(135deg, #BF360C, #FF7043);
+    }
+
+    .dot-amarillo {
+      background: linear-gradient(135deg, #F57F17, #FDD835);
+    }
+
+    .poll-option-label {
+      flex: 1;
+    }
+
+    .poll-planilla-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: block;
+    }
+
+    .poll-planilla-sub {
+      font-size: 0.72rem;
+      opacity: 0.55;
+    }
+
+    .poll-vote-btn {
+      width: 100%;
+      padding: 1rem;
+      background: linear-gradient(135deg, var(--dorado), var(--dorado-bright));
+      color: var(--negro);
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all 0.3s;
+    }
+
+    .poll-vote-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(255, 215, 0, 0.4);
+    }
+
+    .poll-vote-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .poll-results {
+      display: none;
+    }
+
+    .result-item {
+      margin-bottom: 1.3rem;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.4rem;
+    }
+
+    .result-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--blanco);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .result-pct {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    .pct-oro {
+      color: var(--dorado-bright);
+    }
+
+    .pct-verde {
+      color: #66BB6A;
+    }
+
+    .pct-naranja {
+      color: #FF7043;
+    }
+
+    .pct-amarillo {
+      color: #FDD835;
+    }
+
+    .result-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .result-bar-track {
+      height: 10px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .result-bar-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .bar-oro {
+      background: linear-gradient(90deg, var(--dorado), var(--dorado-bright));
+    }
+
+    .bar-verde {
+      background: linear-gradient(90deg, #2E7D32, #66BB6A);
+    }
+
+    .bar-naranja {
+      background: linear-gradient(90deg, #BF360C, #FF7043);
+    }
+
+    .bar-amarillo {
+      background: linear-gradient(90deg, #F57F17, #FDD835);
+    }
+
+    .result-votes {
+      font-size: 0.68rem;
+      color: rgba(255, 255, 255, 0.35);
+      margin-top: 0.25rem;
+    }
+
+    .poll-total {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--dorado);
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(201, 168, 76, 0.15);
+      letter-spacing: 0.1em;
+    }
+
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(255, 0, 0, 0.12);
+      border: 1px solid rgba(255, 0, 0, 0.35);
+      color: #FF4444;
+      font-size: 0.62rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: #FF4444;
+      border-radius: 50%;
+      animation: livePulse 1.2s infinite;
+    }
+
+    @keyframes livePulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.3;
+        transform: scale(0.7);
+      }
+    }
+
+    /* FOOTER */
+    footer {
+      background: var(--negro2);
+      border-top: 2px solid rgba(201, 168, 76, 0.2);
+      padding: 2.5rem 1.5rem;
+      text-align: center;
+    }
+
+    .footer-logo {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      margin: 0 auto 1rem;
+      display: block;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 10px rgba(201, 168, 76, 0.4));
+    }
+
+    .footer-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--dorado);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.15em;
+    }
+
+    .footer-text {
+      font-size: 0.72rem;
+      color: rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.12em;
+    }
+
+    @media (max-width:720px) {
+      .candidatos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ── ORGANIGRAMA ── */
+    #organigrama {
+      background: var(--negro);
+    }
+
+    .org-wrap {
+      overflow-x: auto;
+      padding-bottom: 2rem;
+    }
+
+    .org-tree {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      min-width: 900px;
+    }
+
+    /* Nivel raíz */
+    .org-root {
+      display: flex;
+      justify-content: center;
+    }
+
+    /* Línea vertical desde root hacia los hijos */
+    .org-root-line {
+      width: 2px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--dorado), var(--dorado-claro));
+      margin: 0 auto;
+    }
+
+    /* Fila de secretarías */
+    .org-row {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      position: relative;
+      padding-top: 0;
+    }
+
+    /* Línea horizontal que conecta todas las secretarías */
+    .org-hline {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--dorado) 15%, var(--dorado) 85%, transparent);
+      width: 95%;
+    }
+
+    /* Columna titular + suplente */
+    .org-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding-top: 40px;
+      /* espacio para la línea vertical desde el hline */
+    }
+
+    /* Línea vertical desde hline hacia el nodo titular */
+    .org-col::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 40px;
+      background: var(--dorado);
+    }
+
+    /* Línea vertical entre titular y suplente */
+    .org-vline {
+      width: 2px;
+      height: 20px;
+      background: rgba(201, 168, 76, 0.4);
+    }
+
+    /* Tarjeta del organigrama */
+    .org-card {
+      width: 140px;
+      background: var(--gris);
+      border: 1px solid rgba(201, 168, 76, 0.2);
+      border-radius: 6px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .org-card:hover {
+      border-color: var(--dorado);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(201, 168, 76, 0.25);
+      z-index: 2;
+      position: relative;
+    }
+
+    .org-card.root-card {
+      width: 170px;
+      border-color: rgba(255, 215, 0, 0.5);
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.15);
+    }
+
+    .org-card.suplente-card {
+      opacity: 0.85;
+      border-style: dashed;
+    }
+
+    .org-photo {
+      width: 100%;
+      height: 100px;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      background: linear-gradient(135deg, #1a1200, #2a2000);
+    }
+
+    .org-card.root-card .org-photo {
+      height: 120px;
+    }
+
+    .org-photo-placeholder {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(135deg, #1a1200, #2a2000);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: var(--dorado);
+    }
+
+    .org-card.root-card .org-photo-placeholder {
+      height: 120px;
+      font-size: 2rem;
+    }
+
+    .org-info {
+      padding: 0.55rem 0.5rem 0.6rem;
+    }
+
+    .org-badge {
+      display: inline-block;
+      font-size: 0.5rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 20px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+
+    .org-badge.titular {
+      background: rgba(255, 215, 0, 0.15);
+      color: var(--dorado-bright);
+      border: 1px solid rgba(255, 215, 0, 0.35);
+    }
+
+    .org-badge.suplente {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .org-num {
+      font-size: 0.5rem;
+      color: rgba(201, 168, 76, 0.45);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .org-position {
+      font-size: 0.58rem;
+      color: var(--dorado-claro);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.2rem;
+      line-height: 1.3;
+    }
+
+    .org-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--blanco);
+      line-height: 1.25;
+    }
+
+    /* Sub-vocales: 1er y 2do vocal debajo del suplente de Sec. Com. Justicia */
+    .org-sub-row {
+      display: flex;
+      gap: 0.6rem;
+      justify-content: center;
+      position: relative;
+      padding-top: 20px;
+    }
+
+    /* Línea horizontal que conecta los dos vocales */
+    .org-sub-hline {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(201, 168, 76, 0.4) 20%, rgba(201, 168, 76, 0.4) 80%, transparent);
+      width: 80%;
+    }
+
+    /* Cada vocal col */
+    .org-sub-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding-top: 20px;
+    }
+
+    /* Línea vertical desde hline hasta la tarjeta del vocal */
+    .org-sub-col::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 20px;
+      background: rgba(201, 168, 76, 0.4);
+    }
+
+    .org-card.vocal-card {
+      width: 120px;
+      border-color: rgba(201, 168, 76, 0.15);
+    }
+
+    .org-card.vocal-card .org-photo,
+    .org-card.vocal-card .org-photo-placeholder {
+      height: 80px;
+      font-size: 1.2rem;
+    }
+
+    @media (max-width: 700px) {
+      .org-tree {
+        min-width: 700px;
+      }
+
+      .org-card {
+        width: 110px;
+      }
+
+      .org-card.root-card {
+        width: 140px;
+      }
+
+      .org-row {
+        gap: 0.75rem;
+      }
+
+      .org-card.vocal-card {
+        width: 95px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV (transparente, aparece al scroll) -->
+  <nav id="main-nav">
+    <div class="nav-logo-wrap">
+      <img class="nav-logo" src="imagenes/seccion254.PNG" alt="Logo">
+      <span class="nav-title">SECCIÓN 254</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#organigrama">Organigrama</a></li>
+      <li><a href="#encuesta">Encuesta</a></li>
+      <li><a href="#candidatos">Candidatos</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <canvas id="particles-canvas"></canvas>
+    <div class="hero-content">
+      <div class="logo-wrapper">
+        <img src="imagenes/seccion254.PNG" alt="Logo">
+      </div>
+      <p class="hero-eyebrow">SUTERM — Zona Chapingo, Estado de México</p>
+      <h1 class="hero-title">RENOVACIÓN<br><span>SECCIÓN 254</span></h1>
+      <p class="hero-subtitle">Compromiso. Unidad. Dignidad Trabajadora.</p>
+      <div class="countdown-bar" id="countdown">
+        <div class="countdown-unit"><span class="countdown-num" id="cd-days">00</span><span
+            class="countdown-label">Días</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-hours">00</span><span
+            class="countdown-label">Horas</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-mins">00</span><span
+            class="countdown-label">Minutos</span></div>
+        <span class="countdown-sep">:</span>
+        <div class="countdown-unit"><span class="countdown-num" id="cd-secs">00</span><span
+            class="countdown-label">Segundos</span></div>
+      </div>
+      <a href="#candidatos" class="hero-cta">Conoce la Planilla →</a>
+    </div>
+    <div class="scroll-hint">▼ &nbsp; Desliza hacia abajo</div>
+  </section>
+
+  <div class="gold-divider"></div>
+
+  <!-- ORGANIGRAMA -->
+  <section class="section" id="organigrama" style="background:var(--negro); padding-bottom:3rem;">
+    <div class="section-inner">
+      <div class="section-header">
+        <p class="section-eyebrow">Estructura de la Planilla</p>
+        <h2 class="section-title">Organigrama <em>Renovación 254</em></h2>
+      </div>
+      <div class="org-wrap">
+        <div class="org-tree">
+
+          <!-- SECRETARIO GENERAL (raíz) -->
+          <div class="org-root">
+            <div class="org-card root-card">
+              <img class="org-photo" src="imagenes/c01.jpg" alt="Secretario General"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+              <div class="org-photo-placeholder" style="display:none;">S.G.</div>
+              <div class="org-info">
+                <div class="org-badge titular">Titular</div>
+                <div class="org-num">No. 1</div>
+                <div class="org-position">Secretario(a) General</div>
+                <div class="org-name">Candidato(a) Titular</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Línea vertical raíz → hline -->
+          <div class="org-root-line"></div>
+
+          <!-- Línea horizontal + columnas de secretarías -->
+          <div class="org-row" style="position:relative; width:100%;">
+            <div class="org-hline"></div>
+
+            <!-- TRABAJO -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c02.jpg" alt="Sec. Trabajo Titular"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">S.T.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 2</div>
+                  <div class="org-position">Sec. de Trabajo</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c03.jpg" alt="Sec. Trabajo Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">S.T.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 3</div>
+                  <div class="org-position">Sec. de Trabajo</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PREVISIÓN SOCIAL -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c04.jpg" alt="Previsión Social Titular"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">P.S.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 4</div>
+                  <div class="org-position">Previsión Social</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c05.jpg" alt="Previsión Social Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">P.S.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 5</div>
+                  <div class="org-position">Previsión Social</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- FINANZAS (Eric — destacado) -->
+            <div class="org-col">
+              <div class="org-card" style="border-color:rgba(255,215,0,0.5); box-shadow:0 0 20px rgba(255,215,0,0.12);">
+                <img class="org-photo" src="imagenes/c06.jpg" alt="Finanzas Titular"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">💰</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 6</div>
+                  <div class="org-position">Sec. de Finanzas</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c07.jpg" alt="Finanzas Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">F.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 7</div>
+                  <div class="org-position">Sec. de Finanzas</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ORGANIZACIÓN -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c08.jpg" alt="Organización Titular"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">S.O.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 8</div>
+                  <div class="org-position">Sec. de Organización</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c09.jpg" alt="Organización Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">O.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 9</div>
+                  <div class="org-position">Sec. de Organización</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- INTERIOR -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c12.jpg" alt="Interior Titular"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">S.I.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 12</div>
+                  <div class="org-position">Sec. del Interior</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c13.jpg" alt="Interior Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">I.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 13</div>
+                  <div class="org-position">Sec. del Interior</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMISIÓN JUSTICIA — PRESIDENTE + 1er VOCAL -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c14.jpg" alt="Pdte. Com. Justicia"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">C.J.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 14</div>
+                  <div class="org-position">Pdte. Com. Justicia</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c15.jpg" alt="Pdte. Com. Justicia Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">C.J.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 15</div>
+                  <div class="org-position">Pdte. Com. Justicia</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+
+              <!-- 1er Vocal debajo del suplente del Presidente -->
+              <div class="org-sub-row" style="flex-direction:column; align-items:center;">
+                <div class="org-vline" style="background:rgba(201,168,76,0.4);"></div>
+                <div class="org-card vocal-card">
+                  <img class="org-photo" src="imagenes/c18.jpg" alt="1er Vocal Justicia"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                  <div class="org-photo-placeholder" style="display:none;">1.V.</div>
+                  <div class="org-info">
+                    <div class="org-badge titular">Titular</div>
+                    <div class="org-num">No. 18</div>
+                    <div class="org-position">1er Vocal</div>
+                    <div class="org-name">Candidato(a) Titular</div>
+                  </div>
+                </div>
+                <div class="org-vline" style="background:rgba(201,168,76,0.4);"></div>
+                <div class="org-card vocal-card suplente-card">
+                  <img class="org-photo" src="imagenes/c19.jpg" alt="1er Vocal Suplente"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                  <div class="org-photo-placeholder" style="display:none;">1.V.S.</div>
+                  <div class="org-info">
+                    <div class="org-badge suplente">Suplente</div>
+                    <div class="org-num">No. 19</div>
+                    <div class="org-position">1er Vocal</div>
+                    <div class="org-name">Candidato(a) Suplente</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- COMISIÓN JUSTICIA — SECRETARIO + 2do VOCAL -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c16.jpg" alt="Sec. Com. Justicia"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">S.C.J.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 16</div>
+                  <div class="org-position">Sec. Com. Justicia</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c17.jpg" alt="Sec. Com. Justicia Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">S.J.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 17</div>
+                  <div class="org-position">Sec. Com. Justicia</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+
+              <!-- 2do Vocal debajo del suplente del Secretario -->
+              <div class="org-sub-row" style="flex-direction:column; align-items:center;">
+                <div class="org-vline" style="background:rgba(201,168,76,0.4);"></div>
+                <div class="org-card vocal-card">
+                  <img class="org-photo" src="imagenes/c20.jpg" alt="2do Vocal Justicia"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                  <div class="org-photo-placeholder" style="display:none;">2.V.</div>
+                  <div class="org-info">
+                    <div class="org-badge titular">Titular</div>
+                    <div class="org-num">No. 20</div>
+                    <div class="org-position">2do Vocal</div>
+                    <div class="org-name">Candidato(a) Titular</div>
+                  </div>
+                </div>
+                <div class="org-vline" style="background:rgba(201,168,76,0.4);"></div>
+                <div class="org-card vocal-card suplente-card">
+                  <img class="org-photo" src="imagenes/c21.jpg" alt="2do Vocal Suplente"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                  <div class="org-photo-placeholder" style="display:none;">2.V.S.</div>
+                  <div class="org-info">
+                    <div class="org-badge suplente">Suplente</div>
+                    <div class="org-num">No. 21</div>
+                    <div class="org-position">2do Vocal</div>
+                    <div class="org-name">Candidato(a) Suplente</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /org-row -->
+        </div><!-- /org-tree -->
+      </div><!-- /org-wrap -->
+    </div>
+  </section>
+
+  <div class="gold-divider"></div>
+
+  <!-- ENCUESTA -->
+  <section class="section" id="encuesta">
+    <div class="section-inner">
+      <div class="section-header">
+        <p class="section-eyebrow">Tu Voz Importa</p>
+        <h2 class="section-title">Encuesta <em>en Tiempo Real</em></h2>
+      </div>
+      <div class="poll-container">
+        <div class="poll-header">
+          <div class="live-badge">
+            <div class="live-dot"></div>En Vivo
+          </div>
+          <p class="poll-question">Si hoy fuera la votación, ¿cuál planilla elegirías para dirigir la Sección 254?</p>
+          <p class="poll-subtitle">Encuesta anónima — Un voto por dispositivo</p>
+        </div>
+        <div class="poll-body">
+
+          <!-- VOTING FORM -->
+          <div id="poll-form">
+            <div class="poll-option" onclick="selectOption('oro')">
+              <button class="poll-option-btn" id="btn-oro" type="button">
+                <div class="planilla-dot dot-oro"></div>
+                <span class="poll-option-label">
+                  <span class="poll-planilla-name">🥇 Planilla Oro</span>
+                  <span class="poll-planilla-sub">Renovación — Sección 254</span>
+                </span>
+              </button>
+            </div>
+            <div class="poll-option" onclick="selectOption('verde')">
+              <button class="poll-option-btn" id="btn-verde" type="button">
+                <div class="planilla-dot dot-verde"></div>
+                <span class="poll-option-label">
+                  <span class="poll-planilla-name">🟢 Planilla Verde</span>
+                  <span class="poll-planilla-sub">Sección 254</span>
+                </span>
+              </button>
+            </div>
+            <div class="poll-option" onclick="selectOption('naranja')">
+              <button class="poll-option-btn" id="btn-naranja" type="button">
+                <div class="planilla-dot dot-naranja"></div>
+                <span class="poll-option-label">
+                  <span class="poll-planilla-name">🟠 Planilla Naranja</span>
+                  <span class="poll-planilla-sub">Sección 254</span>
+                </span>
+              </button>
+            </div>
+            <div class="poll-option" onclick="selectOption('amarillo')">
+              <button class="poll-option-btn" id="btn-amarillo" type="button">
+                <div class="planilla-dot dot-amarillo"></div>
+                <span class="poll-option-label">
+                  <span class="poll-planilla-name">🟡 Planilla Amarilla</span>
+                  <span class="poll-planilla-sub">Sección 254</span>
+                </span>
+              </button>
+            </div>
+            <button class="poll-vote-btn" id="vote-btn" onclick="castVote()" disabled>Emitir mi Voto</button>
+          </div>
+
+          <!-- RESULTS -->
+          <div class="poll-results" id="poll-results">
+            <p
+              style="font-size:0.8rem;color:var(--dorado);margin-bottom:1.5rem;text-align:center;letter-spacing:0.1em;text-transform:uppercase;">
+              ¡Gracias por participar! Resultados en tiempo real:</p>
+            <div class="result-item">
+              <div class="result-header">
+                <span class="result-name">
+                  <div class="result-dot" style="background:linear-gradient(135deg,#C9A84C,#FFD700)"></div>🥇 Planilla
+                  Oro
+                </span>
+                <span class="result-pct pct-oro" id="pct-oro">0%</span>
+              </div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill bar-oro" id="bar-oro" style="width:0%"></div>
+              </div>
+              <div class="result-votes" id="votes-oro">0 votos</div>
+            </div>
+            <div class="result-item">
+              <div class="result-header">
+                <span class="result-name">
+                  <div class="result-dot" style="background:linear-gradient(135deg,#2E7D32,#66BB6A)"></div>🟢 Planilla
+                  Verde
+                </span>
+                <span class="result-pct pct-verde" id="pct-verde">0%</span>
+              </div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill bar-verde" id="bar-verde" style="width:0%"></div>
+              </div>
+              <div class="result-votes" id="votes-verde">0 votos</div>
+            </div>
+            <div class="result-item">
+              <div class="result-header">
+                <span class="result-name">
+                  <div class="result-dot" style="background:linear-gradient(135deg,#BF360C,#FF7043)"></div>🟠 Planilla
+                  Naranja
+                </span>
+                <span class="result-pct pct-naranja" id="pct-naranja">0%</span>
+              </div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill bar-naranja" id="bar-naranja" style="width:0%"></div>
+              </div>
+              <div class="result-votes" id="votes-naranja">0 votos</div>
+            </div>
+            <div class="result-item">
+              <div class="result-header">
+                <span class="result-name">
+                  <div class="result-dot" style="background:linear-gradient(135deg,#F57F17,#FDD835)"></div>🟡 Planilla
+                  Amarilla
+                </span>
+                <span class="result-pct pct-amarillo" id="pct-amarillo">0%</span>
+              </div>
+              <div class="result-bar-track">
+                <div class="result-bar-fill bar-amarillo" id="bar-amarillo" style="width:0%"></div>
+              </div>
+              <div class="result-votes" id="votes-amarillo">0 votos</div>
+            </div>
+            <div class="poll-total" id="poll-total">Total: 0 votos registrados</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="gold-divider"></div>
+
+  <!-- CANDIDATOS -->
+  <section class="section" id="candidatos" style="background:var(--negro2);">
+    <div class="section-inner">
+      <div class="section-header">
+        <p class="section-eyebrow">Planilla Renovación — Sección 254</p>
+        <h2 class="section-title">Nuestros <em>21 Candidatos</em></h2>
+      </div>
+      <div class="candidatos-grid">
+
+        <!-- 1 SECRETARIO GENERAL TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c01.jpg" alt="Secretario General Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.G.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 1</p>
+            <p class="candidate-position">Secretario(a) General</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"La unidad de nuestra sección es nuestra mayor fortaleza."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Impulsar la transparencia en todas las decisiones del Comité Ejecutivo</li>
+                <li>Fortalecer los canales de comunicación entre trabajadores y directiva</li>
+                <li>Gestionar mejoras salariales y de contrato colectivo</li>
+                <li>Promover la capacitación y desarrollo profesional de los agremiados</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 SECRETARIO DE TRABAJO TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c02.jpg" alt="Secretario de Trabajo Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.T.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 2</p>
+            <p class="candidate-position">Secretario(a) de Trabajo</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Cada trabajador merece condiciones dignas en su lugar de trabajo."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Revisar y actualizar el Contrato Colectivo de Trabajo</li>
+                <li>Atender con rapidez los conflictos laborales individuales y colectivos</li>
+                <li>Gestionar mejoras en las condiciones físicas de los centros de trabajo</li>
+                <li>Capacitar a los trabajadores sobre sus derechos laborales</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 SECRETARIO DE TRABAJO SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c03.jpg" alt="Secretario de Trabajo Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.T.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 3</p>
+            <p class="candidate-position">Secretario(a) de Trabajo</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Apoyo y respaldo en cada paso del proceso laboral."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Dar seguimiento puntual a todos los expedientes laborales abiertos</li>
+                <li>Apoyar al titular en negociaciones con la institución</li>
+                <li>Mantener actualizado el registro de incidencias laborales</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 PREVISIÓN SOCIAL TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c04.jpg" alt="Previsión Social Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">P.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 4</p>
+            <p class="candidate-position">Secretario(a) de Previsión Social</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"El bienestar de la familia trabajadora, nuestra prioridad."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Ampliar el acceso a apoyos médicos, educativos y funerarios</li>
+                <li>Gestionar convenios con instituciones de salud y educación</li>
+                <li>Crear un programa de becas para hijos de trabajadores</li>
+                <li>Digitalizar los trámites de previsión social para agilizar la atención</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 PREVISIÓN SOCIAL SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c05.jpg" alt="Previsión Social Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">P.S.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 5</p>
+            <p class="candidate-position">Secretario(a) de Previsión Social</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Apoyo constante para la previsión social de cada trabajador."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Apoyar la gestión de trámites ante el IMSS e ISSSTE</li>
+                <li>Dar seguimiento a los casos de incapacidad y jubilación</li>
+                <li>Colaborar en la organización de jornadas de salud</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 FINANZAS TITULAR -->
+        <div class="candidate-card" style="border-color:rgba(255,215,0,0.4);">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c06.jpg" alt="Eric A. Manríquez Rojas"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">💰</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 6</p>
+            <p class="candidate-position">Secretario(a) de Finanzas</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Las finanzas de la sección son las finanzas de todos: claras, justas y al
+              servicio del trabajador."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Publicar informes financieros mensuales de forma digital y accesible</li>
+                <li>Implementar un sistema de auditoría interna permanente</li>
+                <li>Optimizar el uso de los recursos para maximizar los beneficios a los agremiados</li>
+                <li>Eliminar gastos superfluos y redirigir recursos a programas sociales</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="https://youtube.com/@ericmanriquez254" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="https://facebook.com/ericmanriquez254" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="https://tiktok.com/@ericmanriquez254" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 7 FINANZAS SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c07.jpg" alt="Finanzas Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">F.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 7</p>
+            <p class="candidate-position">Secretario(a) de Finanzas</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Transparencia y rendición de cuentas en cada peso."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Verificar y validar todos los movimientos contables de la sección</li>
+                <li>Apoyar en la elaboración del presupuesto anual</li>
+                <li>Garantizar el respaldo documental de todos los egresos</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 8 ORGANIZACIÓN TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c08.jpg" alt="Organización Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.O.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 8</p>
+            <p class="candidate-position">Secretario(a) de Organización</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Una sección organizada es una sección que no se dobla ante nadie."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Actualizar y depurar el padrón de agremiados de la sección</li>
+                <li>Crear brigadas de enlace por centro de trabajo</li>
+                <li>Organizar asambleas informativas trimestrales en cada área</li>
+                <li>Fortalecer la estructura interna del sindicato</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 9 ORGANIZACIÓN SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c09.jpg" alt="Organización Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">O.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 9</p>
+            <p class="candidate-position">Secretario(a) de Organización</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Respaldo firme para cada esfuerzo organizativo."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Coordinar la logística de eventos y asambleas sindicales</li>
+                <li>Mantener actualizado el directorio de representantes por área</li>
+                <li>Apoyar al titular en la integración de nuevos agremiados</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 12 INTERIOR TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c12.jpg" alt="Secretario del Interior Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.I.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 12</p>
+            <p class="candidate-position">Secretario(a) del Interior</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Orden, disciplina y comunicación interna eficaz."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Crear un boletín interno mensual para mantener informados a los trabajadores</li>
+                <li>Sistematizar el archivo y documentación del sindicato</li>
+                <li>Establecer un protocolo claro para la atención de quejas internas</li>
+                <li>Mejorar los canales digitales de comunicación interna</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 13 INTERIOR SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c13.jpg" alt="Secretario del Interior Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">I.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 13</p>
+            <p class="candidate-position">Secretario(a) del Interior</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Apoyo incondicional en la gestión interna de la sección."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Asistir al titular en la coordinación de actividades internas</li>
+                <li>Apoyar la organización de actas y minutas de reuniones</li>
+                <li>Facilitar la comunicación entre las diferentes secretarías</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 14 COMISIÓN JUSTICIA PRESIDENTE TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c14.jpg" alt="Pdte. Comisión Justicia Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">C.J.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 14</p>
+            <p class="candidate-position">Pdte. Comisión Seccional de Justicia</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Justicia imparcial y expedita para todos los trabajadores."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Garantizar resoluciones imparciales en todos los conflictos laborales</li>
+                <li>Establecer tiempos máximos de resolución para cada caso</li>
+                <li>Capacitar a la comisión en materia de derecho laboral sindical</li>
+                <li>Publicar estadísticas de casos resueltos de forma periódica</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 15 COMISIÓN JUSTICIA PRESIDENTE SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c15.jpg" alt="Pdte. Comisión Justicia Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">C.J.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 15</p>
+            <p class="candidate-position">Pdte. Comisión Seccional de Justicia</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Respaldo a la comisión de justicia en todo momento."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Acompañar al presidente en cada audiencia y deliberación</li>
+                <li>Colaborar en la redacción de resoluciones y dictámenes</li>
+                <li>Garantizar continuidad operativa de la comisión</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 16 COMISIÓN JUSTICIA SECRETARIO TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c16.jpg" alt="Sec. Comisión Justicia Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.C.J.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 16</p>
+            <p class="candidate-position">Sec. Comisión Seccional de Justicia</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Administración transparente de los procesos de justicia."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Llevar un registro riguroso de todos los expedientes de la comisión</li>
+                <li>Elaborar actas detalladas de cada sesión y resolución</li>
+                <li>Digitalizar el archivo histórico de la comisión de justicia</li>
+                <li>Asegurar la notificación oportuna a las partes involucradas</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 17 COMISIÓN JUSTICIA SECRETARIO SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c17.jpg" alt="Sec. Comisión Justicia Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">S.J.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 17</p>
+            <p class="candidate-position">Sec. Comisión Seccional de Justicia</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Apoyo permanente en los procedimientos de justicia."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Dar seguimiento a los expedientes en proceso</li>
+                <li>Apoyar en la elaboración y resguardo de actas oficiales</li>
+                <li>Garantizar la correcta notificación a los interesados</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 18 1er VOCAL JUSTICIA TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c18.jpg" alt="1er Vocal Justicia Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">1.V.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 18</p>
+            <p class="candidate-position">1er Vocal / Com. Seccional de Justicia</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Primera voz para la defensa de los derechos del trabajador."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Participar activamente en todas las deliberaciones de la comisión</li>
+                <li>Representar a los trabajadores ante procedimientos disciplinarios</li>
+                <li>Proponer mejoras al reglamento interno de justicia seccional</li>
+                <li>Promover una cultura de resolución pacífica de conflictos</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 19 1er VOCAL JUSTICIA SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c19.jpg" alt="1er Vocal Justicia Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">1.V.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 19</p>
+            <p class="candidate-position">1er Vocal / Com. Seccional de Justicia</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Respaldo al primer vocal en todos los procesos."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Acompañar al primer vocal titular en cada sesión de la comisión</li>
+                <li>Atender a los trabajadores que soliciten orientación en materia de justicia</li>
+                <li>Mantener comunicación constante con las partes en cada proceso</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 20 2do VOCAL JUSTICIA TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c20.jpg" alt="2do Vocal Justicia Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">2.V.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 20</p>
+            <p class="candidate-position">2do Vocal / Com. Seccional de Justicia</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Segunda voz que amplifica la justicia dentro de la sección."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Aportar perspectiva crítica e imparcial en cada deliberación</li>
+                <li>Impulsar la revisión de casos rezagados en la comisión</li>
+                <li>Promover la equidad de género en los procesos de justicia</li>
+                <li>Colaborar con el primer vocal para agilizar tiempos de resolución</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 21 2do VOCAL JUSTICIA SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c21.jpg" alt="2do Vocal Justicia Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">2.V.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 21</p>
+            <p class="candidate-position">2do Vocal / Com. Seccional de Justicia</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Respaldo al segundo vocal para una justicia plena."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Apoyar al segundo vocal en cada proceso de la comisión</li>
+                <li>Dar continuidad a los casos asignados en ausencia del titular</li>
+                <li>Contribuir a la actualización del reglamento de justicia seccional</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <img class="footer-logo" src="imagenes/seccion254.PNG" alt="Logo">
+    <p class="footer-brand">RENOVACIÓN — SECCIÓN 254</p>
+    <p class="footer-text">SUTERM · Zona Chapingo · Estado de México · Compromiso con el Trabajador</p>
+  </footer>
+
+  <script>
+    // NAV transparente que aparece al hacer scroll
+    (function () {
+      const nav = document.getElementById('main-nav');
+      window.addEventListener('scroll', function () {
+        if (window.scrollY > 80) { nav.classList.add('scrolled'); }
+        else { nav.classList.remove('scrolled'); }
+      });
+    })();
+
+    // PARTÍCULAS
+    (function () {
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+      function createParticle() {
+        return {
+          x: Math.random() * canvas.width, y: Math.random() * canvas.height,
+          size: Math.random() * 2.5 + 0.5, speedX: (Math.random() - 0.5) * 0.4,
+          speedY: -Math.random() * 0.5 - 0.2, opacity: Math.random() * 0.6 + 0.1,
+          life: 0, maxLife: Math.random() * 200 + 100
+        };
+      }
+      function init() { resize(); for (let i = 0; i < 80; i++) particles.push(createParticle()); window.addEventListener('resize', resize); }
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p, i) => {
+          p.life++; p.x += p.speedX; p.y += p.speedY;
+          const alpha = p.opacity * Math.sin((p.life / p.maxLife) * Math.PI);
+          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,200,50,${alpha})`; ctx.fill();
+          if (p.life >= p.maxLife) particles[i] = createParticle();
+        });
+        requestAnimationFrame(animate);
+      }
+      init(); animate();
+    })();
+
+    // COUNTDOWN
+    (function () {
+      const target = new Date(); target.setDate(target.getDate() + 30);
+      function update() {
+        const now = new Date(), diff = target - now; if (diff <= 0) return;
+        const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000),
+          m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+        document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
+        document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
+        document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
+        document.getElementById('cd-secs').textContent = String(s).padStart(2, '0');
+      }
+      update(); setInterval(update, 1000);
+    })();
+
+    // ENCUESTA
+    let selected = null;
+    const STORAGE_KEY = 'poll254_planillas_v1';
+    const planillas = ['oro', 'verde', 'naranja', 'amarillo'];
+
+    function getVotes() {
+      try {
+        const raw = localStorage.getItem('poll254_planilla_votes');
+        if (raw) return JSON.parse(raw);
+      } catch (e) { }
+      return { oro: 18, verde: 11, naranja: 9, amarillo: 14 };
+    }
+    function saveVotes(v) { try { localStorage.setItem('poll254_planilla_votes', JSON.stringify(v)); } catch (e) { } }
+
+    function selectOption(id) {
+      selected = id;
+      planillas.forEach(k => {
+        document.getElementById('btn-' + k).classList.toggle('selected', k === id);
+      });
+      document.getElementById('vote-btn').disabled = false;
+    }
+
+    function updateDisplay(votes) {
+      const total = planillas.reduce((s, k) => s + votes[k], 0);
+      planillas.forEach(k => {
+        const pct = total > 0 ? Math.round((votes[k] / total) * 100) : 0;
+        document.getElementById('pct-' + k).textContent = pct + '%';
+        document.getElementById('votes-' + k).textContent = votes[k] + (votes[k] === 1 ? ' voto' : ' votos');
+        setTimeout(() => { document.getElementById('bar-' + k).style.width = pct + '%'; }, 100);
+      });
+      document.getElementById('poll-total').textContent = 'Total: ' + total + ' votos registrados';
+    }
+
+    function castVote() {
+      if (!selected) return;
+      const voted = localStorage.getItem(STORAGE_KEY);
+      let votes = getVotes();
+      if (!voted) { votes[selected]++; saveVotes(votes); localStorage.setItem(STORAGE_KEY, '1'); }
+      document.getElementById('poll-form').style.display = 'none';
+      document.getElementById('poll-results').style.display = 'block';
+      updateDisplay(votes);
+      // Simular votos en vivo
+      setInterval(() => {
+        const v = getVotes();
+        v[planillas[Math.floor(Math.random() * 4)]]++;
+        saveVotes(v);
+        updateDisplay(v);
+      }, 7000);
+    }
+
+    (function () {
+      if (localStorage.getItem(STORAGE_KEY)) {
+        const v = getVotes();
+        document.getElementById('poll-form').style.display = 'none';
+        document.getElementById('poll-results').style.display = 'block';
+        updateDisplay(v);
+        setInterval(() => {
+          const vv = getVotes(); vv[planillas[Math.floor(Math.random() * 4)]]++; saveVotes(vv); updateDisplay(vv);
+        }, 7000);
+      }
+    })();
+  </script>
+
+</body>
+
+</html>
