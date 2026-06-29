@@ -1166,6 +1166,76 @@
         width: 95px;
       }
     }
+
+    /* ── ORGANIGRAMA MÓVIL: layout vertical 2 columnas ── */
+    @media (max-width: 600px) {
+      /* Ocultar árbol horizontal */
+      .org-wrap {
+        overflow-x: visible;
+        padding-bottom: 0;
+      }
+
+      .org-tree {
+        display: none;
+      }
+
+      /* Mostrar vista móvil */
+      .org-mobile {
+        display: block !important;
+      }
+
+      .org-mobile-root {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .org-mobile-root .org-card {
+        width: 160px;
+      }
+
+      .org-mobile-section-title {
+        font-size: 0.62rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--dorado);
+        text-align: center;
+        margin: 1.2rem 0 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid rgba(201, 168, 76, 0.2);
+      }
+
+      .org-mobile-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+
+      .org-mobile-grid .org-card {
+        width: 100%;
+      }
+
+      .org-mobile-grid .org-card .org-photo,
+      .org-mobile-grid .org-card .org-photo-placeholder {
+        height: 90px;
+        font-size: 1.4rem;
+      }
+
+      .org-mobile-pair {
+        display: contents;
+      }
+
+      /* Conector visual entre titular y suplente en móvil */
+      .org-mobile-grid .org-card.suplente-card {
+        border-style: dashed;
+        opacity: 0.88;
+      }
+    }
+
+    /* En pantallas > 600px ocultar la vista móvil */
+    .org-mobile {
+      display: none;
+    }
   </style>
 </head>
 
@@ -1354,6 +1424,33 @@
               </div>
             </div>
 
+            <!-- ACTAS Y ESTADÍSTICA -->
+            <div class="org-col">
+              <div class="org-card">
+                <img class="org-photo" src="imagenes/c10.jpg" alt="Actas y Estadística Titular"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">A.E.</div>
+                <div class="org-info">
+                  <div class="org-badge titular">Titular</div>
+                  <div class="org-num">No. 10</div>
+                  <div class="org-position">Coord. Actas y Est.</div>
+                  <div class="org-name">Candidato(a) Titular</div>
+                </div>
+              </div>
+              <div class="org-vline"></div>
+              <div class="org-card suplente-card">
+                <img class="org-photo" src="imagenes/c11.jpg" alt="Actas y Estadística Suplente"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                <div class="org-photo-placeholder" style="display:none;">A.E.S.</div>
+                <div class="org-info">
+                  <div class="org-badge suplente">Suplente</div>
+                  <div class="org-num">No. 11</div>
+                  <div class="org-position">Coord. Actas y Est.</div>
+                  <div class="org-name">Candidato(a) Suplente</div>
+                </div>
+              </div>
+            </div>
+
             <!-- INTERIOR -->
             <div class="org-col">
               <div class="org-card">
@@ -1494,6 +1591,289 @@
           </div><!-- /org-row -->
         </div><!-- /org-tree -->
       </div><!-- /org-wrap -->
+
+      <!-- ── VISTA MÓVIL DEL ORGANIGRAMA (visible solo en pantallas ≤600px) ── -->
+      <div class="org-mobile">
+
+        <!-- Secretario General -->
+        <div class="org-mobile-root">
+          <div class="org-card root-card">
+            <img class="org-photo" src="imagenes/c01.jpg" alt="Secretario General"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.G.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 1</div>
+              <div class="org-position">Secretario(a) General</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secretarías principales -->
+        <p class="org-mobile-section-title">Secretarías</p>
+        <div class="org-mobile-grid">
+
+          <!-- Trabajo Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c02.jpg" alt="Sec. Trabajo Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.T.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 2</div>
+              <div class="org-position">Sec. de Trabajo</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Trabajo Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c03.jpg" alt="Sec. Trabajo Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.T.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 3</div>
+              <div class="org-position">Sec. de Trabajo</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- Previsión Social Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c04.jpg" alt="Previsión Social Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">P.S.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 4</div>
+              <div class="org-position">Sec. Previsión Social</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Previsión Social Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c05.jpg" alt="Previsión Social Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">P.S.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 5</div>
+              <div class="org-position">Sec. Previsión Social</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- Finanzas Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c06.jpg" alt="Finanzas Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.F.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 6</div>
+              <div class="org-position">Sec. de Finanzas</div>
+              <div class="org-name">Eric Alfonso Manriquez Rojas</div>
+            </div>
+          </div>
+          <!-- Finanzas Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c07.jpg" alt="Finanzas Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.F.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 7</div>
+              <div class="org-position">Sec. de Finanzas</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- Organización Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c08.jpg" alt="Organización Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.O.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 8</div>
+              <div class="org-position">Sec. de Organización</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Organización Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c09.jpg" alt="Organización Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">O.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 9</div>
+              <div class="org-position">Sec. de Organización</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- Actas y Estadística Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c10.jpg" alt="Actas y Estadística Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">A.E.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 10</div>
+              <div class="org-position">Coord. Actas y Est.</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Actas y Estadística Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c11.jpg" alt="Actas y Estadística Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">A.E.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 11</div>
+              <div class="org-position">Coord. Actas y Est.</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- Interior Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c12.jpg" alt="Interior Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.I.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 12</div>
+              <div class="org-position">Sec. del Interior</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Interior Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c13.jpg" alt="Interior Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">I.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 13</div>
+              <div class="org-position">Sec. del Interior</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+        </div><!-- /org-mobile-grid secretarías -->
+
+        <!-- Comisión Seccional de Justicia -->
+        <p class="org-mobile-section-title">Comisión Seccional de Justicia</p>
+        <div class="org-mobile-grid">
+
+          <!-- Presidente Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c14.jpg" alt="Pdte. Com. Justicia"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">C.J.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 14</div>
+              <div class="org-position">Pdte. Com. Justicia</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Presidente Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c15.jpg" alt="Pdte. Com. Justicia Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">C.J.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 15</div>
+              <div class="org-position">Pdte. Com. Justicia</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- Secretario Justicia Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c16.jpg" alt="Sec. Com. Justicia"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.C.J.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 16</div>
+              <div class="org-position">Sec. Com. Justicia</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- Secretario Justicia Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c17.jpg" alt="Sec. Com. Justicia Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">S.J.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 17</div>
+              <div class="org-position">Sec. Com. Justicia</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- 1er Vocal Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c18.jpg" alt="1er Vocal Justicia"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">1.V.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 18</div>
+              <div class="org-position">1er Vocal</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- 1er Vocal Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c19.jpg" alt="1er Vocal Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">1.V.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 19</div>
+              <div class="org-position">1er Vocal</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+          <!-- 2do Vocal Titular -->
+          <div class="org-card">
+            <img class="org-photo" src="imagenes/c20.jpg" alt="2do Vocal Justicia"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">2.V.</div>
+            <div class="org-info">
+              <div class="org-badge titular">Titular</div>
+              <div class="org-num">No. 20</div>
+              <div class="org-position">2do Vocal</div>
+              <div class="org-name">Candidato(a) Titular</div>
+            </div>
+          </div>
+          <!-- 2do Vocal Suplente -->
+          <div class="org-card suplente-card">
+            <img class="org-photo" src="imagenes/c21.jpg" alt="2do Vocal Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="org-photo-placeholder" style="display:none;">2.V.S.</div>
+            <div class="org-info">
+              <div class="org-badge suplente">Suplente</div>
+              <div class="org-num">No. 21</div>
+              <div class="org-position">2do Vocal</div>
+              <div class="org-name">Candidato(a) Suplente</div>
+            </div>
+          </div>
+
+        </div><!-- /org-mobile-grid justicia -->
+
+      </div><!-- /org-mobile -->
+
     </div>
   </section>
 
@@ -1900,6 +2280,65 @@
           </div>
         </div>
 
+        <!-- 10 ACTAS Y ESTADÍSTICA TITULAR -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c10.jpg" alt="Actas y Estadística Titular"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">A.E.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 10</p>
+            <p class="candidate-position">Coord. de Actas y Estadística</p>
+            <span class="candidate-role-badge role-titular">Titular</span>
+            <h3 class="candidate-name">Candidato(a) Titular</h3>
+            <p class="candidate-slogan">"Transparencia y exactitud en cada registro seccional."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Digitalizar y resguardar el acervo de actas de asamblea</li>
+                <li>Generar estadísticas actualizadas de afiliación y participación</li>
+                <li>Garantizar la correcta elaboración de actas en cada sesión</li>
+                <li>Transparentar los datos estadísticos ante los agremiados</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 11 ACTAS Y ESTADÍSTICA SUPLENTE -->
+        <div class="candidate-card">
+          <div class="candidate-photo-wrap">
+            <img src="imagenes/c11.jpg" alt="Actas y Estadística Suplente"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="candidate-photo-placeholder" style="display:none;">A.E.S.</div>
+          </div>
+          <div class="candidate-body">
+            <p class="candidate-num">No. 11</p>
+            <p class="candidate-position">Coord. de Actas y Estadística</p>
+            <span class="candidate-role-badge role-suplente">Suplente</span>
+            <h3 class="candidate-name">Candidato(a) Suplente</h3>
+            <p class="candidate-slogan">"Respaldo y continuidad en el registro fidedigno de la sección."</p>
+            <div class="candidate-plan">
+              <p class="candidate-plan-title">Plan de Trabajo</p>
+              <ul class="plan-items">
+                <li>Apoyar al titular en la elaboración y validación de actas</li>
+                <li>Mantener los archivos estadísticos al día ante cualquier ausencia</li>
+                <li>Colaborar en la difusión de informes estadísticos a los trabajadores</li>
+              </ul>
+            </div>
+            <div class="social-links">
+              <a class="social-btn yt" href="#" target="_blank">▶ YouTube</a>
+              <a class="social-btn fb" href="#" target="_blank">f Facebook</a>
+              <a class="social-btn tt" href="#" target="_blank">♪ TikTok</a>
+            </div>
+          </div>
+        </div>
+
         <!-- 12 INTERIOR TITULAR -->
         <div class="candidate-card">
           <div class="candidate-photo-wrap">
@@ -2245,19 +2684,37 @@
       init(); animate();
     })();
 
-    // COUNTDOWN
+    // COUNTDOWN — Votación 3 de noviembre de 2026, 8:00 a.m. (hora Ciudad de México, UTC-6)
     (function () {
-      const target = new Date(); target.setDate(target.getDate() + 30);
+      // 3 nov 2026 a las 08:00 hora México (UTC-6) = 14:00 UTC
+      const target = new Date('2026-11-03T14:00:00Z');
+
       function update() {
-        const now = new Date(), diff = target - now; if (diff <= 0) return;
-        const d = Math.floor(diff / 86400000), h = Math.floor((diff % 86400000) / 3600000),
-          m = Math.floor((diff % 3600000) / 60000), s = Math.floor((diff % 60000) / 1000);
+        const now = new Date();
+        const diff = target - now;
+
+        if (diff <= 0) {
+          // Día de la votación — mostrar mensaje especial
+          document.getElementById('cd-days').textContent = '¡HOY';
+          document.getElementById('cd-hours').textContent = 'ES';
+          document.getElementById('cd-mins').textContent = 'EL';
+          document.getElementById('cd-secs').textContent = 'DÍA!';
+          return;
+        }
+
+        const d = Math.floor(diff / 86400000);
+        const h = Math.floor((diff % 86400000) / 3600000);
+        const m = Math.floor((diff % 3600000) / 60000);
+        const s = Math.floor((diff % 60000) / 1000);
+
         document.getElementById('cd-days').textContent = String(d).padStart(2, '0');
         document.getElementById('cd-hours').textContent = String(h).padStart(2, '0');
         document.getElementById('cd-mins').textContent = String(m).padStart(2, '0');
         document.getElementById('cd-secs').textContent = String(s).padStart(2, '0');
       }
-      update(); setInterval(update, 1000);
+
+      update();
+      setInterval(update, 1000);
     })();
 
     // ENCUESTA
