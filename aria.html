@@ -1125,6 +1125,7 @@
     var ariaSeccion = "";
     var sidebarOpen = false;
     var esperandoTamaño = false;
+    var tamanoEmpresaConocido = null; // 'pequeña' | 'mediana' | 'grande' — una vez respondido, no se vuelve a preguntar
 
     /* ── TOGGLE BTN: habilitar / deshabilitar ── */
     function setSidebarToggle(enabled) {
@@ -1355,15 +1356,43 @@
 
       ariaSeccion = key;
       if (typeof registrarSeccion === 'function') registrarSeccion(key);
-      esperandoTamaño = true;
       actualizarCtx();
       activarPlatBtn(key);
-      renderTamanosEmpresa();
       setSidebarToggle(true); // habilitar ☰
 
       var lbl = ARIA_SECCIONES[key].label;
       var saludo = (typeof ARIA_USER !== 'undefined' && ARIA_USER.nombre) ? ', <b>' + ARIA_USER.nombre + '</b>' : '';
+
+      // Si ya sabemos el tamaño de empresa (se preguntó una vez), vamos directo a la solución
+      if (tamanoEmpresaConocido) {
+        esperandoTamaño = false;
+        addBot('Perfecto' + saludo + ', vamos a <b>' + lbl + '</b>.');
+        setTimeout(function () {
+          mostrarSolucionSeccion(key, tamanoEmpresaConocido);
+          renderQuickBtns(key);
+        }, 650);
+        return;
+      }
+
+      esperandoTamaño = true;
+      renderTamanosEmpresa();
       addBot('Perfecto' + saludo + ', vamos a <b>' + lbl + '</b>.<br>Para darte la recomendación más precisa: ¿cuántos empleados tiene tu empresa?');
+    }
+
+    /* ── MOSTRAR SOLUCIÓN (reutilizable: primera vez o cambios de sección posteriores) ── */
+    function mostrarSolucionSeccion(seccion, tamano) {
+      // Si está disponible la versión v2 del discurso usa esa, sino la v1
+      if (seccion && typeof SOLUCIONES_TAMAÑO_V2 !== 'undefined'
+        && SOLUCIONES_TAMAÑO_V2[seccion] && SOLUCIONES_TAMAÑO_V2[seccion][tamano]) {
+        var html = SOLUCIONES_TAMAÑO_V2[seccion][tamano](tamano);
+        // Si la función ya renderizó las frases animadas, no llamar addBot
+        if (html !== '__ARIA_FRASES_RENDERED__') addBot(html);
+      } else if (seccion && SOLUCIONES_TAMAÑO[seccion]) {
+        // fallback a v1
+        var keyV1 = tamano === 'pequeña' ? '1 - 20 empleados' : tamano === 'mediana' ? '20 - 100 empleados' : '+ 100 empleados';
+        var solucion = SOLUCIONES_TAMAÑO[seccion][keyV1] || '';
+        addBot(solucion);
+      }
     }
 
     function renderTamanosEmpresa() {
@@ -1598,7 +1627,7 @@
       }
 
       // 5. Precio con descuento
-      var precioBase = 1.99;
+      var precioBase = 1000;
       var precioFinal = descPct > 0 ? (precioBase * (1 - descPct / 100)).toFixed(2) : precioBase.toFixed(2);
 
       /* ── CONSTRUIR RESPUESTA ── */
@@ -1662,7 +1691,7 @@
         + 'width:100%;padding:13px;font-family:\'Orbitron\',monospace;font-size:.58rem;font-weight:700;'
         + 'letter-spacing:3px;background:var(--cyan);color:var(--dark);border:none;cursor:pointer;'
         + 'clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);">'
-        + '📩 CONTACTAR A UN ESPECIALISTA →</button>'
+        + '👉 Activalo Ahora →</button>'
         + '</div>';
 
       addBot(resumen);
@@ -1734,7 +1763,7 @@
         var s = ARIA_SECCIONES[ariaSeccion];
         var isMob = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
         var url = isMob ? s.url_mobile : s.url_desktop;
-        return 'No tengo esa información específica aquí, pero puedes ver todo sobre <b>' + s.label + '</b> en la plataforma completa:<br><a href="' + url + '" style="color:var(--cyan)">→ Ver plataforma completa</a><br><br>O contáctanos: <a href="mailto:contacto@datasys.mx" style="color:var(--cyan)">contacto@datasys.mx</a> · +52 (55) 1017-6436';
+        return 'No tengo esa información específica aquí, pero puedes ver todo sobre <b>' + s.label + '</b> en la plataforma completa:<br><a href="' + url + '" style="color:var(--cyan)">→ Ver plataforma completa</a><br><br>O contáctanos: <a href="mailto:contacto@datasys.global" style="color:var(--cyan)">contacto@datasys.global</a> · +52 (55) 1017-6436';
       }
       return '¿Sobre cuál área quieres saber más? Puedes seleccionarla en el menú lateral o preguntarme directamente.<br><span style="opacity:.5;font-size:.8em;">🏭 producción · 📦 inventarios · 🚚 logística</span>';
     }
@@ -1756,18 +1785,9 @@
         if (t.includes("1") || t.includes("20") || t.includes("100") || t.includes("empleado") || t.includes("pequeña") || t.includes("mediana") || t.includes("grande")) {
           var tamano = (typeof resolverTamanoTexto === 'function') ? resolverTamanoTexto(texto) : "mediana";
 
-          // Si está disponible la versión v2 del discurso usa esa, sino la v1
-          if (ariaSeccion && typeof SOLUCIONES_TAMAÑO_V2 !== 'undefined'
-            && SOLUCIONES_TAMAÑO_V2[ariaSeccion] && SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano]) {
-            var html = SOLUCIONES_TAMAÑO_V2[ariaSeccion][tamano](tamano);
-            // Si la función ya renderizó las frases animadas, no llamar addBot
-            if (html !== '__ARIA_FRASES_RENDERED__') addBot(html);
-          } else if (ariaSeccion && SOLUCIONES_TAMAÑO[ariaSeccion]) {
-            // fallback a v1
-            var keyV1 = tamano === 'pequeña' ? '1 - 20 empleados' : tamano === 'mediana' ? '20 - 100 empleados' : '+ 100 empleados';
-            var solucion = SOLUCIONES_TAMAÑO[ariaSeccion][keyV1] || '';
-            addBot(solucion);
-          }
+          tamanoEmpresaConocido = tamano; // recordar la respuesta: ya no se vuelve a preguntar
+          mostrarSolucionSeccion(ariaSeccion, tamano);
+
           esperandoTamaño = false;
           renderQuickBtns(ariaSeccion);
           return;
