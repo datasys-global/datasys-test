@@ -14,7 +14,7 @@ var ARIA_inventarios = [
   /* ── ENTRADAS Y SALIDAS ── */
   {
     claves: ["entrada","entradas","salida","salidas","movimiento","movimientos","recepción","recepcion","despacho","transferencia"],
-    respuesta: "<div style='margin-bottom:10px;border-radius:6px;overflow:hidden;'><iframe width='100%' height='175' src='https://www.youtube.com/embed/7Gy_qChjFcE' frameborder='0' allowfullscreen style='display:block;'></iframe></div><!-- 🔧 SUSTITUYE con video propio de tu proceso de recepción/despacho --><span style='opacity:.45;font-size:.75em;'>▲ Cómo funciona el control de entradas y salidas</span><br><br>📥📤 <b>Movimientos registrados:</b><br>• Entradas: compras, devoluciones, producción terminada<br>• Salidas: surtido a producción, ventas, transferencias<br>• Lectura por código de barras o QR (cámara del celular)<br>• Historial completo auditable por movimiento"
+    respuesta: "<div style='margin-bottom:10px;border-radius:6px;overflow:hidden;'><iframe width='100%' height='175' src='https://www.youtube-nocookie.com/embed/jp3Tt8IeW-A' frameborder='0' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen style='display:block;'></iframe></div><!-- 🔧 SUSTITUYE con video propio de tu proceso de recepción/despacho --><span style='opacity:.45;font-size:.75em;'>▲ Cómo funciona el control de entradas y salidas</span><br><br>📥📤 <b>Movimientos registrados:</b><br>• Entradas: compras, devoluciones, producción terminada<br>• Salidas: surtido a producción, ventas, transferencias<br>• Lectura por código de barras o QR (cámara del celular)<br>• Historial completo auditable por movimiento"
   },
 
   /* ── STOCK / EXISTENCIAS ── */
@@ -38,7 +38,7 @@ var ARIA_inventarios = [
   /* ── TRAZABILIDAD ── */
   {
     claves: ["trazabilidad","lote","lotes","serie","número de serie","caducidad","vencimiento","rastrear","rastreo"],
-    respuesta: "<div style='margin-bottom:10px;border-radius:6px;overflow:hidden;'><iframe width='100%' height='175' src='https://www.youtube.com/embed/RFV6gIaiCBs' frameborder='0' allowfullscreen style='display:block;'></iframe></div><!-- 🔧 SUSTITUYE con video propio de trazabilidad --><span style='opacity:.45;font-size:.75em;'>▲ Trazabilidad de inventario por lote y serie</span><br><br>🔎 <b>Trazabilidad completa:</b><br>• Por número de lote, serie o fecha de caducidad<br>• ¿De dónde vino? ¿A dónde fue? ¿Quién lo movió?<br>• Trazabilidad hacia atrás (recall) y hacia adelante<br>• Compatible con ISO, BPM y FDA"
+    respuesta: "<div style='margin-bottom:10px;border-radius:6px;overflow:hidden;'><iframe width='100%' height='175' src='https://www.youtube-nocookie.com/embed/RFV6gIaiCBs' frameborder='0' referrerpolicy='strict-origin-when-cross-origin' allowfullscreen style='display:block;'></iframe></div><!-- 🔧 SUSTITUYE con video propio de trazabilidad --><span style='opacity:.45;font-size:.75em;'>▲ Trazabilidad de inventario por lote y serie</span><br><br>🔎 <b>Trazabilidad completa:</b><br>• Por número de lote, serie o fecha de caducidad<br>• ¿De dónde vino? ¿A dónde fue? ¿Quién lo movió?<br>• Trazabilidad hacia atrás (recall) y hacia adelante<br>• Compatible con ISO, BPM y FDA"
   },
 
   /* ── INVENTARIO FÍSICO ── */
